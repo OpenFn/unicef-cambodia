@@ -23,10 +23,10 @@ post("https://api.primero/mrmims_endpoint", {
   },
   body: (state) => {
     const postBody = {
-      comment: 'This case was referred automatically from UNICEF CPIMS+.',
-      consent_to_share_with_unicef: true,
+      comment: 'This case was referred automatically from UNICEF CPIMS+.', //Hard-coded message
+      consent_to_share_with_unicef: true, //Hard-coded set to TRUE as default value
       caseId: state.data.case_id,
-      caseType: 'UNICEF Referral',
+      caseType: 'UNICEF Referral', //Hard-coded "tag" of case data
       referral_date: state.data.date_of_referral,
       referral_type: state.data.type_of_referral,
       referral_response_priority: state.data.referral_response_priority,
