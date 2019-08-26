@@ -1,5 +1,31 @@
 {
   "data":{
-    //Sample payload
-  }
+    "type": "CPMIS+ Case",
+    "case_id": "CP20195678",
+    "consent_given": true,
+    "date_of_referral": "2019-08-06T16:54:51.429555Z",
+    "type_of_referral": "Internal",
+    "referral_response_priority": "Medium",
+    "referred_by_name": "Janani Panchalingam",
+    "referred_by_agency": "UNICEF",
+    "referred_by_position": "Case Manager",
+    "referred_by_phone": "790970353",
+    "referred_by_email":"jan@openfn.org",
+    "referred_to": "MRMIMS+",
+    "referred_to_name": "Robert McTavish",
+    "referred_to_agency": "UNICEF",
+    "referred_to_position": "Case Manager",
+    "referred_to_phone": "2713744657",
+    "referred_to_email": "robert@openfn.org",
+    "beneficiary":{
+      "name_first": "Rebecca",
+      "name_last": "Msikinya",
+      "date_of_birth": "2009-05-04",
+      "sex": "female",
+      "reason_for_referral": "Relocation",
+      "protection_concerns": "Separated; Psychological distress",
+      "protection_concerns_other": null,
+      "referral_service_requested": "Basic psychosocial support",
+      "referral_service_requested_other": null }
+   }
 }
