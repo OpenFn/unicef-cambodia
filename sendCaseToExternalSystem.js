@@ -1,19 +1,22 @@
 //Sample job to send data from CPIMIS+ to external system (proGres)
 alterState((state) => {
   //Example of reformatting data from "Male"/ "Female" value --> "M" / "F"
-  state.sexReformatted = (state.data.beneficiary.sex==='Male' ? 'M' : 'F');
+  state.sexReformatted = (state.data.beneficiary.sex=='Male' ? 'M' : 'F');
   //Example of re-categorizing service types
   state.progresServiceName = (
-      if(state.data.referral_service_requested === "Basic psychosocial support"){
+      if(state.data.referral_service_requested == "Basic psychosocial support"){
         return 'Psychosocial Support Services';
-      }else if(state.data.referral_service_requested === "Cash assistance"){
+      }else if(state.data.referral_service_requested == "Cash assistance"){
         return 'Cash Transfer';
-      }else if(state.data.referral_service_requested === "Food"){
+      }else if(state.data.referral_service_requested == "Food"){
         return 'Food Assistance';
       }else{
         const serviceDescription = 'UNICEF Service Request: ${state.data.beneficiary.referral_service_requested}';
         return serviceDescription;
       });
+  //Example of whether or not to return share assessment data depending if 'Share BIA Data' = true
+  state.BIA_data = (state.data.consent_share_bia_data) == true ? state.data.assessment.results : 'No BIA data shared');
+
   return state;
 });
 
@@ -26,7 +29,7 @@ post("https://api.primero/mrmims_endpoint", {
       comment: 'This case was referred automatically from UNICEF CPIMS+.', //Hard-coded message
       consent_to_share_with_unicef: true, //Hard-coded set to TRUE as default value
       caseId: state.data.case_id,
-      caseType: 'UNICEF Referral', //Hard-coded "tag" of case data
+      case_source: 'UNICEF Referral', //Hard-coded "tag" of case data
       referral_date: state.data.date_of_referral,
       referral_type: state.data.type_of_referral,
       referral_response_priority: state.data.referral_response_priority,
@@ -41,8 +44,9 @@ post("https://api.primero/mrmims_endpoint", {
       dob: , state.data.beneficiary.date_of_birth,
       sex: state.sexReformatted, //sex data value reformatted before posting to external system
       referral_reason: state.data.beneficiary.reason_for_referral,
-      protectionNotes: state.data.beneficiary.protection_concerns,
-      referral_service_requested: state.progresServiceName //service re-classified under external system's service categories
+      protection_notes: state.data.beneficiary.protection_concerns,
+      referral_service_requested: state.progresServiceName, //service re-classified under external system's service categories
+      assessment_data: state.BIA_data //will return BIA data if consent given
     };
     return postBody;
   }
