@@ -1,4 +1,22 @@
 //Sample job to send data from CPIMIS+ to external system (proGres)
+alterState((state) => {
+  //Example of reformatting data from "Male"/ "Female" value --> "M" / "F"
+  state.sexReformatted = (state.data.beneficiary.sex==='Male' ? 'M' : 'F');
+  //Example of re-categorizing service types
+  state.progresServiceName = (
+      if(state.data.referral_service_requested === "Basic psychosocial support"){
+        return 'Psychosocial Support Services';
+      }else if(state.data.referral_service_requested === "Cash assistance"){
+        return 'Cash Transfer';
+      }else if(state.data.referral_service_requested === "Food"){
+        return 'Food Assistance';
+      }else{
+        const serviceDescription = 'UNICEF Service Request: ${state.data.beneficiary.referral_service_requested}';
+        return serviceDescription;
+      });
+  return state;
+});
+
 post("https://api.primero/mrmims_endpoint", {
   headers: {
     "Content-Type": "application/json",
@@ -20,12 +38,11 @@ post("https://api.primero/mrmims_endpoint", {
       referred_to: state.data.referred_to,
       firstName: state.data.beneficiary.name_first,
       surname: state.data.beneficiary.name_last,
-      dob: , // reformat date of state.data.beneficiary.date_of_birth
-      sex: state.data.beneficiary.sex,
-      // If sex = Male/Female, return "M" / "F"
+      dob: , state.data.beneficiary.date_of_birth,
+      sex: state.sexReformatted, //sex data value reformatted before posting to external system
       referral_reason: state.data.beneficiary.reason_for_referral,
-      protectionNotes: ,// If not null, concatenate 'state.data.beneficiary.protection_concerns' AND 'state.data.beneficiary.protection_concerns_other'
-      referral_service_requested: state.data.beneficiary.referral_service_requested
+      protectionNotes: state.data.beneficiary.protection_concerns,
+      referral_service_requested: state.progresServiceName //service re-classified under external system's service categories
     };
     return postBody;
   }
