@@ -1,8 +1,8 @@
 // Prepping the source data...
 alterState(state => {
-  // Example of reformatting data from "Male"/ "Female" value --> "M" / "F"
+  // Plucking out the part we want
   state.data = state.data.Envelope.Body.notifications.Notification.sObject;
-
+  // Example of reformatting data from "Male"/ "Female" value --> "M" / "F"
   state.sexReformatted = (state.data.Sex__c == 'Male' ? 'M' : 'F');
 
   // Example of whether or not to return share assessment data depending if 'Consent to Share BIA Data' = true
