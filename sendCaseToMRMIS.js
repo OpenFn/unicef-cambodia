@@ -7,7 +7,7 @@ alterState(state => {
 // Sample job to send data from CPIMIS+ to MRMIS+
 create('Contact', fields(
   field('Case_Type__c', 'UNICEF MRMIS+ Case'), //Hard-coded tag
-  field('Description', 'This case was referred automatically from UNICEF CPIMS+.'), //Hard-coded message
+  field('Description', 'This case was referred automatically from UNICEF.'), //Hard-coded message
   field('Case_ID__c', dataValue('Case_ID__c')),
   field('Date_of_Referral__c', dataValue('Date_of_Referral__c')),
   field('Type_of_Referral__c', dataValue('Type_of_Referral__c')),
