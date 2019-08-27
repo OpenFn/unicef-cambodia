@@ -1,4 +1,4 @@
-//Sample job to send data from CPIMIS+ to external system (proGres)
+/* Sample job to send data from CPIMIS+ to external system (proGres) */
 alterState((state) => {
   //Example of reformatting data from "Male"/ "Female" value --> "M" / "F"
   const primero = state.data.Envelope.Body.notifications.Notification.sObject;
@@ -6,7 +6,6 @@ alterState((state) => {
 
   //Example of whether or not to return share assessment data depending if 'Consent to Share BIA Data' = true
   state.BIAdata = (primero.Consent_To_Share_BIA__c=='true' ? primero.BIA_Results__c : 'No BIA data shared');
-
   //Example of re-categorizing service types
   state.assignService = function assignService(state, serviceType){
     var service= '';
@@ -20,7 +19,6 @@ alterState((state) => {
       return service = 'UNICEF Service Request: ${primero.Referral_Service_Requested__c}';
     }
   };
-
   return state
 });
 
@@ -46,5 +44,5 @@ create('Contact', fields(
     return state.assignService(state, primero.Referral_Service_Requested__c);
   }),
   field('Protection_Concerns__c', dataValue('Envelope.Body.notifications.Notification.sObject.Protection_Concerns__c')),
-  field('BIA_Results__c', (state) => { return state.BIAdata }) //funnction to return BIA data if consent is given
+  field('BIA_Results__c', (state) => { return state.BIAdata }) //function to return BIA data if consent is given
 ))
