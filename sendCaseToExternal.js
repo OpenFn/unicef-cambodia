@@ -12,28 +12,26 @@ alterState((state) => {
     if(serviceType =='Basic psychosocial support'){
       return service = 'Psychosocial Services';
     }else if(serviceType=='Cash assistance'){
-      return 'Cash Transfer';
+      return 'UN Cash Transfer';
     }else if(serviceType=='Food'){
-      return service = 'Food Assistance';
+      return service = 'UN Food Assistance';
     }else{
-      return service = 'UNICEF Service Request: ${primero.Referral_Service_Requested__c}';
+      return service = serviceType;
     }
   };
   return state
 });
 
 create('Contact', fields(
+  field('Case_Type__c', 'UNICEF Referral'), //Hard-coded tag
   field('Description', 'This case was referred automatically from UNICEF CPIMS+.'), //Hard-coded message
-  field('Consent_To_Share__c', 'true'),//Hard-coded set to TRUE as default value
-  field('Case_ID__c', dataValue('Envelope.Body.notifications.Notification.sObject.Case_ID__c')),
+  field('Sync_with_Primero__c', 'true'),//Hard-coded set to TRUE as default value
+  field('Primero_ID__c', dataValue('Envelope.Body.notifications.Notification.sObject.Case_ID__c')),
   field('Date_of_Referral__c', dataValue('Envelope.Body.notifications.Notification.sObject.Date_of_Referral__c')),
   field('Type_of_Referral__c', dataValue('Envelope.Body.notifications.Notification.sObject.Type_of_Referral__c')),
   field('Referral_Response_Priority__c', dataValue('Envelope.Body.notifications.Notification.sObject.Referral_Response_Priority__c')),
-  field('Referred_By_Name__c', dataValue('Envelope.Body.notifications.Notification.sObject.Referred_By_Name__c')),
   field('Referred_By_Agency__c', dataValue('Envelope.Body.notifications.Notification.sObject.Referred_By_Agency__c')),
-  field('Referred_By_Position__c', dataValue('Envelope.Body.notifications.Notification.sObject.Referred_By_Position__c')),
-  field('Referred_By_Phone__c', dataValue('Envelope.Body.notifications.Notification.sObject.Referred_By_Phone__c')),
-  field('Referred_To_Name__c', dataValue('Envelope.Body.notifications.Notification.sObject.Referred_To_Name__c')),
+  field('Referred_To_Agency__c', dataValue('Envelope.Body.notifications.Notification.sObject.Referred_To_Agency__c')),
   field('FirstName', dataValue('Envelope.Body.notifications.Notification.sObject.FirstName')),
   field('LastName', dataValue('Envelope.Body.notifications.Notification.sObject.LastName')),
   field('Birthdate', dataValue('Envelope.Body.notifications.Notification.sObject.Birthdate')),
