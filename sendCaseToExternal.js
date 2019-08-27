@@ -12,11 +12,13 @@ alterState(state => {
   state.assignService = function assignService(serviceType) {
     switch (serviceType) {
       case 'Basic psychosocial support':
-        return 'Psychosocial Services';        
+        return 'Enroll in MPHSS Services';
       case 'Cash assistance':
-        return 'UN Cash Transfer';
+        return 'Cash Transfer Program';
       case 'Food':
-        return 'UN Food Assistance';
+        return 'Food Assistance Program';
+      case 'Education':
+          return 'Education Program';
       default:
         return '';
     }
@@ -39,12 +41,11 @@ create('Contact', fields(
   field('FirstName', dataValue('FirstName')),
   field('LastName', dataValue('LastName')),
   field('Birthdate', dataValue('Birthdate')),
-  field('Sex__c', state.sexReformatted), // function to reformat data value from "Male" --> "M"
+  field('Sex__c', state => { return state.sexReformatted}), // function to reformat data value from "Male" --> "M"
   field('Reason_For_Referral__c', dataValue('Reason_For_Referral__c')),
-  field('Referral_Service_Requested__c', state => {
-    // function to re-classify service under external system's service categories
+  field('Referral_Service_Requested__c', state => { // function to re-classify service under external system's service categories
     return state.assignService(state.data.Referral_Service_Requested__c);
   }),
   field('Protection_Concerns__c', dataValue('Protection_Concerns__c')),
-  field('BIA_Results__c', state.BIAdata) // function to return BIA data if consent is given
+  field('BIA_Results__c', state => { return state.BIAdata}) // function to return BIA data if consent is given
 ));
