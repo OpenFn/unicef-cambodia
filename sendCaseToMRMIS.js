@@ -19,10 +19,5 @@ create('Contact', fields(
   field('Sex__c', dataValue('Sex__c')),
   field('Reason_For_Referral__c', dataValue('Reason_For_Referral__c')),
   field('Referral_Service_Requested__c', dataValue('Referral_Service_Requested__c')),
-  field('Protection_Concerns__c', dataValue('Protection_Concerns__c')),
-  field('BIA_Results__c', state => {
-    // Custom function to return BIA data if consent is given
-    const consented = state.data.Consent_To_Share_BIA__c == 'true';
-    return consented ? state.data.BIA_Results__c : 'No BIA data shared';
-  })
+  field('Protection_Concerns__c', dataValue('Protection_Concerns__c'))
 ));
