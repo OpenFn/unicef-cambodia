@@ -30,13 +30,13 @@ alterState(state => {
 // Sample job to send data from CPIMIS+ to external system (proGres)
 create('Contact', fields(
   field('Case_Type__c', 'UNICEF Referral'), // Hard-coded tag
-  field('Description', 'This case was referred automatically from UNICEF CPIMS+.'), //Hard-coded message
+  field('Description', 'This case was referred automatically from UNICEF MRMIS+.'), //Hard-coded message
   field('Sync_with_Primero__c', 'true'),// Hard-coded set to TRUE as default value
   field('Primero_ID__c', dataValue('Case_ID__c')),
   field('Date_of_Referral__c', dataValue('Date_of_Referral__c')),
   field('Type_of_Referral__c', dataValue('Type_of_Referral__c')),
   field('Referral_Response_Priority__c', dataValue('Referral_Response_Priority__c')),
-  field('Referred_By_Agency__c', dataValue('Referred_By_Agency__c')),
+  field('Referred_By_Agency__c', 'UNICEF MRMIS+'),
   field('Referred_To_Agency__c', dataValue('Referred_To_Agency__c')),
   field('FirstName', dataValue('FirstName')),
   field('LastName', dataValue('LastName')),
