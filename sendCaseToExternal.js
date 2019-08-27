@@ -13,13 +13,10 @@ alterState(state => {
     switch (serviceType) {
       case 'Basic psychosocial support':
         return 'Psychosocial Services';        
-      
       case 'Cash assistance':
         return 'UN Cash Transfer';
-    
       case 'Food':
         return 'UN Food Assistance';
-
       default:
         return '';
     }
