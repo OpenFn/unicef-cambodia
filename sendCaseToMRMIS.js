@@ -1,36 +1,26 @@
-post("https://api.primero/mrmims_endpoint", {
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: (state) => {
-    const postBody = {
-      comment: 'This case was referred automatically from CPIMS+.',
-      case_id: state.data.case_id,
-      case_type: 'Referral',
-      date_of_referral: state.data.date_of_referral,
-      type_of_referral: state.data.type_of_referral,
-      referral_response_priority: state.data.referral_response_priority,
-      referred_by_name: state.data.referred_by_name,
-      referred_by_agency: state.data.referred_by_agency,
-      referred_by_position: state.data.referred_by_position,
-      referred_by_phone: state.data.referred_by_phone,
-      referred_by_email: state.data.referred_by_email,
-      referred_to: state.data.referred_to,
-      referred_to_name: state.data.referred_to_name,
-      referred_to_agency: state.data.referred_to_agency,
-      referred_to_position: state.data.referred_to_position,
-      referred_to_phone: state.data.referred_to_phone,
-      referred_to_email: state.data.referred_to_email,
-      name_first: state.data.beneficiary.name_first,
-      name_last: state.data.beneficiary.name_last,
-      date_of_birth: state.data.beneficiary.date_of_birth,
-      sex: state.data.beneficiary.sex,
-      reason_for_referral: state.data.beneficiary.reason_for_referral,
-      protection_concerns: state.data.beneficiary.protection_concerns,
-      protection_concerns_other: state.data.beneficiary.protection_concerns_other,
-      referral_service_requested: state.data.beneficiary.referral_service_requested,
-      referral_service_requested_other: state.data.beneficiary.referral_service_requested_other
-    };
-    return postBody;
-  }
-});
+/* Sample job to send data from CPIMIS+ to MRMIS+ */ 
+create('Contact', fields(
+  field('Case_Type__c', 'MRMIS+'), //Hard-coded tag
+  field('Description', 'This case was referred automatically from UNICEF CPIMS+.'), //Hard-coded message
+  field('Consent_To_Share__c', 'true'),//Hard-coded set to TRUE as default value
+  field('Case_ID__c', dataValue('Envelope.Body.notifications.Notification.sObject.Case_ID__c')),
+  field('Date_of_Referral__c', dataValue('Envelope.Body.notifications.Notification.sObject.Date_of_Referral__c')),
+  field('Type_of_Referral__c', dataValue('Envelope.Body.notifications.Notification.sObject.Type_of_Referral__c')),
+  field('Referral_Response_Priority__c', dataValue('Envelope.Body.notifications.Notification.sObject.Referral_Response_Priority__c')),
+  field('Referred_By_Name__c', dataValue('Envelope.Body.notifications.Notification.sObject.Referred_By_Name__c')),
+  field('Referred_By_Agency__c', dataValue('Envelope.Body.notifications.Notification.sObject.Referred_By_Agency__c')),
+  field('Referred_By_Position__c', dataValue('Envelope.Body.notifications.Notification.sObject.Referred_By_Position__c')),
+  field('Referred_By_Phone__c', dataValue('Envelope.Body.notifications.Notification.sObject.Referred_By_Phone__c')),
+  field('Referred_To_Name__c', dataValue('Envelope.Body.notifications.Notification.sObject.Referred_To_Name__c')),
+  field('FirstName', dataValue('Envelope.Body.notifications.Notification.sObject.FirstName')),
+  field('LastName', dataValue('Envelope.Body.notifications.Notification.sObject.LastName')),
+  field('Birthdate', dataValue('Envelope.Body.notifications.Notification.sObject.Birthdate')),
+  field('Sex__c',  dataValue('Sex__c')),
+  field('Reason_For_Referral__c', dataValue('Envelope.Body.notifications.Notification.sObject.Reason_For_Referral__c')),
+  field('Referral_Service_Requested__c', dataValue('Envelope.Body.notifications.Notification.sObject.Referral_Service_Requested__c')),
+  field('Protection_Concerns__c', dataValue('Envelope.Body.notifications.Notification.sObject.Protection_Concerns__c')),
+  field('BIA_Results__c', (state) => { //function to return BIA data if consent is given
+    const primero = state.data.Envelope.Body.notifications.Notification.sObject;
+    return (primero.Consent_To_Share_BIA__c=='true' ? primero.BIA_Results__c : 'No BIA data shared');
+  })
+))
