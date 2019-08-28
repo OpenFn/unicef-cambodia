@@ -2,11 +2,12 @@
 alterState(state => {
   // Plucking out the part we want
   state.data = state.data.Envelope.Body.notifications.Notification.sObject;
+
   // Example of reformatting data from "Male"/ "Female" value --> "M" / "F"
-  state.sexReformatted = (state.data.Sex__c == 'Male' ? 'M' : 'F');
+  state.data.sexReformatted = (state.data.Sex__c == 'Male' ? 'M' : 'F');
 
   // Example of whether or not to return share assessment data depending if 'Consent to Share BIA Data' = true
-  state.BIAdata = (state.data.Consent_To_Share_BIA__c == 'true' ? state.data.BIA_Results__c : 'No BIA data shared');
+  state.data.BIAdata = (state.data.Consent_To_Share_BIA__c == 'true' ? state.data.BIA_Results__c : 'No BIA data shared');
 
   // Example of re-categorizing service types
   state.assignService = function assignService(serviceType) {
@@ -41,11 +42,11 @@ create('Contact', fields(
   field('FirstName', dataValue('FirstName')),
   field('LastName', dataValue('LastName')),
   field('Birthdate', dataValue('Birthdate')),
-  field('Sex__c', state => { return state.sexReformatted}), // function to reformat data value from "Male" --> "M"
+  field('Sex__c', dataValue('sexReformatted')), // function to reformat data value from "Male" --> "M"
   field('Reason_For_Referral__c', dataValue('Reason_For_Referral__c')),
-  field('Referral_Service_Requested__c', state => { // function to re-classify service under external system's service categories
-    return state.assignService(state.data.Referral_Service_Requested__c);
+  field('Referral_Service_Requested__c', state => {
+    return state.assignService(state.data.Referral_Service_Requested__c)
   }),
   field('Protection_Concerns__c', dataValue('Protection_Concerns__c')),
-  field('BIA_Results__c', state => { return state.BIAdata}) // function to return BIA data if consent is given
+  field('BIA_Results__c', dataValue('BIAdata')) // function to return BIA data if consent is given
 ));
