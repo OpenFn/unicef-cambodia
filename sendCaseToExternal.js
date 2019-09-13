@@ -1,3 +1,4 @@
+// Sample job to send case data to external system
 // Prepping the source data...
 alterState(state => {
   // Plucking out the part we want
@@ -28,12 +29,12 @@ alterState(state => {
   return state;
 });
 
-// Sample job to send data from CPIMIS+ to external system (proGres)
+// Sample job to send data from CPIMIS+ to external system; create 'Contact' record in destination DB
 create('Contact', fields(
   field('Case_Type__c', 'UNICEF Referral'), // Hard-coded tag
   field('Description', 'This case was referred automatically from UNICEF MRMIS+.'), //Hard-coded message
   field('Sync_with_Primero__c', 'true'),// Hard-coded set to TRUE as default value
-  field('Primero_ID__c', dataValue('Case_ID__c')),
+  field('Primero_ID__c', dataValue('Case_ID__c')), // Mapping field('Destination_field', dataValue('Source_field'))
   field('Date_of_Referral__c', dataValue('Date_of_Referral__c')),
   field('Type_of_Referral__c', dataValue('Type_of_Referral__c')),
   field('Referral_Response_Priority__c', dataValue('Referral_Response_Priority__c')),
@@ -42,11 +43,11 @@ create('Contact', fields(
   field('FirstName', dataValue('FirstName')),
   field('LastName', dataValue('LastName')),
   field('Birthdate', dataValue('Birthdate')),
-  field('Sex__c', dataValue('sexReformatted')), // function to reformat data value from "Male" --> "M"
+  field('Sex__c', dataValue('sexReformatted')), // to return reformatted data value from "Male" --> "M"
   field('Reason_For_Referral__c', dataValue('Reason_For_Referral__c')),
-  field('Referral_Service_Requested__c', state => {
+  field('Referral_Service_Requested__c', state => { //  to re-categorize services as defined in line 13
     return state.assignService(state.data.Referral_Service_Requested__c)
   }),
   field('Protection_Concerns__c', dataValue('Protection_Concerns__c')),
-  field('BIA_Results__c', dataValue('BIAdata')) // function to return BIA data if consent is given
+  field('BIA_Results__c', dataValue('BIAdata')) // to return BIA data if consent is given
 ));
