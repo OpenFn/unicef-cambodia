@@ -1,14 +1,15 @@
+//Sample job to send case data from CPIMS+ to MRMIS+ modules
 alterState(state => {
   // Pluck out the part we want.
   state.data = state.data.Envelope.Body.notifications.Notification.sObject;
   return state;
 });
 
-// Sample job to send data from CPIMIS+ to MRMIS+
+// Sample job to send case data; create 'Contact' record in destination DB
 create('Contact', fields(
   field('Case_Type__c', 'UNICEF MRMIS+ Case'), //Hard-coded tag
   field('Description', 'This case was referred automatically from UNICEF.'), //Hard-coded message
-  field('Case_ID__c', dataValue('Case_ID__c')),
+  field('Case_ID__c', dataValue('Case_ID__c')), // Mapping field('Destination_field', dataValue('Source_field'))
   field('Date_of_Referral__c', dataValue('Date_of_Referral__c')),
   field('Type_of_Referral__c', dataValue('Type_of_Referral__c')),
   field('Referral_Response_Priority__c', dataValue('Referral_Response_Priority__c')),
