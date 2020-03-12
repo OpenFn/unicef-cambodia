@@ -1,0 +1,52 @@
+{
+  "child": {
+    "owned_by": "primero_gbv",
+    "owned_by_full_name": "GBV Worker",
+    "owned_by_agency": "agency-unicef",
+    "previously_owned_by": "primero",
+    "previously_owned_by_full_name": "GBV Worker",
+    "previously_owned_by_agency": "agency-unicef",
+    "module_id": "primeromodule-gbv",
+    "created_organization": "agency-unicef",
+    "created_by": "primero_gbv",
+    "created_by_full_name": "GBV Worker",
+    "created_at": "2016/06/17 07:27:28 +0000",
+    "last_updated_at": "2016/06/18 07:27:28 +0000",
+    "posted_at": "2016/06/18 07:27:28 +0000",
+    "record_state": true,
+    "marked_for_mobile": false,
+    "consent_for_services": false,
+    "child_status": "Open",
+    "name": "Sample Name",
+    "name_first": "Sample",
+    "name_last": "Name",
+    "name_nickname": "Nickname",
+    "name_given_post_separation": "No",
+    "registration_date": "2016/06/17",
+    "sex": "Male",
+    "age": 10,
+    "date_of_birth": "2006/01/10",
+    "estimated": false,
+    "address_is_permanent": false,
+    "system_generated_followup": false,
+    "family_details_section": [
+      {
+        "relation_name": "Feng Bo2",
+        "relation": "Father",
+        "relation_is_caregiver": false,
+        "relation_child_lived_with_pre_separation": "Yes",
+        "relation_child_is_in_contact": "No",
+        "relation_child_is_separated_from": "Yes",
+        "relation_nickname": "Bobo",
+        "relation_is_alive": "Unknown",
+        "relation_age": 40,
+        "relation_date_of_birth": "1976/01/01"
+      }
+    ],
+    "case_id": "56798b3e-c5b8-44d9-a8c1-2593b2b127c9",
+    "short_id": "2b127c9",
+    "hidden_name": false,
+    "posted_from": "Mobile",
+    "couchrest-type": "Child"
+  }
+}
