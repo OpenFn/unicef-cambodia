@@ -1,0 +1,46 @@
+{
+  "remote": true,
+  "child": {
+    "case_id": "51f2adb5-dcdb-4310-9b69-c4e28c063aeb",
+    "short_id": "c063aeb",
+    "owned_by": "primero",
+    "created_by": "primero",
+    "owned_by_agency": "agency_name",
+    "created_at": "2020/02/18 00:00:00 +0000",
+    "case_id_display": "c063aeb",
+    "name_first": "third",
+    "name_last": "case",
+    "sex": "female",
+    "date_of_birth": "2005/06/13",
+    "oscar_number": "88986571w",
+    "mosvy_number": "30588986571",
+    "location_current": "12110417",
+    "protection_status": "migrant_child_13820",
+    "module_id": "primeromodule-cp",
+    "record_state": true,
+    "registration_date": "2016/06/17",
+    "child_status": "Open",
+    "consent_for_services": true,
+    "disclosure_other_orgs": true,
+    "has_referral": true,
+    "services_section": [{
+      "unique_id": "81544ee2-f17e-4970-9b8f-3ad20618cd7c",
+      "service_response_type": "referral_from_oscar",
+      "service_type": "counselling",
+      "service_type_text": "Counselling",
+      "service_type_details_text": "Family counselling / mediation",
+      "oscar_case_worker_name": "Name OSCaR case worker",
+      "oscar_referring_organization": "OSCaR Organization",
+      "oscar_case_worker_telephone": "0123456789"
+    }],
+    "transitions": [{
+      "unique_id": "b92bbac8-aecc-4a83-9c2a-ed0f65699958",
+      "type": "referral",
+      "notes": "this is a new referal 22",
+      "transitioned_by": "primero",
+      "service": "counselling",
+      "created_at": "2020/02/18",
+      "service_section_unique_id": "81544ee2-f17e-4970-9b8f-3ad20618cd7c"
+    }]
+  }
+}
