@@ -29,20 +29,18 @@
     "estimated": false,
     "address_is_permanent": false,
     "system_generated_followup": false,
-    "family_details_section": [
-      {
-        "relation_name": "Feng Bo2",
-        "relation": "Father",
-        "relation_is_caregiver": false,
-        "relation_child_lived_with_pre_separation": "Yes",
-        "relation_child_is_in_contact": "No",
-        "relation_child_is_separated_from": "Yes",
-        "relation_nickname": "Bobo",
-        "relation_is_alive": "Unknown",
-        "relation_age": 40,
-        "relation_date_of_birth": "1976/01/01"
-      }
-    ],
+    "family_details_section": [{
+      "relation_name": "Feng Bo2",
+      "relation": "Father",
+      "relation_is_caregiver": false,
+      "relation_child_lived_with_pre_separation": "Yes",
+      "relation_child_is_in_contact": "No",
+      "relation_child_is_separated_from": "Yes",
+      "relation_nickname": "Bobo",
+      "relation_is_alive": "Unknown",
+      "relation_age": 40,
+      "relation_date_of_birth": "1976/01/01"
+    }],
     "case_id": "56798b3e-c5b8-44d9-a8c1-2593b2b127c9",
     "short_id": "2b127c9",
     "hidden_name": false,
