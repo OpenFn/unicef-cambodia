@@ -1,4 +1,4 @@
-alterState((state) => {
+alterState(state => {
   var results = [];
 
   while (state.data.length) {
@@ -12,8 +12,8 @@ alterState((state) => {
 each(
   '$.caseChunks[*]',
   post('/api/v1/organizations/clients/create_many/', {
-    body: (state) => {
-      return state.data.map((x) => {
+    body: state => {
+      return state.data.map(x => {
         return {
           external_id: x.case_id,
           external_id_display: x.case_id_display,
