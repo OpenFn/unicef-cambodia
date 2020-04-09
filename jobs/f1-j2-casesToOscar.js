@@ -29,7 +29,7 @@ each(
           external_case_worker_id: x.owned_by_id,
           organization_name: x.owned_by_agency,
           organization_id: x.owned_by_agency_id,
-          'services[][name]': x['services_section[][service_type]'],
+          services: [{ name: x.services_section.service_type }],
         };
       });
     },
