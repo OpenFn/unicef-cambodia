@@ -1,5 +1,6 @@
 alterState(state => {
   state.cases = state.data.map(x => {
+    // here we build the payload for Primero
     return {
       remote: true,
       child: {
@@ -37,10 +38,14 @@ alterState(state => {
 
 each(
   '$.cases[*]',
-  upsertCase({
-    externalId: 'oscar_number',
-    data: state => state.data,
-  })
+  upsertCase(
+    { externalId: 'oscar_number', data: state => state.data },
+    post('https://www.openfn.org/inbox/uuid', {
+      json: {
+        external_id: state.data.externalId,
+        global_id: state.data.oscar_id,
+        external_id_display: state.data.extDisplay,
+      },
+    })
+  )
 );
-
-// TODO: post ID back to Oscar from Primero
