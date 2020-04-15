@@ -14,14 +14,20 @@ each(
   post(
     '/api/v1/auth/sign_in',
     {
-      jar: true,
+      keepCookie: true,
       body: {
         email: state.configuration.username,
         password: state.configuration.password,
       },
     },
     post('/api/v1/organizations/clients/create_many/', {
-      jar: false,
+      headers: state => {
+        return {
+          'access-token': state.data.__headers['access-token'],
+          client: state.data.__headers.client,
+          uid: state.configuration.username,
+        };
+      },
       body: state => {
         return state.references[0].map(x => {
           return {
