@@ -1,8 +1,11 @@
+//Primero cases --> OSCaR
+//UserStory1: Generating government referrals, creating referrals in Oscar
+
 alterState(state => {
   var results = [];
 
   while (state.data.length) {
-    results.push(state.data.splice(0, 100));
+    results.push(state.data.splice(0, 100)); //sending cases in batches of 100
   }
 
   state.caseChunks = results;
@@ -11,17 +14,18 @@ alterState(state => {
 
 each(
   '$.caseChunks[*]',
-  post(
-    '/api/v1/auth/sign_in',
-    {
+  post( //Oscar authentication
+    '/api/v1/auth/sign_in', {
       keepCookie: true,
       body: {
         email: state.configuration.username,
         password: state.configuration.password,
       },
     },
-    post('/api/v1/organizations/clients/create_many/', {
+    //User Story 1.8b: Create referrals in Oscar
+    post('/api/v1/organizations/clients/create_many/', { //This will upsert cases
       headers: state => {
+        //Oscar authentication
         return {
           'access-token': state.data.__headers['access-token'],
           client: state.data.__headers.client,
@@ -30,7 +34,9 @@ each(
       },
       body: state => {
         return state.references[0].map(x => {
+          //Mappings for posting cases to Oscar
           return {
+            //oscar_field, primero_field,
             external_id: x.case_id,
             external_id_display: x.case_id_display,
             global_id: x.oscar_number,
@@ -45,7 +51,10 @@ each(
             external_case_worker_id: x.owned_by_id,
             organization_name: x.owned_by_agency,
             organization_id: x.owned_by_agency_id,
-            services: [{ name: x.services_section.service_type }],
+            services: [{
+              id: x.services_section.unique_id,
+              name: x.services_section.service_type
+            }],
           };
         });
       },
