@@ -1,5 +1,5 @@
-//Primero cases --> OSCaR
-//UserStory1: Generating government referrals, creating referrals in Oscar
+// Primero cases --> OSCaR
+// User Story 1: Generating government referrals, creating referrals in Oscar
 
 alterState(state => {
   var results = [];
