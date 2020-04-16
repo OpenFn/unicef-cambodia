@@ -59,5 +59,7 @@ each(
         });
       },
     })
+    // Send oscar_number and mosvy_number back to Primero  >>Q: Will this be included in response body from OSCaR after create?  
+    // POST to /api/cases         
   )
 );
