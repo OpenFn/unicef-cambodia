@@ -52,7 +52,7 @@ alterState(state => {
 each(
   '$.cases[*]',
   upsertCase(
-    { externalId: 'oscar_number', data: state => state.data },
+    { externalId: 'oscar_number', data: state => state.data }, //>>Q: Upsert Primero cases based on matching oscar_number, mosvy_number, AND/OR case_id? 
     alterState(state => {
       return post(
         //Return case links to Oscar
