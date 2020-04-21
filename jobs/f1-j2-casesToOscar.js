@@ -14,8 +14,10 @@ alterState(state => {
 
 each(
   '$.caseChunks[*]',
-  post( //Oscar authentication
-    '/api/v1/auth/sign_in', {
+  post(
+    //Oscar authentication
+    '/api/v1/auth/sign_in',
+    {
       keepCookie: true,
       body: {
         email: state.configuration.username,
@@ -23,11 +25,13 @@ each(
       },
     },
     //User Story 1.8b: Create referrals in Oscar
-    post('/api/v1/organizations/clients/create_many/', { //This will upsert cases
+    post('/api/v1/organizations/clients/create_many/', {
+      //This will upsert cases
       headers: state => {
         //Oscar authentication
         return {
           'access-token': state.data.__headers['access-token'],
+          'Content-Type': 'application/json',
           client: state.data.__headers.client,
           uid: state.configuration.username,
         };
@@ -51,17 +55,16 @@ each(
             external_case_worker_id: x.owned_by_id,
             organization_name: x.owned_by_agency,
             organization_id: x.owned_by_agency_id,
-            services: [{
-              id: x.services_section.unique_id,
-              name: x.services_section.service_type
-            }],
-            transaction_id: x.transition_id
+            services: [
+              {
+                id: x.services_section.unique_id,
+                name: x.services_section.service_type,
+              },
+            ],
+            transaction_id: x.transition_id,
           };
         });
       },
     })
-    // After creating new cases in OSCaR                   >>Q: Will this be included in response body from OSCaR after create?
-    // Send oscar_number and mosvy_number back to Primero    
-    // POST to /api/cases         
   )
 );

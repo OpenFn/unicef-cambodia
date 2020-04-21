@@ -53,22 +53,8 @@ alterState(state => {
 
 each(
   '$.cases[*]',
-  upsertCase(
-    { externalId: 'oscar_number', data: state => state.data }, //>>Q: Upsert Primero cases based on matching oscar_number, mosvy_number, AND/OR case_id?
-    alterState(state => {
-      return post(
-        //Return case links to Oscar
-        //PUT to /api/v1/organizations/clients/update_links/
-        //send back to OpenFn inbox instead of Oscar for testing
-        `https://www.openfn.org/inbox/${state.configuration.inboxUuid}`,
-        {
-          body: {
-            external_id: state.data.case_id,
-            global_id: state.data.oscar_number,
-            external_id_display: state.data.case_id_display,
-          },
-        }
-      )(state);
-    })
-  )
+  upsertCase({
+    externalIds: ['oscar_number', 'case_id'],
+    data: state => state.data,
+  })
 );
