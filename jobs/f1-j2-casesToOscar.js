@@ -25,7 +25,7 @@ each(
       },
     },
     //User Story 1.8b: Create referrals in Oscar
-    post('/api/v1/organizations/clients/create_many/', {
+    post('/api/v1/organizations/clients/upsert/', {
       //This will upsert cases
       headers: state => {
         //Oscar authentication
