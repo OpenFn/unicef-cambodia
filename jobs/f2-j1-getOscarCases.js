@@ -1,8 +1,7 @@
 // GET new OSCaR cases
-// User Story 2: View Oscar cases in Primero
-// User Story 4: Sending referrals to Primero  >>Q: Can we collapse w/ job f4-j1?
+// User Story 2: 'View Oscar cases in Primero' AND User Story 4: 'Sending referrals to Primero'
 post(
-  //Oscar authentication
+  //Oscar authentication  --> To update?
   '/api/v1/auth/sign_in',
   {
     keepCookie: true,
