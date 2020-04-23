@@ -1,6 +1,10 @@
 // Oscar cases ---> Primero
 // User Story 2: 'View Oscar cases in Primero' AND User Story 4: 'Sending referrals to Primero'
 alterState(state => {
+  const data=state.data;
+  if(!Array.isArray(data)){
+    state.data=[data];
+  }
   state.cases = state.data.map(x => {
     //Mappings for upserting cases in Primero (update if existing, insert if new)
     return {
