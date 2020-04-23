@@ -16,9 +16,9 @@ getCases(
       return x.transitions.map(t => t.created_at).sort((a, b) => b - a)[0];
     }).sort((a, b) => b - a)[0];
 
-    console.log(state.lastFetch);
-    // TODO: The API returns dates in a very different format that it accepts dates.
-    // We will need to do some date conversion in here.
+    // TODO: The API returns dates in a different format that it accepts dates.
+    console.log('The last fetched transition date is: ' + state.lastFetch);
+    // We will need to do some date conversion in here before returning state.
     return state;
   }
 );
