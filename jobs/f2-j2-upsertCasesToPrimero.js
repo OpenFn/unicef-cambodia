@@ -44,8 +44,8 @@ alterState(state => {
       transitions: [
         {
           //service_section_unique_id: x.??, //Q: How should we generate this UUID?
+          //service: x.services.name,
           created_at: x.referral_date, //Q: Confirm this should be referral not created date? 
-          service: x.services.name,
           type: 'referral'
         },
       ],
