@@ -33,9 +33,9 @@ alterState(state => {
       services_section: [
         {
           //unique_id: x.??,  //Q: Is this a UUID from OSCaR or one that OpenFn generates? 
-          service_type: x.services.name,  
-          service_type_text: x.services.name, //Q: Same mapping as above? 
-          service_type_details_text: x.services.name, //Q: Same mapping as above? 
+          //service_type: x.services.name,  
+          //service_type_text: x.services.name, //Q: Same mapping as above? 
+          //service_type_details_text: x.services.name, //Q: Same mapping as above? 
           oscar_case_worker_name: x.case_worker_name,
           oscar_referring_organization: x.organization_name,
           oscar_case_worker_telephone: x.case_worker_mobile,
