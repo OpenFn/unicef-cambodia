@@ -6,7 +6,7 @@ getCases(
     scope: {
       transitions_created_at: `date_range||${
         state.lastFetch || '01-01-2020' // a default starting date
-      }.30-03-3020`, //>>Q: What should this date filter be?
+      }.01-01-4000`, // effectively no end date (year 4000!)
       service_response_types: 'list||referral_to_oscar',
     },
   },
