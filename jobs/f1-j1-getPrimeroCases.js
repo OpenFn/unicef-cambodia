@@ -4,7 +4,9 @@ getCases(
   {
     remote: true,
     scope: {
-      transitions_created_at: `date_range||${state.lastFetch}.30-03-3020`, //>>Q: What should this date filter be?
+      transitions_created_at: `date_range||${
+        state.lastFetch || '01-01-2020' // a default starting date
+      }.30-03-3020`, //>>Q: What should this date filter be?
       service_response_types: 'list||referral_to_oscar',
     },
   },
