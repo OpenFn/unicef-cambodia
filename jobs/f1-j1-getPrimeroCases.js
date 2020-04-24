@@ -9,14 +9,19 @@ getCases(
     },
   },
   state => {
-    // TODO: Is transitions enough, or do we need to use an updated_at field on the case? 
+    // TODO: Is transitions enough, or do we need to use an updated_at field on the case?
     // Get latest transition from all cases.
-    const dateArr = state.data.map(x => {
-      // Get latest transition from a single case
-      return x.transitions.map(t => t.created_at).sort((a, b) => b - a)[0];
-    }).sort((a, b) => b - a)[0].split('/');
+    const dateArr = state.data
+      .map(x => {
+        // Get latest transition from a single case
+        return x.transitions.map(t => t.created_at).sort((a, b) => b - a)[0];
+      })
+      .sort((a, b) => b - a)[0]
+      .split('/');
 
-    state.lastFetch = `${dateArr[2]}-${dateArr[1]}-${dateArr[0]}`
+    state.lastFetch = `${dateArr[2]}-${dateArr[1]}-${dateArr[0]}`;
+
+    console.log('The last fetched transition date is: ' + state.lastFetch);
     return state;
   }
 );
