@@ -9,6 +9,7 @@ alterState(state => {
   }
 
   state.caseChunks = results;
+  console.log(state);
   return state;
 });
 
