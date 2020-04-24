@@ -22,8 +22,10 @@ post(
       };
     },
     query: {
-      // since_date: state.lastQueryDate,
-      since_date: '2020-01-01',
+      since_date: state.lastQueryDate || '2020-01-01',
     },
+  }, state => {
+    state.lastQueryDate = Date.parse(state.data.__headers.date)
+    return state;
   })
 );
