@@ -24,25 +24,24 @@ alterState(state => {
         consent_for_services: 'true',
         disclosure_other_orgs: 'true',
         module_id: "primeromodule-cp",
-        registration_date: c.referral_date
+        registration_date: c.referral_date,
+        oscar_case_worker_name: c.case_worker_name,
+        oscar_referring_organization: c.organization_name,
+        oscar_case_worker_telephone: c.case_worker_mobile
       },
       services_section: c.services.map(s => {
         return {
-          unique_id: s.id,  //Q: Is this a UUID from OSCaR or one that OpenFn generates? 
-          service_type: s.name,  
-          service_type_text: s.name, //Q: Same mapping as above? 
-          service_type_details_text: s.name, //Q: Same mapping as above? 
-          // These are not in the array, but come down from the case
-          oscar_case_worker_name: c.case_worker_name,
-          oscar_referring_organization: c.organization_name,
-          oscar_case_worker_telephone: c.case_worker_mobile,
+          unique_id: s.uuid,
+          service_type: s.name,  //Add service mapping table. If s.name not in table, list as "Other"
+          service_type_text: s.name, //Same logic as above
+          service_type_details_text: s.name //If type is "Other", map to services[][name][][subservices][name]
         },
       ),
       transitions: [
         {
-          //service_section_unique_id: x.??, //Q: How should we generate this UUID?
-          //service: x.services.name,
-          created_at: x.referral_date, //Q: Confirm this should be referral not created date? 
+          service_section_unique_id: s.uuid,
+          service: s.services.name, //This is see above logic for service name mapping, array
+          created_at: s.referral_date, //Q: Should this be today's date?
           type: 'referral'
         },
       ],
@@ -54,8 +53,8 @@ alterState(state => {
 
 each(
   '$.cases[*]',
-  upsertCase({
-    externalIds: ['oscar_number', 'case_id'], //Upsert Primero cases based on matching 'oscar_number' OR 'case_id'
+  upsertCase({ //Upsert Primero cases based on matching 'oscar_number' OR 'case_id'
+    externalIds: ['oscar_number', 'case_id'],
     data: state => state.data,
   })
 );
