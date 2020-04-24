@@ -37,32 +37,32 @@ each(
         };
       },
       body: state => {
-        return state.references[0].map(x => {
+        return state.references[0].map(c => {
           //Mappings for posting cases to Oscar
           return {
             //oscar_field, primero_field,
-            external_id: x.case_id,
-            external_id_display: x.case_id_display,
-            global_id: x.oscar_number,
-            mosvy_number: x.mosvy_number,
-            given_name: x.name_first,
-            family_name: x.name_last,
-            gender: x.sex,
-            date_of_birth: x.date_of_birth,
-            location_current_village_code: x.location_current,
-            reason_for_referral: x.protection_status,
-            external_case_worker_name: x.owned_by,
-            external_case_worker_id: x.owned_by_id,
-            external_case_worker_mobile_phone: x.owned_by_phone,
-            organization_name: x.owned_by_agency,
-            organization_id: x.owned_by_agency_id,
+            external_id: c.case_id,
+            external_id_display: c.case_id_display,
+            global_id: c.oscar_number,
+            mosvy_number: c.mosvy_number,
+            given_name: c.name_first,
+            family_name: c.name_last,
+            gender: c.sex,
+            date_of_birth: c.date_of_birth,
+            location_current_village_code: c.location_current,
+            reason_for_referral: c.protection_status,
+            external_case_worker_name: c.owned_by,
+            external_case_worker_id: c.owned_by_id,
+            external_case_worker_mobile_phone: c.owned_by_phone,
+            organization_name: c.owned_by_agency,
+            organization_id: c.owned_by_agency_id,
             services: [
               {
-                id: x.services_section.unique_id,
-                name: x.services_section.service_type,
+                id: c.services_section.unique_id,
+                name: c.services_section.service_type,
               },
             ],
-            transaction_id: x.transition_id,
+            transaction_id: c.transition_id,
           };
         });
       },
