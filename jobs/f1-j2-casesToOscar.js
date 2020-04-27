@@ -38,7 +38,7 @@ each(
         };
       },
       body: state => {
-        return state.references[0].map(c => {
+        return state.references[1].map(c => {
           //Mappings for posting cases to Oscar
           return {
             //oscar_field, primero_field,
