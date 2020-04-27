@@ -57,12 +57,12 @@ each(
             external_case_worker_mobile_phone: c.owned_by_phone,
             organization_name: c.owned_by_agency,
             organization_id: c.owned_by_agency_id,
-            services: [
-              {
-                id: c.services_section.unique_id,
-                name: c.services_section.service_type,
-              },
-            ],
+            services: c.services_section.map(s => {
+              return {
+                uuid: s.unique_id,
+                name: s.service_type,
+              };
+            }),
             transaction_id: c.transition_id,
           };
         });
