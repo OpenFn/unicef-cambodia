@@ -5,7 +5,7 @@ alterState(state => {
   var results = [];
 
   while (state.data.length) {
-    results.push(state.data.splice(0, 100)); //sending cases in batches of 100
+    results.push(state.data.splice(0, 1)); //sending cases in batches of 1
   }
 
   state.caseChunks = results;
