@@ -24,7 +24,7 @@ post(
         };
       },
       query: {
-        since_date: state.lastQueryDate || '2020-01-01',
+        since_date: state.lastQueryDate || '2020-01-01 00:00:00',
       },
     },
     state => {
