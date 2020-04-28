@@ -83,7 +83,9 @@ alterState(state => {
         address_current: c.address_current_village_code,
         oscar_status: c.status,
         protection_status: c.reason_for_referral,
-        owned_by: agencyMap[`agency-${c.organization_name}`] || `agency-${c.organization_name}-user`,
+        owned_by:
+          agencyMap[`agency-${c.organization_name}`] ||
+          `agency-${c.organization_name}-user`,
         oscar_reason_for_exiting: c.reason_for_exiting,
         has_referral: 'true',
         consent_for_services: 'true',
@@ -121,6 +123,14 @@ each(
   upsertCase({
     //Upsert Primero cases based on matching 'oscar_number' OR 'case_id'
     externalIds: ['oscar_number', 'case_id'],
-    data: state => state.data,
+    data: state => {
+      // NOTE: Comment this out (or disable console) in production to protect
+      // against exposure of sensitive data.
+      console.log(
+        'Data provided to `upsertCase`: ',
+        JSON.stringify(state.data, null, 2)
+      );
+      return state.data;
+    },
   })
 );

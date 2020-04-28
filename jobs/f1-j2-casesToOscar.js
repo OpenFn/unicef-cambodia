@@ -9,7 +9,6 @@ alterState(state => {
   }
 
   state.caseChunks = results;
-  console.log(state);
   return state;
 });
 
@@ -40,7 +39,7 @@ each(
       body: state => {
         return state.references[1].map(c => {
           //Mappings for posting cases to Oscar
-          return {
+          const json = {
             //oscar_field, primero_field,
             external_id: c.case_id,
             external_id_display: c.case_id_display,
@@ -49,7 +48,7 @@ each(
             given_name: c.name_first,
             family_name: c.name_last,
             gender: c.sex,
-            date_of_birth: c.date_of_birth.replace(/\//g, "-"),
+            date_of_birth: c.date_of_birth.replace(/\//g, '-'),
             location_current_village_code: c.location_current,
             reason_for_referral: c.protection_status,
             external_case_worker_name: c.owned_by,
@@ -65,6 +64,14 @@ each(
             }),
             transaction_id: c.transition_id,
           };
+
+          // NOTE: Comment this out (or disable console) in production to protect
+          // against exposure of sensitive data.
+          console.log(
+            'Case data to be posted to Oscar: ',
+            JSON.stringify(json, null, 2)
+          );
+          return json;
         });
       },
     })
