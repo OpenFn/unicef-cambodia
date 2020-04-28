@@ -29,11 +29,15 @@ post(
     },
     state => {
       const date = new Date(Date.parse(state.data.__headers.date));
-      const yyyy = date.getFullYear();
-      const mm = date.getMonth();
-      const dd = date.getDate();
+      const YYYY = date.getUTCFullYear();
+      const MM = date.getUTCMonth();
+      const DD = date.getUTCDate();
 
-      state.lastQueryDate = `${yyyy}-${mm}-${dd}`;
+      const hh = date.getUTCHours();
+      const mm = date.getUTCMinutes();
+      const ss = date.getUTCSeconds();
+
+      state.lastQueryDate = `${YYYY}-${MM}-${DD} ${hh}:${mm}:${ss}`;
       return state;
     }
   )
