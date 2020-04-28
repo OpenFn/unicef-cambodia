@@ -49,13 +49,13 @@ each(
             given_name: c.name_first,
             family_name: c.name_last,
             gender: c.sex,
-            date_of_birth: c.date_of_birth,
+            date_of_birth: c.date_of_birth.replace(/\//g, "-"),
             location_current_village_code: c.location_current,
             reason_for_referral: c.protection_status,
             external_case_worker_name: c.owned_by,
             external_case_worker_id: c.owned_by_id,
             external_case_worker_mobile_phone: c.owned_by_phone,
-            organization_name: c.owned_by_agency,
+            organization_name: c.owned_by_agency.substring(7),
             organization_id: c.owned_by_agency_id,
             services: c.services_section.map(s => {
               return {
