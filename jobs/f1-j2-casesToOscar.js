@@ -37,7 +37,7 @@ each(
             given_name: c.name_first,
             family_name: c.name_last,
             gender: c.sex,
-            date_of_birth: c.date_of_birth.replace(/\//g, '-'),
+            date_of_birth: c.date_of_birth && c.date_of_birth.replace(/\//g, '-'),
             location_current_village_code: c.location_current,
             address_current_village_code: c.address_current,
             reason_for_referral: c.protection_status,
