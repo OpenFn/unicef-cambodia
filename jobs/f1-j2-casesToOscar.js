@@ -28,31 +28,33 @@ each(
         const c = state.references[1];
         //Mappings for posting cases to Oscar
         const json = {
-          //oscar_field, primero_field,
-          external_id: c.case_id,
-          external_id_display: c.case_id_display,
-          global_id: c.oscar_number,
-          mosvy_number: c.mosvy_number,
-          given_name: c.name_first,
-          family_name: c.name_last,
-          gender: c.sex,
-          date_of_birth: c.date_of_birth.replace(/\//g, '-'),
-          location_current_village_code: c.location_current,
-          address_current_village_code: c.address_current,
-          reason_for_referral: c.protection_status,
-          external_case_worker_name: c.owned_by,
-          external_case_worker_id: c.owned_by_id,
-          external_case_worker_mobile_phone: c.owned_by_phone,
-          organization_name: 'cif', //hardcoding to one of the orgs in Oscar staging system for testing
-          //organization_name: c.owned_by_agency.substring(7),
-          organization_id: c.owned_by_agency_id,
-          services: c.services_section.map(s => {
-            return {
-              uuid: s.unique_id,
-              name: s.service_type,
-            };
-          }),
-          transaction_id: c.transition_id,
+          organization: {
+            //oscar_field, primero_field,
+            external_id: c.case_id,
+            external_id_display: c.case_id_display,
+            global_id: c.oscar_number,
+            mosvy_number: c.mosvy_number,
+            given_name: c.name_first,
+            family_name: c.name_last,
+            gender: c.sex,
+            date_of_birth: c.date_of_birth.replace(/\//g, '-'),
+            location_current_village_code: c.location_current,
+            address_current_village_code: c.address_current,
+            reason_for_referral: c.protection_status,
+            external_case_worker_name: c.owned_by,
+            external_case_worker_id: c.owned_by_id,
+            external_case_worker_mobile_phone: c.owned_by_phone,
+            organization_name: 'cif', //hardcoding to one of the orgs in Oscar staging system for testing
+            //organization_name: c.owned_by_agency.substring(7),
+            organization_id: c.owned_by_agency_id,
+            services: c.services_section.map(s => {
+              return {
+                uuid: s.unique_id,
+                name: s.service_type,
+              };
+            }),
+            transaction_id: c.transition_id,
+          },
         };
 
         // NOTE: Comment this out (or disable console) in production to protect
