@@ -1,3 +1,8 @@
+alterState(state => {
+  console.log(state)
+  return state;
+})
+
 // Primero cases --> OSCaR
 // User Story 1: Generating government referrals, creating referrals in Oscar
 each(
@@ -26,7 +31,6 @@ each(
       },
       body: state => {
         const c = state.references[1];
-        console.log(c);
         //Mappings for posting cases to Oscar
         const json = {
           organization: {
