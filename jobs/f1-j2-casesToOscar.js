@@ -26,6 +26,7 @@ each(
       },
       body: state => {
         const c = state.references[1];
+        console.log(c);
         //Mappings for posting cases to Oscar
         const json = {
           organization: {
