@@ -50,6 +50,7 @@ each(
             gender: c.sex,
             date_of_birth: c.date_of_birth.replace(/\//g, '-'),
             location_current_village_code: c.location_current,
+            address_current_village_code: c.address_current,
             reason_for_referral: c.protection_status,
             external_case_worker_name: c.owned_by,
             external_case_worker_id: c.owned_by_id,
