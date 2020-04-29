@@ -1,36 +1,38 @@
-alterState(state => {
-  console.log(JSON.stringify(state, null, 2))
-  return state;
-})
-
 // Primero cases --> OSCaR
 // User Story 1: Generating government referrals, creating referrals in Oscar
-each(
-  '$.data[*]',
-  post(
-    //Oscar authentication
-    '/api/v1/auth/sign_in',
-    {
-      keepCookie: true,
-      body: {
-        email: state.configuration.username,
-        password: state.configuration.password,
-      },
+post(
+  //Oscar authentication, once per run
+  '/api/v1/auth/sign_in',
+  {
+    keepCookie: true,
+    body: {
+      email: state.configuration.username,
+      password: state.configuration.password,
     },
-    //User Story 1.8b: Create referrals in Oscar
+  },
+  //User Story 1.8b: Create referrals in Oscar
+  each(
+    merge(
+      '$.references[0][*]',
+      // Bring down the authentication info for use in each case post.
+      fields(
+        field('__token', dataValue("__headers['access-token']")),
+        field('__client', dataValue('__headers.client'))
+      )
+    ),
     post('/api/v1/organizations/clients/upsert/', {
       //This will upsert cases
       headers: state => {
-        //Oscar authentication
+        //Use Oscar authentication from previous step
         return {
-          'access-token': state.data.__headers['access-token'],
           'Content-Type': 'application/json',
-          client: state.data.__headers.client,
           uid: state.configuration.username,
+          client: state.data.__client,
+          'access-token': state.data.__token,
         };
       },
       body: state => {
-        const c = state.references[1];
+        const c = state.data;
         //Mappings for posting cases to Oscar
         const json = {
           organization: {
@@ -42,7 +44,8 @@ each(
             given_name: c.name_first,
             family_name: c.name_last,
             gender: c.sex,
-            date_of_birth: c.date_of_birth && c.date_of_birth.replace(/\//g, '-'),
+            date_of_birth:
+              c.date_of_birth && c.date_of_birth.replace(/\//g, '-'),
             location_current_village_code: c.location_current,
             address_current_village_code: c.address_current,
             reason_for_referral: c.protection_status,
