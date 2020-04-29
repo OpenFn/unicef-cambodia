@@ -1,5 +1,5 @@
 alterState(state => {
-  console.log(state)
+  console.log(JSON.stringify(state, null, 2))
   return state;
 })
 
