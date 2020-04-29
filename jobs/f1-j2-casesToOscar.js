@@ -70,9 +70,8 @@ each(
           // NOTE: Comment this out (or disable console) in production to protect
           // against exposure of sensitive data.
           console.log(
-            'Case data to be posted to Oscar: [',
-            JSON.stringify(json, null, 2),
-            ']'
+            'Case data to be posted to Oscar: ',
+            JSON.stringify(json, null, 2)
           );
           return json;
         });
