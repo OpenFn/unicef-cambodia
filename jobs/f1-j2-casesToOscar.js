@@ -55,7 +55,8 @@ each(
             external_case_worker_name: c.owned_by,
             external_case_worker_id: c.owned_by_id,
             external_case_worker_mobile_phone: c.owned_by_phone,
-            organization_name: c.owned_by_agency.substring(7),
+            organization_name: 'cif', //hardcoding to one of the orgs in Oscar staging system for testing
+            //organization_name: c.owned_by_agency.substring(7),
             organization_id: c.owned_by_agency_id,
             services: c.services_section.map(s => {
               return {
