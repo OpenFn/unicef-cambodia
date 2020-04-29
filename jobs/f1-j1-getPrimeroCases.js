@@ -11,6 +11,7 @@ getCases(
     },
   },
   state => {
+    state.references = [];
     // TODO: Is transitions enough, or do we need to use an updated_at field on the case?
     // Get latest transition from all cases.
     const dateArr = state.data
