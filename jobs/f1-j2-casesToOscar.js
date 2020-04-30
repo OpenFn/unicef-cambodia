@@ -39,6 +39,7 @@ post(
             //oscar_field, primero_field,
             external_id: c.case_id,
             external_id_display: c.case_id_display,
+            global_id: '01E6ASHST25VB0BW513KNRJT3E',
             //global_id: c.oscar_number, //remove? 
             mosvy_number: c.mosvy_number,
             given_name: c.name_first,
