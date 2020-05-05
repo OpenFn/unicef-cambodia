@@ -34,7 +34,7 @@ getCases(
       console.log("Found cases, updating 'last created case' date.");
       state.lastCreated = `${lastCreationParts[2]}-${lastCreationParts[1]}-${lastCreationParts[0]}`;
     }
-
+    /* Do we need to check for transitions_changed_at date specifically?
     const updateDates = state.data
       .map(x => {
         // Get latest transition from a single case
@@ -47,10 +47,11 @@ getCases(
     if (lastUpdateParts) {
       console.log("Found cases, updating 'last updated case' date.");
       state.lastUpdated = `${lastCreationParts[2]}-${lastCreationParts[1]}-${lastCreationParts[0]}`;
-    }
+    } 
+     console.log('The last transition update is: ' + state.lastUpdated);
+    */
 
     console.log('The last transition creation is: ' + state.lastCreated);
-    console.log('The last transition update is: ' + state.lastUpdated);
 
     return state;
   }
