@@ -4,7 +4,7 @@ getCases(
   {
     remote: true,
     scope: {
-      transitions_created_at: `or_op||date_range||${
+      transitions_created_at: `date_range||${
           state.lastCreated || '01-01-2020'
         }.01-01-4020`,
       /*or: {  //TO DISCUSS --> date filters, OR operator
