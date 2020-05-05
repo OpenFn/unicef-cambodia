@@ -109,7 +109,8 @@ post(
                 name: serviceMap[s.service_type] || 'Other',
               };
             }),
-            transaction_id: oscarStrings(c.transition_id),
+            transaction_id: c.transition_id,
+            //transaction_id: oscarStrings(c.transition_id),
           },
         };
 
