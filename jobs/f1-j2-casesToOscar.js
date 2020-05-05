@@ -100,8 +100,8 @@ post(
             external_case_worker_name: oscarStrings(c.owned_by),
             external_case_worker_id: oscarStrings(c.owned_by_id),
             external_case_worker_mobile: c.owned_by_phone || '000000000',
-            // organization_name: 'cif', // hardcoding to one of the orgs in Oscar staging system for testing
-            organization_name: oscarStrings(c.owned_by_agency.substring(7)),
+            organization_name: 'cif', // hardcoding to one of the orgs in Oscar staging system for testing
+            //organization_name: oscarStrings(c.owned_by_agency.substring(7)), //add back in before go-live
             organization_id: oscarStrings(c.owned_by_agency_id),
             services: c.services_section.map(s => {
               return {
