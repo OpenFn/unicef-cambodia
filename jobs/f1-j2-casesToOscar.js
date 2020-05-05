@@ -53,7 +53,7 @@ post(
             reason_for_referral: c.protection_status,
             external_case_worker_name: c.owned_by,
             external_case_worker_id: '',//c.owned_by_id,
-            external_case_worker_mobile_phone: '',//c.owned_by_phone,
+            external_case_worker_mobile_phone: '000000000',//c.owned_by_phone,
             organization_name: 'cif', //hardcoding to one of the orgs in Oscar staging system for testing
             //organization_name: c.owned_by_agency.substring(7),
             organization_id: c.owned_by_agency_id,
