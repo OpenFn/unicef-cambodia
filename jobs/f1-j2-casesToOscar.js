@@ -32,7 +32,6 @@ post(
         };
       },
       body: state => {
-
         // TODO: This is very strange behaviour for an API. Let's confirm with
         // Kiry that it's not indicative of bigger problems under the hood.
         function oscarStrings(data) {
@@ -57,8 +56,9 @@ post(
             given_name: oscarStrings(c.name_first),
             family_name: oscarStrings(c.name_last),
             gender: oscarStrings(c.sex),
-            date_of_birth:
-              c.date_of_birth && c.date_of_birth.replace(/\//g, '-'),
+            date_of_birth: oscarStrings(
+              c.date_of_birth && c.date_of_birth.replace(/\//g, '-')
+            ),
             location_current_village_code: oscarStrings(c.location_current),
             address_current_village_code: oscarStrings(c.address_current),
             reason_for_referral: oscarStrings(c.protection_status),
@@ -84,7 +84,7 @@ post(
           'Case data to be posted to Oscar: ',
           JSON.stringify(json, null, 2)
         );
-        
+
         return json;
       },
     })
