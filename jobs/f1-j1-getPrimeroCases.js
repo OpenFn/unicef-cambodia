@@ -4,9 +4,10 @@ getCases(
   {
     remote: true,
     scope: {
-      transitions_changed_at: `date_range||${
+      transitions_changed_at: `date_range||01-05-2020.01-01-4000`, //hardcoding start & end date until we figure out lastFetch
+      /*transitions_changed_at: `date_range||${
         state.lastFetch || '01-01-2020' // a default starting date
-      }.01-01-4000`, // effectively no end date (year 4000!)
+      }.01-01-4000`,*/ // effectively no end date (year 4000!)
       service_response_types: 'list||referral_to_oscar',
     },
   },
