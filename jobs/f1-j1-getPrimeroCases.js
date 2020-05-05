@@ -28,7 +28,7 @@ getCases(
       })
       .sort((a, b) => b - a);
 
-    const lastCreationParts = creationDates.length > 0 && dateArr[0].split('/');
+    const lastCreationParts = creationDates.length > 0 && creationDates[0].split('/');
 
     if (lastCreationParts) {
       console.log("Found cases, updating 'last created case' date.");
@@ -42,7 +42,7 @@ getCases(
       })
       .sort((a, b) => b - a);
 
-    const lastUpdateParts = updateDates.length > 0 && dateArr[0].split('/');
+    const lastUpdateParts = updateDates.length > 0 && updateDates[0].split('/');
 
     if (lastUpdateParts) {
       console.log("Found cases, updating 'last updated case' date.");
