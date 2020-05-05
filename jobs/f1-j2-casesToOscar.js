@@ -39,9 +39,9 @@ post(
             //oscar_field, primero_field,
             external_id: c.case_id,
             external_id_display: c.case_id_display,
-            //global_id: '',
+            global_id: '',
             //global_id: '01E6ASHST25VB0BW513KNRJT3E', //this works
-            global_id: c.oscar_number, //remove? 
+           //global_id: c.oscar_number, //commenting out during tesing, because Primero test data has fake oscar numbers
             mosvy_number: c.mosvy_number,
             given_name: c.name_first,
             family_name: c.name_last,
