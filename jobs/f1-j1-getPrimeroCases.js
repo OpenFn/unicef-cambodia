@@ -4,20 +4,22 @@ getCases(
   {
     remote: true,
     scope: {
-      or: {
+      transitions_created_at: `or_op||date_range||${
+          state.lastCreated || '01-01-2020'
+        }.01-01-4020`,
+      /*or: {  //TO DISCUSS --> date filters, OR operator
         transitions_created_at: `or_op||date_range||${
           state.lastCreated || '01-01-2020'
         }.01-01-4020`,
         transitions_changed_at: `or_op||date_range||${
           state.lastUpdated || '01-01-2020'
         }.01-01-4020`,
-      },
+      }, */
       service_response_types: 'list||referral_to_oscar',
     },
   },
   state => {
     state.references = [];
-    // TODO: Is transitions enough, or do we need to use an updated_at field on the case?
     // Get latest transition from all cases.
     const creationDates = state.data
       .map(x => {
