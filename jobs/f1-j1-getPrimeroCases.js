@@ -4,7 +4,7 @@ getCases(
   {
     remote: true,
     scope: {
-      transition_changed_to: `date_range||${
+      transitions_changed_at: `date_range||${
         state.lastFetch || '01-01-2020' // a default starting date
       }.01-01-4000`, // effectively no end date (year 4000!)
       service_response_types: 'list||referral_to_oscar',
