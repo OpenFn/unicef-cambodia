@@ -43,6 +43,22 @@ post(
           }
         }
 
+        const serviceMap = {
+          social_work_case_work: 'Social Work / Case Work',
+          family_based_care: 'Family Based Care',
+          drug_alcohol: 'Drug / Alcohol',
+          counselling: 'Counselling',
+          financial_development: 'Financial Development',
+          disability_support: 'Disability Support',
+          medical_support: 'Medical Support',
+          legal_support: 'Legal Support',
+          mental_health_support: 'Mental Health Support',
+          training_education: 'Training and Education',
+          family_support: 'Family Support',
+          anti_trafficking: 'Anti-Trafficking',
+          other: 'Other',
+        };
+
         const c = state.data;
 
         // Mappings for posting cases to Oscar
@@ -71,7 +87,7 @@ post(
             services: c.services_section.map(s => {
               return {
                 uuid: oscarStrings(s.unique_id),
-                name: oscarStrings(s.service_type),
+                name: serviceMap[s.service_type] || 'Other',
               };
             }),
             transaction_id: oscarStrings(c.transition_id),
