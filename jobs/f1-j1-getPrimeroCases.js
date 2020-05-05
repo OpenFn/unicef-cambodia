@@ -5,7 +5,7 @@ getCases(
     remote: true,
     scope: {
       transitions_changed_at: `date_range||${
-        state.lastFetch || '01-01-2020' //default starting date
+         '01-01-2020' //default starting date
       }.01-01-2020`, //effectively no end date (year 4000!)
 
       // Replace date filter with transitions_changed_at once Quoin confirms questions
