@@ -59,7 +59,7 @@ post(
             organization_id: c.owned_by_agency_id,
             services: c.services_section.map(s => {
               return {
-                uuid: s.unique_id,
+                //uuid: s.unique_id,
                 name: s.service_type,
               };
             }),
