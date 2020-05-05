@@ -66,6 +66,23 @@ alterState(state => {
     'agency-wmo': 'agency-wmo-user',
   };
 
+  const protectionMap = {
+    'Living and working on street': 'unaccompanied',
+    'Unaccompanied child': 'separated',
+    'Migrant child': 'migrant_child_13820',
+    'Trafficked child': 'trafficked_child_47822',
+    'Sexually exploited child': 'sexually_exploited_child_71438',
+    'Abandoned child': 'abandoned_child_98628',
+    'Orphan child': 'orphan_child_99287',
+    'HIV/AIDS': 'hiv_aids_88169',
+    'Physical impairment': 'physical_impairment_03566',
+    'Mental impairment': 'mental_impairment_27429',
+    'Domestic violated child': 'domestic_violated_child_28014',
+    'Vulnerable child affected by alcohol':
+      'vulnerable_child_affected_by_alcohol_01558',
+    'OSCaR referral': 'oscar_referral',
+  };
+
   state.cases = state.data.data.map(c => {
     //Mappings for upserting cases in Primero (update if existing, insert if new)
     return {
@@ -82,7 +99,7 @@ alterState(state => {
         location_current: c.location_current_village_code,
         address_current: c.address_current_village_code,
         oscar_status: c.status,
-        protection_status: c.reason_for_referral,
+        protection_status: protectionMap[c.reason_for_referral] || 'other',
         owned_by:
           agencyMap[`agency-${c.organization_name}`] ||
           `agency-${c.organization_name}-user`,

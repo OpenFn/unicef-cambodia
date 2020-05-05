@@ -59,6 +59,23 @@ post(
           other: 'Other',
         };
 
+        const protectionMap = {
+          unaccompanied: 'Living and working on street',
+          separated: 'Unaccompanied child',
+          migrant_child_13820: 'Migrant child',
+          trafficked_child_47822: 'Trafficked child',
+          sexually_exploited_child_71438: 'Sexually exploited child',
+          abandoned_child_98628: 'Abandoned child',
+          orphan_child_99287: 'Orphan child',
+          hiv_aids_88169: 'HIV/AIDS',
+          physical_impairment_03566: 'Physical impairment',
+          mental_impairment_27429: 'Mental impairment',
+          domestic_violated_child_28014: 'Domestic violated child',
+          vulnerable_child_affected_by_alcohol_01558:
+            'Vulnerable child affected by alcohol',
+          oscar_referral: 'OSCaR referral',
+        };
+
         const c = state.data;
 
         // Mappings for posting cases to Oscar
@@ -77,7 +94,9 @@ post(
             ),
             location_current_village_code: oscarStrings(c.location_current),
             address_current_village_code: oscarStrings(c.address_current),
-            reason_for_referral: oscarStrings(c.protection_status),
+            reason_for_referral: oscarStrings(
+              protectionMap[c.protection_status] || c.protection_status
+            ),
             external_case_worker_name: oscarStrings(c.owned_by),
             external_case_worker_id: oscarStrings(c.owned_by_id),
             external_case_worker_mobile: c.owned_by_phone || '000000000',
