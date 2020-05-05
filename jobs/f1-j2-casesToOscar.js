@@ -32,38 +32,49 @@ post(
         };
       },
       body: state => {
+
+        // TODO: This is very strange behaviour for an API. Let's confirm with
+        // Kiry that it's not indicative of bigger problems under the hood.
+        function oscarStrings(data) {
+          if (data) {
+            return data;
+          } else {
+            console.log('Converting key to an empty string for OSCAR.');
+            return '';
+          }
+        }
+
         const c = state.data;
-        //Mappings for posting cases to Oscar
+
+        // Mappings for posting cases to Oscar
         const json = {
           organization: {
-            //oscar_field, primero_field,
-            external_id: c.case_id,
-            external_id_display: c.case_id_display,
-            //global_id: '',
-            //global_id: '01E6ASHST25VB0BW513KNRJT3E', //this works
-            global_id: c.oscar_number, //commenting out during tesing, because Primero test data has fake oscar numbers
-            mosvy_number: c.mosvy_number,
-            given_name: c.name_first,
-            family_name: c.name_last,
-            gender: c.sex,
+            // oscar_field, primero_field,
+            external_id: oscarStrings(c.case_id),
+            external_id_display: oscarStrings(c.case_id_display),
+            global_id: oscarStrings(c.oscar_number), // commenting out during tesing, because Primero test data has fake oscar numbers
+            mosvy_number: oscarStrings(c.mosvy_number),
+            given_name: oscarStrings(c.name_first),
+            family_name: oscarStrings(c.name_last),
+            gender: oscarStrings(c.sex),
             date_of_birth:
               c.date_of_birth && c.date_of_birth.replace(/\//g, '-'),
-            location_current_village_code: c.location_current,
-            address_current_village_code: c.address_current,
-            reason_for_referral: c.protection_status,
-            external_case_worker_name: c.owned_by,
-            external_case_worker_id: c.owned_by_id,
-            external_case_worker_mobile: c.owned_by_phone, //RETURN "000000000" if undefined
-            //organization_name: 'cif', //hardcoding to one of the orgs in Oscar staging system for testing
-            organization_name: c.owned_by_agency.substring(7),
-            organization_id: c.owned_by_agency_id,
+            location_current_village_code: oscarStrings(c.location_current),
+            address_current_village_code: oscarStrings(c.address_current),
+            reason_for_referral: oscarStrings(c.protection_status),
+            external_case_worker_name: oscarStrings(c.owned_by),
+            external_case_worker_id: oscarStrings(c.owned_by_id),
+            external_case_worker_mobile: c.owned_by_phone || '000000000',
+            // organization_name: 'cif', // hardcoding to one of the orgs in Oscar staging system for testing
+            organization_name: oscarStrings(c.owned_by_agency.substring(7)),
+            organization_id: oscarStrings(c.owned_by_agency_id),
             services: c.services_section.map(s => {
               return {
-                uuid: s.unique_id,
-                name: s.service_type,
+                uuid: oscarStrings(s.unique_id),
+                name: oscarStrings(s.service_type),
               };
             }),
-            transaction_id: c.transition_id,
+            transaction_id: oscarStrings(c.transition_id),
           },
         };
 
@@ -73,6 +84,7 @@ post(
           'Case data to be posted to Oscar: ',
           JSON.stringify(json, null, 2)
         );
+        
         return json;
       },
     })
