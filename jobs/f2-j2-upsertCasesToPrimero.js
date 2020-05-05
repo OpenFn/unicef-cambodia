@@ -2,18 +2,18 @@
 // User Story 2: 'View Oscar cases in Primero' AND User Story 4: 'Sending referrals to Primero'
 alterState(state => {
   const serviceMap = {
-    'Social Work / Case Work': 'Social Work / Case Work',
-    'Family Based Care': 'Family Based Care',
-    'Drug/Alcohol': 'Drug / Alcohol',
-    Counselling: 'Counselling',
-    'Financial Development': 'Financial Development',
-    'Disability Support': 'Disability Support',
-    'Medical Support': 'Medical Support',
-    'Legal Support': 'Legal Support',
-    'Mental Health Support': 'Mental Health Support',
-    'Training and Education': 'Training and Education',
-    'Family Support': 'Family Support',
-    'Anti-Trafficking': 'Anti-Trafficking',
+    'Social Work / Case Work': 'social_work_case_work',
+    'Family Based Care': 'family_based_care',
+    'Drug/Alcohol': 'drug_alcohol',
+    Counselling: 'counselling',
+    'Financial Development': 'financial_development',
+    'Disability Support': 'disability_support',
+    'Medical Support': 'medical_support',
+    'Legal Support': 'legal_support',
+    'Mental Health Support': 'mental_health_support',
+    'Training and Education': 'training_education',
+    'Family Support': 'family_support',
+    'Anti-Trafficking': 'anti_trafficking',
   };
 
   const agencyMap = {
