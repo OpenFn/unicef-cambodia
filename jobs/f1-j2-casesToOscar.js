@@ -44,19 +44,66 @@ post(
         }
 
         const serviceMap = {
-          social_work_case_work: 'Social Work / Case Work',
-          family_based_care: 'Family Based Care',
-          drug_alcohol: 'Drug / Alcohol',
-          counselling: 'Counselling',
-          financial_development: 'Financial Development',
-          disability_support: 'Disability Support',
-          medical_support: 'Medical Support',
-          legal_support: 'Legal Support',
-          mental_health_support: 'Mental Health Support',
-          training_education: 'Training and Education',
-          family_support: 'Family Support',
-          anti_trafficking: 'Anti-Trafficking',
-          other: 'Other',
+          social_work_case_work_generalist:
+            'Generalist social work / case work',
+          social_work_case_work_community: 'Community social work',
+          family_based_care_emergency_foster: 'Emergency foster care',
+          family_based_care_longterm_foster: 'Long term foster care',
+          family_based_care_kinship: 'Kinship care',
+          family_based_care_domestic_adoption: 'Domestic adoption support',
+          family_based_care_family_preservation: 'Family preservation',
+          family_based_care_family_reunification: 'Family reunification',
+          family_based_care_independent_living: 'Independent Living',
+          drug_alcohol_counselling: 'Drug and Alcohol Counselling',
+          drug_alcohol_detox_rehabilitation: 'Detox / rehabilitation services',
+          drug_alcohol_detox_support: 'Detox support',
+          counselling_generalist: 'Generalist counselling',
+          counselling_abuse_survivors: 'Counselling for abuse survivors',
+          counselling_trauma: 'Trauma counselling',
+          counselling_family: 'Family counselling / mediation',
+          financial_development_material_assistance:
+            'Direct material assistance',
+          financial_development_financial_assistance:
+            'Direct financial assistance',
+          financial_development_income_generation: 'Income generation services',
+          financial_development_day_care: 'Day care services',
+          disability_support_therapeutic_interventions:
+            'Therapeutic interventions',
+          'disability_support_respite-care': 'Disability respite care',
+          disability_support_therapeutic_training: 'Therapeutic training',
+          disability_support_aid_provision: 'Disability-aid provision',
+          disability_support_peripheral: 'Peripheral supports',
+          disability_support_groups: 'Support groups',
+          medical_support_access_care: 'Support to access care',
+          medical_support_provision_medical_case: 'Provision of medical care',
+          medical_support_medical_training: 'Medical training services',
+          medical_support_healt_education: 'Health education',
+          legal_support_access_legal_services:
+            'Support to access legal services',
+          legal_support_advocacy_services: 'Legal advocacy services',
+          legal_support_representation: 'Legal representation',
+          legal_support_prision_visitation: 'Prison visitation support',
+          mental_health_support_therapeutic_interventions:
+            'Therapeutic interventions',
+          mental_health_support_therapeutic_training: 'Therapeutic training',
+          mental_health_support_direct_medical_support:
+            'Direct medical support',
+          training_education_school_support: 'School support',
+          training_education_supplementary: 'Supplementary school education',
+          training_education_vocational: 'Vocational education and training',
+          training_education_material_support:
+            'Material support for education (uniforms, etc)',
+          training_education_scholarships: 'Scholarships or financial support',
+          training_education_life_skills: 'Life skills',
+          family_support_family_support: 'Family support',
+          anti_trafficking_rescue: 'Rescue Services',
+          anti_trafficking_transitional_accomodation:
+            'Transitional Accommodation',
+          anti_trafficking_post_trafficking: 'Post-Trafficking Counseling',
+          anti_trafficking_community_reintegration:
+            'Community Reintegration Support',
+          residential_care_gov_only_other: 'Residential Care Institution',
+          other_other_service: 'Other Service',
         };
 
         const protectionMap = {
@@ -103,12 +150,19 @@ post(
             organization_name: 'cif', // hardcoding to one of the orgs in Oscar staging system for testing
             //organization_name: oscarStrings(c.owned_by_agency.substring(7)), //add back in before go-live
             organization_id: oscarStrings(c.owned_by_agency_id),
-            services: c.services_section.map(s => {
-              return {
-                uuid: oscarStrings(s.unique_id),
-                name: serviceMap[s.service_type] || 'Other',
-              };
-            }),
+            services: [].concat.apply(
+              [],
+              c.services_section
+                .filter(s => s.service_subtype)
+                .map(s => {
+                  return s.service_subtype.map(st => {
+                    return {
+                      uuid: oscarStrings(s.unique_id),
+                      name: serviceMap[st] || 'Other',
+                    };
+                  });
+                })
+            ),
             transaction_id: c.transition_id,
             //transaction_id: oscarStrings(c.transition_id),
           },
