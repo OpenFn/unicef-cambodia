@@ -1,3 +1,10 @@
+// Clear data from previous runs.
+alterState(state => {
+  state.data = {};
+  state.references = [];
+  return state;
+});
+
 // GET new Primero cases
 // User Story 1: Generating government referrals
 getCases(
@@ -7,19 +14,19 @@ getCases(
       /*transitions_created_at: `date_range||${
           state.lastCreated || '01-01-2020'
         }.01-01-4020`,*/
-      or: {  //TO DISCUSS --> date filters, OR operator
+      or: {
+        //TO DISCUSS --> date filters, OR operator
         transitions_created_at: `or_op||date_range||${
           state.lastCreated || '01-01-2020'
         }.01-01-4020`,
         transitions_changed_at: `or_op||date_range||${
           state.lastUpdated || '01-01-2020 00:00'
         }.01-01-4020 00:00`,
-      }, 
+      },
       service_response_types: 'list||referral_to_oscar',
     },
   },
   state => {
-    state.references = [];
     // Get latest transition from all cases.
     const creationDates = state.data
       .map(x => {
@@ -28,7 +35,8 @@ getCases(
       })
       .sort((a, b) => b - a);
 
-    const lastCreationParts = creationDates.length > 0 && creationDates[0].split('/');
+    const lastCreationParts =
+      creationDates.length > 0 && creationDates[0].split('/');
 
     if (lastCreationParts) {
       console.log("Found cases, updating 'last created case' date.");
@@ -47,9 +55,9 @@ getCases(
     if (lastUpdateParts) {
       console.log("Found cases, updating 'last updated case' date.");
       state.lastUpdated = `${lastCreationParts[2]}-${lastCreationParts[1]}-${lastCreationParts[0]}`;
-    } 
-     console.log('The last transition update is: ' + state.lastUpdated);
-     console.log('The last transition creation is: ' + state.lastCreated);
+    }
+    console.log('The last transition update is: ' + state.lastUpdated);
+    console.log('The last transition creation is: ' + state.lastCreated);
 
     return state;
   }

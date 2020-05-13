@@ -1,3 +1,10 @@
+// Clear data from previous runs.
+alterState(state => {
+  state.data = {};
+  state.references = [];
+  return state;
+});
+
 // GET new OSCaR cases
 // User Story 2: 'View Oscar cases in Primero' AND User Story 4: 'Sending referrals to Primero'
 post(
