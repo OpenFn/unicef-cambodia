@@ -18,7 +18,7 @@ post(
     },
   },
   get(
-    '/api/v1/organizations/clients?since_date',
+    '/api/v1/organizations/clients',
     {
       keepCookie: true,
       headers: state => {
@@ -32,6 +32,7 @@ post(
       },
       query: {
         since_date: state.lastQueryDate || '2020-01-01 00:00:00',
+        referred_external: true,
       },
     },
     state => {
