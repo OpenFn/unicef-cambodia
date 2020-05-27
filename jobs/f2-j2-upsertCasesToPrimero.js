@@ -330,6 +330,7 @@ alterState(state => {
         oscar_case_worker_name: c.case_worker_name,
         oscar_referring_organization: c.organization_name,
         oscar_case_worker_telephone: c.case_worker_mobile,
+        oscar_referral_consent_form: //return comma separated string of oscar referral_consent_form[] links
       },
       services_section: convert(c.services),
       transitions: convert(c.services).map(t => {
