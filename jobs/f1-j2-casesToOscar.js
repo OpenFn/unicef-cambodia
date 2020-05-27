@@ -150,6 +150,7 @@ post(
             organization_name: 'cif', // hardcoding to one of the orgs in Oscar staging system for testing
             //organization_name: oscarStrings(c.owned_by_agency.substring(7)), //add back in before go-live
             organization_id: oscarStrings(c.owned_by_agency_id),
+            isReferred: true,
             services: [].concat.apply(
               [],
               c.services_section
