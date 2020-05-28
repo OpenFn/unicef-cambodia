@@ -1,8 +1,3 @@
-alterState(state => {
-  console.log(JSON.stringify(state, null, 2));
-  return state;
-});
-
 // Primero cases --> OSCaR
 // User Story 1: Generating government referrals, creating referrals in Oscar
 post(
@@ -18,7 +13,7 @@ post(
   //User Story 1.8b: Create referrals in Oscar
   each(
     merge(
-      '$.references[0][*]',
+      '$.references[1][*]',
       // Bring down the authentication info for use in each case post.
       fields(
         field('__token', dataValue("__headers['access-token']")),
