@@ -1,3 +1,8 @@
+alterState(state => {
+  console.log(JSON.stringify(state.references, null, 2));
+  return state;
+});
+
 // Primero cases --> OSCaR
 // User Story 1: Generating government referrals, creating referrals in Oscar
 post(
