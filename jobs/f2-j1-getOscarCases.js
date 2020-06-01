@@ -38,8 +38,8 @@ post(
     state => {
       const date = new Date(Date.parse(state.data.__headers.date));
       const YYYY = date.getUTCFullYear();
-      const MM = `${date.getUTCMonth()}`.padStart(2, "0");
-      const DD = `${date.getUTCDate()}`.padStart(2, "0");
+      const MM = date.getUTCMonth()
+      const DD = date.getUTCDate()
 
       const hh = date.getUTCHours();
       const mm = date.getUTCMinutes();
