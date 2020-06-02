@@ -302,6 +302,8 @@ alterState(state => {
       return newArr;
     }
 
+    const now = new Date();
+
     //Mappings for upserting cases in Primero (update if existing, insert if new)
     return {
       remote: true,
@@ -326,7 +328,7 @@ alterState(state => {
         consent_for_services: 'true',
         disclosure_other_orgs: 'true',
         module_id: 'primeromodule-cp',
-        registration_date: c.referral_date,
+        registration_date: now.toISOString().split('T')[0].replace(/-/g, '/'),
         oscar_case_worker_name: c.case_worker_name,
         oscar_referring_organization: c.organization_name,
         oscar_case_worker_telephone: c.case_worker_mobile,
