@@ -17,10 +17,10 @@ getCases(
       or: {
         //TO DISCUSS --> date filters, OR operator
         transitions_created_at: `or_op||date_range||${
-          state.lastCreated || '01-01-2020'
+          state.lastCreated || '03-06-2020'
         }.01-01-4020`,
         transitions_changed_at: `or_op||date_range||${
-          state.lastUpdated || '01-01-2020 00:00'
+          state.lastUpdated || '03-06-2020 00:00'
         }.01-01-4020 00:00`,
       },
       service_response_types: 'list||referral_to_oscar',
@@ -35,8 +35,7 @@ getCases(
       })
       .sort((a, b) => b - a);
 
-    const lastCreationParts =
-      creationDates.length > 0 && creationDates[0].split('/');
+    const lastCreationParts = creationDates[0] && creationDates[0].split('/');
 
     if (lastCreationParts) {
       console.log("Found cases, updating 'last created case' date.");
@@ -46,10 +45,11 @@ getCases(
     const updateDates = state.data
       // Do we need to check for transitions_changed_at date specifically? It
       // seems like transitions_changed_at should be the ONLY cursor we use.
+      .filter(x => x.transitions_changed_at)
       .map(x => x.transitions_changed_at)
       .sort((a, b) => b - a);
 
-    const lastUpdateParts = updateDates.length > 0 && updateDates[0].split('/');
+    const lastUpdateParts = updateDates[0] && updateDates[0].split('/');
 
     if (lastUpdateParts) {
       console.log("Found cases, updating 'last updated case' date.");
