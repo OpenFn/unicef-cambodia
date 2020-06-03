@@ -38,13 +38,13 @@ post(
     state => {
       const date = new Date(Date.parse(state.data.__headers.date));
       const YYYY = date.getUTCFullYear();
-      const MM = date.getUTCMonth();
-      const DD = date.getUTCDate();
+      const MM = date.getUTCMonth()
+      const DD = date.getUTCDate()
 
       const hh = date.getUTCHours();
       const mm = date.getUTCMinutes();
       const ss = date.getUTCSeconds();
-
+      
       state.lastQueryDate = `${YYYY}-${MM}-${DD} ${hh}:${mm}:${ss}`;
       return state;
     }
