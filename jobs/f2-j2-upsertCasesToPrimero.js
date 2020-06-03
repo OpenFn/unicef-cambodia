@@ -304,6 +304,8 @@ alterState(state => {
 
     const now = new Date();
 
+    console.log(`Data provided by Oscar: ${JSON.stringify(c, null, 2)}`);
+
     //Mappings for upserting cases in Primero (update if existing, insert if new)
     return {
       remote: true,
@@ -341,7 +343,7 @@ alterState(state => {
       transitions: convert(c.services).map(t => {
         return {
           service_section_unique_id: t.unique_id,
-          service: t.name || 'Other',
+          service: t.service_type,
           // created_at: t.referral_date, //Q: Should this be today's date?
           type: 'referral',
         };
