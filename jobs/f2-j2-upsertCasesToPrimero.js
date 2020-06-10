@@ -321,7 +321,8 @@ alterState(state => {
         location_current: c.location_current_village_code,
         address_current: c.address_current_village_code,
         oscar_status: c.status,
-        protection_status: protectionMap[c.reason_for_referral] || 'other',
+        protection_status: 'oscar_referral', //protectionMap[c.reason_for_referral] || 'other',
+        protection_status_oscar: c.reason_for_referral,
         owned_by:
           agencyMap[`agency-${c.organization_name}`] ||
           `agency-${c.organization_name}-user`,
