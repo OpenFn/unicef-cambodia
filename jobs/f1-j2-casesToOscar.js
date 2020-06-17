@@ -124,6 +124,7 @@ post(
         };
 
         const c = state.data;
+        console.log(`Data provided by Primero: ${JSON.stringify(c, null, 2)}`);
 
         // Mappings for posting cases to Oscar
         const json = {
