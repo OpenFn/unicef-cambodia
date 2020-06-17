@@ -312,8 +312,7 @@ alterState(state => {
       oscar_number: c.global_id,
       child: {
         // primero_field: oscar_field,
-        case_id: c.external_id,
-        case_id_display: c.external_id_display,
+        case_id: c.external_id, //externalId for upserts 
         oscar_number: c.global_id,
         mosvy_number: c.mosvy_number,
         name_first: c.given_name,
