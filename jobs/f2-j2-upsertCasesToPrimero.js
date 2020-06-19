@@ -310,6 +310,7 @@ alterState(state => {
     return {
       remote: true,
       oscar_number: c.global_id,
+      case_id: c.external_id,
       child: {
         // primero_field: oscar_field,
         case_id: c.external_id, // externalId for upsert (will fail if multiple found)
