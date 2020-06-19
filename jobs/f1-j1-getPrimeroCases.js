@@ -27,6 +27,11 @@ getCases(
     },
   },
   state => {
+    console.log(
+      `Primero API responded with cases: ${JSON.stringify(
+        state.data.map(x => x.case_id_display)
+      )}`
+    );
     // Get latest transition from all cases.
     const creationDates = state.data
       .map(x => {
@@ -52,7 +57,7 @@ getCases(
     const lastUpdateParts = updateDates[0] && updateDates[0].split('/');
 
     if (lastUpdateParts) {
-      console.log("Found cases, updating 'last updated case' date.");
+      console.log(`Found cases, updating 'last updated case' date.`);
       state.lastUpdated = `${lastCreationParts[2]}-${lastCreationParts[1]}-${lastCreationParts[0]}`;
     }
 
