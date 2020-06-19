@@ -1,7 +1,7 @@
 // Primero cases --> OSCaR
 // User Story 1: Generating government referrals, creating referrals in Oscar
 post(
-  //Oscar authentication, once per run
+  // Oscar authentication, once per run
   '/api/v1/auth/sign_in',
   {
     keepCookie: true,
@@ -10,7 +10,7 @@ post(
       password: state.configuration.password,
     },
   },
-  //User Story 1.8b: Create referrals in Oscar
+  // User Story 1.8b: Create referrals in Oscar
   each(
     merge(
       '$.references[1][*]',
@@ -21,9 +21,9 @@ post(
       )
     ),
     post('/api/v1/organizations/clients/upsert/', {
-      //This will upsert cases
+      // This will upsert cases
       headers: state => {
-        //Use Oscar authentication from previous step
+        // Use Oscar authentication from previous step
         return {
           'Content-Type': 'application/json',
           uid: state.configuration.username,
@@ -140,9 +140,9 @@ post(
             date_of_birth: oscarStrings(
               c.date_of_birth && c.date_of_birth.replace(/\//g, '-')
             ),
-           //location_current_village_code: oscarStrings(c.location_current),
-            location_current_village_code: '0'.repeat(8 - c.location_current.length) +
-            c.location_current, //add leading zeros when uploading to Oscar
+            // location_current_village_code: oscarStrings(c.location_current),
+            location_current_village_code:
+              '0'.repeat(8 - c.location_current.length) + c.location_current, //add leading zeros when uploading to Oscar
             address_current_village_code: oscarStrings(c.address_current),
             reason_for_referral: oscarStrings(
               protectionMap[c.protection_status] || c.protection_status
@@ -151,7 +151,7 @@ post(
             external_case_worker_id: oscarStrings(c.owned_by_id),
             external_case_worker_mobile: c.owned_by_phone || '000000000',
             organization_name: 'cif', // hardcoding to one of the orgs in Oscar staging system for testing
-            //organization_name: oscarStrings(c.owned_by_agency.substring(7)), //add back in before go-live
+            // organization_name: oscarStrings(c.owned_by_agency.substring(7)), // add back in before go-live
             organization_id: oscarStrings(c.owned_by_agency_id),
             isReferred: true,
             services: [].concat.apply(
@@ -168,7 +168,7 @@ post(
                 })
             ),
             transaction_id: c.transition_id,
-            //transaction_id: oscarStrings(c.transition_id),
+            // transaction_id: oscarStrings(c.transition_id),
           },
         };
 
