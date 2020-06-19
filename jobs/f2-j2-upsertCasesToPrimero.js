@@ -304,13 +304,17 @@ alterState(state => {
 
     const now = new Date();
 
-    console.log(`Data provided by Oscar: ${JSON.stringify(c, null, 2)}`);
+    console.log(
+      `Data provided by Oscar ${c.global_id} / external ID ${
+        c.external_id
+      }: ${JSON.stringify(c, null, 2)}`
+    );
 
     //Mappings for upserting cases in Primero (update if existing, insert if new)
     return {
       remote: true,
       oscar_number: c.global_id,
-      case_id: c.external_id,
+      case_id: c.external_id !== '' ? c.external_id : null,
       child: {
         // primero_field: oscar_field,
         case_id: c.external_id, // externalId for upsert (will fail if multiple found)
