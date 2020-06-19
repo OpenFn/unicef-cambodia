@@ -305,9 +305,9 @@ alterState(state => {
     const now = new Date();
 
     console.log(
-      `Data provided by Oscar ${c.global_id} / external ID ${
+      `Data provided by Oscar (ON: ${c.global_id} / extId: ${
         c.external_id
-      }: ${JSON.stringify(c, null, 2)}`
+      }) : ${JSON.stringify(c, null, 2)}`
     );
 
     //Mappings for upserting cases in Primero (update if existing, insert if new)
