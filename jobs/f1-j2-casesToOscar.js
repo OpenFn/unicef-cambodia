@@ -39,7 +39,7 @@ post(
             return data;
           } else {
             console.log('Converting key to an empty string for OSCAR.');
-            return '';
+            return '00000000';
           }
         }
         
