@@ -141,7 +141,7 @@ post(
               c.date_of_birth && c.date_of_birth.replace(/\//g, '-')
             ),
             // location_current_village_code: oscarStrings(c.location_current),
-            location_current_village_code: (location_current=='NaN' ? '' : ('0'.repeat(8 - c.location_current.length) + c.location_current)), //add leading zeros when uploading to Oscar
+            location_current_village_code: (location_current=='NaN' ? '00000000' : ('0'.repeat(8 - c.location_current.length) + c.location_current)), //add leading zeros when uploading to Oscar
             address_current_village_code: oscarStrings(c.address_current),
             reason_for_referral: oscarStrings(
               protectionMap[c.protection_status] || c.protection_status
