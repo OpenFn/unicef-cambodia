@@ -39,7 +39,7 @@ post(
             return data;
           } else {
             console.log('Converting key to an empty string for OSCAR.');
-            return '00000000';
+            return '';
           }
         }
         
@@ -48,7 +48,7 @@ post(
             return ('0'.repeat(8 - data.length) + data);
           } else {
             console.log('Converting NaN values to null.');
-            return '';
+            return '00000000';
           }
         }
 
