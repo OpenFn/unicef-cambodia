@@ -324,10 +324,9 @@ alterState(state => {
         name_last: c.family_name,
         sex: c.gender,
         date_of_birth: c.date_of_birth,
-        location_current: parseInt(
-          c.location_current_village_code,
-          10
-        ).toString(),
+        location_current:
+          c.location_current_village_code &&
+          parseInt(c.location_current_village_code, 10).toString(),
         address_current: c.address_current_village_code,
         oscar_status: c.status,
         protection_status: 'oscar_referral', // protectionMap[c.reason_for_referral] || 'other',
