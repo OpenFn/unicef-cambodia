@@ -48,7 +48,7 @@ post(
             return ('0'.repeat(8 - data.length) + data);
           } else {
             console.log('Converting NaN values to null.');
-            return '00000000';
+            return '';
           }
         }
 
