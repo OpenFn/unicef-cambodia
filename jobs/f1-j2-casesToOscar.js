@@ -44,10 +44,10 @@ post(
         }
         
          function checkValue(data) {
-          if (data!=='NaN') {
+          if (data!=='NaN' && data!=='') {
             return ('0'.repeat(8 - data.length) + data);
           } else {
-            console.log('Converting NaN values to null.');
+            console.log('Converting location null values to OSCAR empty string.');
             return '';
           }
         }
