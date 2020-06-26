@@ -44,7 +44,7 @@ post(
         }
         
          function checkValue(data) {
-          if (data!=='NaN' && data!=='') {
+          if (data!=='NaN' && data) {
             return ('0'.repeat(8 - data.length) + data);
           } else {
             console.log('Converting location null values to OSCAR empty string.');
