@@ -32,6 +32,41 @@ getCases(
         state.data.map(x => x.case_id_display)
       )}`
     );
+
+    state.data.forEach(x => {
+      function assertExists(prop) {
+        x.hasOwnProperty(prop) || error(prop);
+      }
+
+      function error(prop) {
+        throw `Primero API violated contract on the '${prop}' property.
+        Please contact _____@primero.org'`;
+      }
+
+      assertExists('owned_by');
+      assertExists('owned_by_agency');
+      assertExists('owned_by_phone');
+      assertExists('module_id');
+      assertExists('created_at');
+      assertExists('case_id_display');
+      assertExists('mosvy_number');
+      assertExists('oscar_number');
+      assertExists('name_first');
+      assertExists('name_last');
+      assertExists('sex');
+      assertExists('date_of_birth');
+      assertExists('location_current');
+      assertExists('services_section');
+      assertExists('transitions');
+      assertExists('_id');
+      assertExists('case_id');
+      assertExists('protection_status');
+      assertExists('transitions_changed_at');
+
+      Array.isArray(x.transitions) || error('transitions');
+      Array.isArray(x.services_section) || error('services_section');
+    });
+
     // Get latest transition from all cases.
     const creationDates = state.data
       .map(x => {
