@@ -141,7 +141,7 @@ post(
             // oscar_field, primero_field,
             external_id: oscarStrings(c.case_id),
             external_id_display: oscarStrings(c.case_id_display),
-            global_id: oscarStrings(c.oscar_number), // commenting out during tesing, because Primero test data has fake oscar numbers
+            global_id: oscarStrings(c.oscar_number), 
             mosvy_number: oscarStrings(c.mosvy_number),
             given_name: oscarStrings(c.name_first),
             family_name: oscarStrings(c.name_last),
@@ -151,8 +151,6 @@ post(
             ),
             // location_current_village_code: oscarStrings(c.location_current),
             location_current_village_code: checkValue(c.location_current),
-            //location_current_village_code: (location_current=='NaN' ? '00000000' : ('0'.repeat(8 - c.location_current.length) + c.location_current)), //add leading zeros when uploading to Oscar
-            //'0'.repeat(8 - c.location_current.length) + c.location_current
             address_current_village_code: oscarStrings(c.address_current),
             reason_for_referral: oscarStrings(
               protectionMap[c.protection_status] || c.protection_status
@@ -160,8 +158,8 @@ post(
             external_case_worker_name: oscarStrings(c.owned_by),
             external_case_worker_id: oscarStrings(c.owned_by_id),
             external_case_worker_mobile: c.owned_by_phone || '000000000',
-            organization_name: 'cif', // hardcoding to one of the orgs in Oscar staging system for testing
-            // organization_name: oscarStrings(c.owned_by_agency.substring(7)), // add back in before go-live
+            //organization_name: 'cif', // hardcoding to one of the orgs in Oscar staging system for testing
+            organization_name: oscarStrings(c.owned_by_agency.substring(7)), // add back in before go-live
             organization_id: oscarStrings(c.owned_by_agency_id),
             is_referred: true,
             services: [].concat.apply(
