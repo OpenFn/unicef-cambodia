@@ -296,7 +296,10 @@ alterState(state => {
           service_type: key,
           service_type_text: key,
           service_type_details_text: obj[key][0].service_type_details_text,
-          service_response_type: 'referral_from_oscar'
+          service_response_type: 'referral_from_oscar',
+          oscar_case_worker_name: c.case_worker_name,
+          oscar_referring_organization: c.organization_name,
+         oscar_case_worker_telephone: c.case_worker_mobile,
         };
       });
 
