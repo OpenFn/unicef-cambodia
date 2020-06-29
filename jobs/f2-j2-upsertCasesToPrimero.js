@@ -330,13 +330,13 @@ alterState(state => {
             : null,
         address_current: c.address_current_village_code,
         oscar_status: c.status,
-        protection_status: 'oscar_referral', // protectionMap[c.reason_for_referral] || 'other',
-        protection_status_oscar: c.reason_for_referral,
+        protection_status: 'oscar_referral', 
+        protection_status_oscar: c.reason_for_referral, //map string value from Oscar
         owned_by:
           agencyMap[`agency-${c.organization_name}`] ||
           `agency-${c.organization_name}-user`,
         oscar_reason_for_exiting: c.reason_for_exiting,
-        has_referral: 'true',
+        has_referral: c.is_referred,
         consent_for_services: 'true',
         disclosure_other_orgs: 'true',
         module_id: 'primeromodule-cp',
@@ -344,17 +344,17 @@ alterState(state => {
         oscar_case_worker_name: c.case_worker_name,
         oscar_referring_organization: c.organization_name,
         oscar_case_worker_telephone: c.case_worker_mobile,
-        oscar_referral_consent_form:
+       /* oscar_referral_consent_form:   //do not map consent form
           c.referral_consent_form.length > 0
             ? c.referral_consent_form.join(',')
-            : null,
+            : null, */
       },
       services_section: convert(c.services),
       transitions: convert(c.services).map(t => {
         return {
           service_section_unique_id: t.unique_id,
           service: t.service_type,
-          // created_at: t.referral_date, // Q: Should this be today's date?
+          created_at: now.toISOString().split('T')[0].replace(/-/g, '/'),
           type: 'referral',
         };
       }),
