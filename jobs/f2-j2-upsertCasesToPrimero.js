@@ -296,6 +296,7 @@ alterState(state => {
           service_type: key,
           service_type_text: key,
           service_type_details_text: obj[key][0].service_type_details_text,
+          service_response_type: 'referral_from_oscar'
         };
       });
 
@@ -337,8 +338,8 @@ alterState(state => {
           `agency-${c.organization_name}-user`,
         oscar_reason_for_exiting: c.reason_for_exiting,
         has_referral: c.is_referred,
-        consent_for_services: 'true',
-        disclosure_other_orgs: 'true',
+        consent_for_services: true,
+        disclosure_other_orgs: true,
         module_id: 'primeromodule-cp',
         registration_date: now.toISOString().split('T')[0].replace(/-/g, '/'),
         oscar_case_worker_name: c.case_worker_name,
