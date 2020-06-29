@@ -299,7 +299,7 @@ alterState(state => {
           service_response_type: 'referral_from_oscar',
           oscar_case_worker_name: c.case_worker_name,
           oscar_referring_organization: c.organization_name,
-         oscar_case_worker_telephone: c.case_worker_mobile,
+          oscar_case_worker_telephone: c.case_worker_mobile,
         };
       });
 
@@ -345,9 +345,6 @@ alterState(state => {
         disclosure_other_orgs: true,
         module_id: 'primeromodule-cp',
         registration_date: now.toISOString().split('T')[0].replace(/-/g, '/'),
-        oscar_case_worker_name: c.case_worker_name,
-        oscar_referring_organization: c.organization_name,
-        oscar_case_worker_telephone: c.case_worker_mobile,
         /* oscar_referral_consent_form:   //do not map consent form
           c.referral_consent_form.length > 0
             ? c.referral_consent_form.join(',')
