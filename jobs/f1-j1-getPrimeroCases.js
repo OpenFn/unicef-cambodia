@@ -32,6 +32,7 @@ getCases(
         state.data.map(x => x.case_id_display)
       )}`
     );
+    /*
     // Get latest transition from all cases.
     const creationDates = state.data
       .map(x => {
@@ -63,7 +64,7 @@ getCases(
 
     console.log('The last transition update is: ' + state.lastUpdated);
     console.log('The last transition creation is: ' + state.lastCreated);
-
+    */
     return state;
   }
-);
+); 
