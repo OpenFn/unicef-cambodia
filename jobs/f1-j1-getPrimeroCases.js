@@ -56,13 +56,13 @@ getCases(
       .map(x => x.transitions_changed_at)
       .sort((a, b) => b - a);
 
-    console.log(updateDates);
-
     const lastUpdateParts = updateDates[0] && updateDates[0].split('/');
+    const lastUpdateDay = lastUpdateParts[2].split(' ')[0];
+    const lastUpdateTimes = lastUpdateParts[2].split(' ')[1].split(':');
 
     if (lastUpdateParts) {
       console.log(`Found cases, updating 'last updated case' date.`);
-      state.lastUpdated = `${lastCreationParts[2]}-${lastCreationParts[1]}-${lastCreationParts[0]}`;
+      state.lastUpdated = `${lastUpdateDay}-${lastUpdateParts[1]}-${lastUpdateParts[0]} ${lastUpdateTimes[0]}:${lastUpdateTimes[1]}`;
     }
 
     console.log('The last transition update is: ' + state.lastUpdated);
