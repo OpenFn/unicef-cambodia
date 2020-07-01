@@ -42,10 +42,10 @@ post(
             return '';
           }
         }
-        
-         function checkValue(data) {
-          if (data!=='NaN' && data) {
-            return ('0'.repeat(8 - data.length) + data);
+
+        function checkValue(data) {
+          if (data !== 'NaN' && data) {
+            return '0'.repeat(8 - data.length) + data;
           } else {
             console.log('Converting location null values to OSCAR empty string.');
             return '';
@@ -53,8 +53,7 @@ post(
         }
 
         const serviceMap = {
-          social_work_case_work_generalist:
-            'Generalist social work / case work',
+          social_work_case_work_generalist: 'Generalist social work / case work',
           social_work_case_work_community: 'Community social work',
           family_based_care_emergency_foster: 'Emergency foster care',
           family_based_care_longterm_foster: 'Long term foster care',
@@ -70,14 +69,11 @@ post(
           counselling_abuse_survivors: 'Counselling for abuse survivors',
           counselling_trauma: 'Trauma counselling',
           counselling_family: 'Family counselling / mediation',
-          financial_development_material_assistance:
-            'Direct material assistance',
-          financial_development_financial_assistance:
-            'Direct financial assistance',
+          financial_development_material_assistance: 'Direct material assistance',
+          financial_development_financial_assistance: 'Direct financial assistance',
           financial_development_income_generation: 'Income generation services',
           financial_development_day_care: 'Day care services',
-          disability_support_therapeutic_interventions:
-            'Therapeutic interventions',
+          disability_support_therapeutic_interventions: 'Therapeutic interventions',
           'disability_support_respite-care': 'Disability respite care',
           disability_support_therapeutic_training: 'Therapeutic training',
           disability_support_aid_provision: 'Disability-aid provision',
@@ -87,30 +83,24 @@ post(
           medical_support_provision_medical_case: 'Provision of medical care',
           medical_support_medical_training: 'Medical training services',
           medical_support_healt_education: 'Health education',
-          legal_support_access_legal_services:
-            'Support to access legal services',
+          legal_support_access_legal_services: 'Support to access legal services',
           legal_support_advocacy_services: 'Legal advocacy services',
           legal_support_representation: 'Legal representation',
           legal_support_prision_visitation: 'Prison visitation support',
-          mental_health_support_therapeutic_interventions:
-            'Therapeutic interventions',
+          mental_health_support_therapeutic_interventions: 'Therapeutic interventions',
           mental_health_support_therapeutic_training: 'Therapeutic training',
-          mental_health_support_direct_medical_support:
-            'Direct medical support',
+          mental_health_support_direct_medical_support: 'Direct medical support',
           training_education_school_support: 'School support',
           training_education_supplementary: 'Supplementary school education',
           training_education_vocational: 'Vocational education and training',
-          training_education_material_support:
-            'Material support for education (uniforms, etc)',
+          training_education_material_support: 'Material support for education (uniforms, etc)',
           training_education_scholarships: 'Scholarships or financial support',
           training_education_life_skills: 'Life skills',
           family_support_family_support: 'Family support',
           anti_trafficking_rescue: 'Rescue Services',
-          anti_trafficking_transitional_accomodation:
-            'Transitional Accommodation',
+          anti_trafficking_transitional_accomodation: 'Transitional Accommodation',
           anti_trafficking_post_trafficking: 'Post-Trafficking Counseling',
-          anti_trafficking_community_reintegration:
-            'Community Reintegration Support',
+          anti_trafficking_community_reintegration: 'Community Reintegration Support',
           residential_care_gov_only_other: 'Residential Care Institution',
           other_other_service: 'Other Service',
         };
@@ -127,8 +117,7 @@ post(
           physical_impairment_03566: 'Physical impairment',
           mental_impairment_27429: 'Mental impairment',
           domestic_violated_child_28014: 'Domestic violated child',
-          vulnerable_child_affected_by_alcohol_01558:
-            'Vulnerable child affected by alcohol',
+          vulnerable_child_affected_by_alcohol_01558: 'Vulnerable child affected by alcohol',
           oscar_referral: 'OSCaR referral',
         };
 
@@ -141,14 +130,12 @@ post(
             // oscar_field, primero_field,
             external_id: oscarStrings(c.case_id),
             external_id_display: oscarStrings(c.case_id_display),
-            global_id: oscarStrings(c.oscar_number), 
+            global_id: oscarStrings(c.oscar_number),
             mosvy_number: oscarStrings(c.mosvy_number),
             given_name: oscarStrings(c.name_first),
             family_name: oscarStrings(c.name_last),
             gender: oscarStrings(c.sex),
-            date_of_birth: oscarStrings(
-              c.date_of_birth && c.date_of_birth.replace(/\//g, '-')
-            ),
+            date_of_birth: oscarStrings(c.date_of_birth && c.date_of_birth.replace(/\//g, '-')),
             // location_current_village_code: oscarStrings(c.location_current),
             location_current_village_code: checkValue(c.location_current),
             address_current_village_code: oscarStrings(c.address_current),
@@ -182,10 +169,7 @@ post(
 
         // NOTE: Comment this out (or disable console) in production to protect
         // against exposure of sensitive data.
-        console.log(
-          'Case data to be posted to Oscar: ',
-          JSON.stringify(json, null, 2)
-        );
+        console.log('Case data to be posted to Oscar: ', JSON.stringify(json, null, 2));
 
         return json;
       },

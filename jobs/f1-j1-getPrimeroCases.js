@@ -28,9 +28,7 @@ getCases(
   },
   state => {
     console.log(
-      `Primero API responded with cases: ${JSON.stringify(
-        state.data.map(x => x.case_id_display)
-      )}`
+      `Primero API responded with cases: ${JSON.stringify(state.data.map(x => x.case_id_display))}`
     );
     /*
     // Get latest transition from all cases.
@@ -67,4 +65,4 @@ getCases(
     */
     return state;
   }
-); 
+);

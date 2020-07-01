@@ -263,8 +263,7 @@ alterState(state => {
     'Physical impairment': 'physical_impairment_03566',
     'Mental impairment': 'mental_impairment_27429',
     'Domestic violated child': 'domestic_violated_child_28014',
-    'Vulnerable child affected by alcohol':
-      'vulnerable_child_affected_by_alcohol_01558',
+    'Vulnerable child affected by alcohol': 'vulnerable_child_affected_by_alcohol_01558',
     'OSCaR referral': 'oscar_referral',
   };
 
@@ -274,18 +273,16 @@ alterState(state => {
         .map(s => {
           return {
             unique_id: s.uuid,
-            service_subtype:
-              (serviceMap[s.name] && serviceMap[s.name].subtype) || 'Other',
-            service_type:
-              (serviceMap[s.name] && serviceMap[s.name].type) || 'Other',
-            service_type_text:
-              (serviceMap[s.name] && serviceMap[s.name].type) || 'Other',
+            service_subtype: (serviceMap[s.name] && serviceMap[s.name].subtype) || 'Other',
+            service_type: (serviceMap[s.name] && serviceMap[s.name].type) || 'Other',
+            service_type_text: (serviceMap[s.name] && serviceMap[s.name].type) || 'Other',
             service_type_details_text: serviceMap[s.name] ? 'n/a' : s.name,
           };
         })
         .reduce((result, currentValue) => {
-          (result[currentValue['service_type']] =
-            result[currentValue['service_type']] || []).push(currentValue);
+          (result[currentValue['service_type']] = result[currentValue['service_type']] || []).push(
+            currentValue
+          );
           return result;
         }, {});
 
@@ -298,7 +295,7 @@ alterState(state => {
           service_type_details_text: obj[key][0].service_type_details_text,
           service_response_type: 'referral_from_oscar',
           oscar_case_worker_name: c.case_worker_name,
-          oscar_referring_organization:  `agency-${c.organization_name}`,
+          oscar_referring_organization: `agency-${c.organization_name}`,
           oscar_case_worker_telephone: c.case_worker_mobile,
         };
       });
@@ -309,9 +306,11 @@ alterState(state => {
     const now = new Date();
 
     console.log(
-      `Data provided by Oscar (ON: ${c.global_id} / extId: ${
-        c.external_id
-      }) : ${JSON.stringify(c, null, 2)}`
+      `Data provided by Oscar (ON: ${c.global_id} / extId: ${c.external_id}) : ${JSON.stringify(
+        c,
+        null,
+        2
+      )}`
     );
 
     // Mappings for upserting cases in Primero (update if existing, insert if new)
@@ -337,8 +336,7 @@ alterState(state => {
         protection_status: 'oscar_referral',
         protection_status_oscar: c.reason_for_referral, //map string value from Oscar
         owned_by:
-          agencyMap[`agency-${c.organization_name}`] ||
-          `agency-${c.organization_name}-user`,
+          agencyMap[`agency-${c.organization_name}`] || `agency-${c.organization_name}-user`,
         oscar_reason_for_exiting: c.reason_for_exiting,
         has_referral: c.is_referred,
         consent_for_services: true,
@@ -373,10 +371,7 @@ each(
     data: state => {
       // NOTE: Comment this out (or disable console) in production to protect
       // against exposure of sensitive data.
-      console.log(
-        'Data provided to Primero `upsertCase`: ',
-        JSON.stringify(state.data, null, 2)
-      );
+      console.log('Data provided to Primero `upsertCase`: ', JSON.stringify(state.data, null, 2));
       return state.data;
     },
   })
