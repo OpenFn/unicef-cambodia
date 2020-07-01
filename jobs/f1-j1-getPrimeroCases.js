@@ -56,6 +56,8 @@ getCases(
       .map(x => x.transitions_changed_at)
       .sort((a, b) => b - a);
 
+    console.log(updateDates);
+
     const lastUpdateParts = updateDates[0] && updateDates[0].split('/');
 
     if (lastUpdateParts) {
