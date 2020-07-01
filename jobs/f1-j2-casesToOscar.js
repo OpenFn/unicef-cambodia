@@ -146,7 +146,7 @@ post(
             // reason_for_referral: oscarStrings(
             //   protectionMap[c.protection_status] || c.protection_status
             // ),
-            reason_for_referral: oscarStrings(lastTransition && lastTransition.note),
+            //reason_for_referral: oscarStrings(lastTransition && lastTransition.note),
             external_case_worker_name: oscarStrings(c.owned_by),
             external_case_worker_id: oscarStrings(c.owned_by_id),
             external_case_worker_mobile: c.owned_by_phone || '000000000',
