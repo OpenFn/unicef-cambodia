@@ -122,9 +122,9 @@ post(
         };
 
         const c = state.data;
-        //const lastTransition = c.transitions.sort((a, b) =>
-          //a.created_at < b.created_at ? 1 : -1
-        //)[0];
+        const lastTransitionNote =
+          c.transitions &&
+          c.transitions.sort((a, b) => (a.created_at < b.created_at ? 1 : -1))[0].notes;
 
         console.log(`Data provided by Primero: ${JSON.stringify(c, null, 2)}`);
 
@@ -146,7 +146,7 @@ post(
             // reason_for_referral: oscarStrings(
             //   protectionMap[c.protection_status] || c.protection_status
             // ),
-            //reason_for_referral: oscarStrings(lastTransition && lastTransition.note),
+            reason_for_referral: oscarStrings(lastTransitionNote),
             external_case_worker_name: oscarStrings(c.owned_by),
             external_case_worker_id: oscarStrings(c.owned_by_id),
             external_case_worker_mobile: c.owned_by_phone || '000000000',
