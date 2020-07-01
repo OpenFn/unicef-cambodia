@@ -139,9 +139,10 @@ post(
             // location_current_village_code: oscarStrings(c.location_current),
             location_current_village_code: checkValue(c.location_current),
             address_current_village_code: oscarStrings(c.address_current),
-            reason_for_referral: oscarStrings(
-              protectionMap[c.protection_status] || c.protection_status
-            ),
+            // reason_for_referral: oscarStrings(
+            //   protectionMap[c.protection_status] || c.protection_status
+            // ),
+            reason_for_referral: oscarStrings(c.transitions[0] && c.transitions[0].note),
             external_case_worker_name: oscarStrings(c.owned_by),
             external_case_worker_id: oscarStrings(c.owned_by_id),
             external_case_worker_mobile: c.owned_by_phone || '000000000',
