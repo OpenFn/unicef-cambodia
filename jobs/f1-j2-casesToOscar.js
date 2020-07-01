@@ -121,7 +121,7 @@ post(
           oscar_referral: 'OSCaR referral',
         };
 
-        //const c = state.data;
+        const c = state.data;
         //const lastTransition = c.transitions.sort((a, b) =>
           //a.created_at < b.created_at ? 1 : -1
         //)[0];
