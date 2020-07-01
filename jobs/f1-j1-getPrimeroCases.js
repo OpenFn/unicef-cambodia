@@ -30,12 +30,15 @@ getCases(
     console.log(
       `Primero API responded with cases: ${JSON.stringify(state.data.map(x => x.case_id_display))}`
     );
-    /*
+
     // Get latest transition from all cases.
     const creationDates = state.data
-      .map(x => {
-        // Get latest transition from a single case
-        return x.transitions.map(t => t.created_at).sort((a, b) => b - a)[0];
+      .map(c => {
+        if (c.transitions && c.transitions.length > 0) {
+          // Get latest transition from a single case
+          return c.transitions.map(t => t.created_at).sort((a, b) => b - a)[0];
+        }
+        return c.transitions_changed_at;
       })
       .sort((a, b) => b - a);
 
@@ -62,7 +65,7 @@ getCases(
 
     console.log('The last transition update is: ' + state.lastUpdated);
     console.log('The last transition creation is: ' + state.lastCreated);
-    */
+
     return state;
   }
 );
