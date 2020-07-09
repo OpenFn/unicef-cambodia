@@ -2,6 +2,9 @@
 alterState(state => {
   state.data = {};
   state.references = [];
+  console.log(`last query date: ${state.lastQueryDate}`);
+  state.thisQueryDate = new Date().toISOString().replace('T', ' ').replace('Z', '');
+  console.log(`this query date: ${state.thisQueryDate}`);
   return state;
 });
 
@@ -21,32 +24,18 @@ post(
     '/api/v1/organizations/clients',
     {
       keepCookie: true,
-      headers: state => {
-        //Oscar authentication
-        return {
-          'access-token': state.data.__headers['access-token'],
-          'Content-Type': 'application/json',
-          client: state.data.__headers.client,
-          uid: state.configuration.username,
-        };
-      },
+      headers: state => ({
+        // Oscar authentication
+        'access-token': state.data.__headers['access-token'],
+        'Content-Type': 'application/json',
+        client: state.data.__headers.client,
+        uid: state.configuration.username,
+      }),
       query: {
-        since_date: state.lastQueryDate || '2020-01-01 00:00:00', //harcoded option for testing '2020-06-15 00:00:00',
+        since_date: state.lastQueryDate || '2020-07-05 00:00:00', //harcoded option for testing '2020-06-15 00:00:00',
         referred_external: true,
       },
     },
-    state => {
-      const date = new Date(Date.parse(state.data.__headers.date));
-      const YYYY = date.getUTCFullYear();
-      const MM = date.getUTCMonth();
-      const DD = date.getUTCDate();
-
-      const hh = date.getUTCHours();
-      const mm = date.getUTCMinutes();
-      const ss = date.getUTCSeconds();
-
-      state.lastQueryDate = `${YYYY}-${MM}-${DD} ${hh}:${mm}:${ss}`;
-      return state;
-    }
+    state => ({ ...state, lastQueryDate: state.thisQueryDate })
   )
 );
