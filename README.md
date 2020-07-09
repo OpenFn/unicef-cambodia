@@ -32,7 +32,7 @@ These jobs were designed using [Primero API documentation v1.1](https://docs.goo
 
 ### Timed Data Syncs
 On a timer-basis OpenFn will send the below GET requests to the Primero and OSCaR systems to fetch updated case information and new referrals. 
-\ _**Flow 1: Primero cases --> OSCaR**_
+\_**Flow 1: Primero cases --> OSCaR**_
 ``` 
 GET /api/cases?remote=true&scope[or][transitions_created_at]=or_op||date_range||07-05-2020.01-01-4020&scope[or][transitions_changed_at]=or_op||date_range||07-05-2020 00:40.01-01-4020 03:00&scope[service_response_types]=list||referral_to_oscar 
 ```
