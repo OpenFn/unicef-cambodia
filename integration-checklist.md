@@ -26,6 +26,12 @@
 - [ ] ...
 
 ### (6) Administration
-- [ ] OpenFn users & access levels confirmed? 
+#### Provisioning, Hosting, & Maintenance
+- [ ] Deployment: SaaS, local, or open-source-only deployment? 
+- [ ] Configuration: Who is managing changes? 
+- [ ] Maintenance: Software maintenance, security updates, etc. 
+
+#### Support
+- [ ] Administrator users & access levels confirmed? 
 - [ ] Support POCs identified for each connected system? 
 
