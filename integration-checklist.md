@@ -1,7 +1,10 @@
 # Next Primero Deployment
 
 ### (1) Functional Requirements
+- [ ] Business value articulated?
 - [ ] User Stories documented?
+- [ ] Partner sign-off documents
+- [ ] Design POCs identified? 
 - [ ] ...
 
 ### (2) System APIs
@@ -13,7 +16,7 @@
 ### (3) Flows
 - [ ] How does information flow between systems? (high-level process flow diagrams, linked to user stories)
 - [ ] Assumptions (re: human workflows, data entry, consent, other criteria)
-- [ ] Test cases 
+- [ ] Testing plan 
 
 ### (4) Flow Triggers
 - [ ] What kicks off a data sync? (Event- or Timer-based?)
@@ -32,6 +35,6 @@
 - [ ] Maintenance: Software maintenance, security updates, etc. 
 
 #### Support
-- [ ] Administrator users & access levels confirmed? 
+- [ ] Integration administrator users & access levels confirmed? 
 - [ ] Support POCs identified for each connected system? 
 
