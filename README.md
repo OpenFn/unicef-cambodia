@@ -52,10 +52,6 @@ _Example Request_
 ``` 
 GET /api/cases?remote=true&scope[or][transitions_created_at]=or_op||date_range||07-05-2020.01-01-4020&scope[or][transitions_changed_at]=or_op||date_range||07-05-2020 00:40.01-01-4020 03:00&scope[service_response_types]=list||referral_to_oscar 
 ```
-### Assumptions 
-<To Discusss> 
-* Data entry assumptions (& video ?)
-* Agency registration 
 
 _**Flow 2: OSCaR cases --> Primero**_
 
@@ -68,8 +64,14 @@ _Example Request_
 ```
  GET /api/v1/organizations/clients?since_date='2020-07-01 01:00:00'||'2020-07-01 00:00:00'&referred_external=true
 ```
+### Assumptions 
+<To Discuss>
+ 
+* Data entry assumptions (& video ?)
+* Agency registration 
 
 ## (5) Flow Mappings & Transformations
+
 <Link to Mapping Template - To Discuss>
 
 ## (6) Administration
