@@ -27,6 +27,12 @@ _**Flow 2: OSCaR cases --> Primero**_
 
 These jobs were designed using [Primero API documentation v1.1](https://docs.google.com/document/d/1jpaT2_UBBnc3PxPYlLMBEzNUkyfuxRZiksywG5MKM0Q/edit?usp=sharing) and [OSCaR API documentation 1.0.0](https://app.swaggerhub.com/apis/Ro51/OSCaRInterop/1.0.0#/info). 
 
-**Questions about this implementation?** Contact aleksa@openfn.org. 
+| Syntax | Description | Notes |
+| --- | ----------- | ----------- |
+| Header | Title | Title |
+| Paragraph | Text | Title |
+
+### Questions about this implementation? 
+Contact aleksa@openfn.org. 
 
 
