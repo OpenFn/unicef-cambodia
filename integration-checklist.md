@@ -7,11 +7,12 @@
 ### (2) System APIs
 - [ ] APIs built? 
 - [ ] API documementation available? 
-- [ ] Access to system dev environment? 
+- [ ] Access to system dev/test environments? 
+- [ ] APIs tested? 
 
 ### (3) Flows
-- [ ] How does the data flows between systems? (high-level system processes, linked to user stories)
-- [ ] Assumptions (re: human workflows, data entry)
+- [ ] How does information flow between systems? (high-level process flow diagrams, linked to user stories)
+- [ ] Assumptions (re: human workflows, data entry, consent, other criteria)
 - [ ] Test cases 
 
 ### (4) Flow Triggers
