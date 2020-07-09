@@ -8,7 +8,7 @@ Repository to manage OpenFn jobs to integrate the open-source UNICEF [**Primero*
 Two integration flows have been implemented to facilitate a bi-directional sync between the Primero and OSCaR systems to share relevant case and referral data between systems. This is to support the following functional requirements.
 
 _**Flow 1: Primero cases --> OSCaR**_
-* User Story 1: Generating Government Referrals 
+* User Story 1: Generating government Referrals 
 
 _**Flow 2: OSCaR cases --> Primero**_
 * User Story 2: View OSCaR cases in Primero 
@@ -25,14 +25,10 @@ _**Flow 2: OSCaR cases --> Primero**_
 1. [f2-j1-getOscarCases.js](https://github.com/OpenFn/unicef-cambodia/blob/master/jobs/f2-j1-getOscarCases.js)
 2. [f2-j2-upsertCasesToPrimero.js](https://github.com/OpenFn/unicef-cambodia/blob/master/jobs/f2-j2-upsertCasesToPrimero.js)
 
+### API Versions
 These jobs were designed using [Primero API documentation v1.1](https://docs.google.com/document/d/1jpaT2_UBBnc3PxPYlLMBEzNUkyfuxRZiksywG5MKM0Q/edit?usp=sharing) and [OSCaR API documentation 1.0.0](https://app.swaggerhub.com/apis/Ro51/OSCaRInterop/1.0.0#/info). 
 
-| Syntax | Description | Notes |
-| --- | ----------- | ----------- |
-| Header | Title | Title |
-| Paragraph | Text | Title |
-
-### Questions about this implementation? 
-Contact aleksa@openfn.org. 
+## Questions about this implementation? 
+Contact aleksa@openfn.org for more information. 
 
 
