@@ -1,7 +1,7 @@
 # Next Primero Deployment
 
 ### (1) Functional Requirements
-- [ ] User Stories documented
+- [ ] User Stories documented?
 - [ ] ...
 
 ### (2) System APIs
@@ -10,9 +10,9 @@
 - [ ] Access to system dev environment? 
 
 ### (3) Flows
-- [ ] Define the data flows between systems (high-level system processes, linked to user stories)
+- [ ] How does the data flows between systems? (high-level system processes, linked to user stories)
 - [ ] Assumptions (re: human workflows, data entry)
-- [ ] Test suite 
+- [ ] Test cases 
 
 ### (4) Flow Triggers
 - [ ] What kicks off a data sync? (Event- or Timer-based?)
