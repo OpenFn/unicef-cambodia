@@ -34,10 +34,10 @@ post(
         uid: state.configuration.username,
       }),
       query: { //state.lastQueryDate || '2020-07-05 00:00:00'
-        since_date:'2020-07-05 00:00:00', //harcoded option for testing '2020-06-15 00:00:00',
+        since_date:'2020-07-09 00:00:00', //harcoded option for testing '2020-06-15 00:00:00',
         referred_external: true,
       },
     },
-    state => ({ ...state, lastQueryDate: state.lastQueryDate })
+    state => ({ ...state, lastQueryDate: '2020-07-09 00:00:00' })
   )
 );
