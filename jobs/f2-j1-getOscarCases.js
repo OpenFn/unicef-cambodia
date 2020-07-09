@@ -2,9 +2,11 @@
 alterState(state => {
   state.data = {};
   state.references = [];
-  console.log(`last query date: ${state.lastQueryDate}`);
+  console.log(`lastQueryDate (from the previous run): ${state.lastQueryDate}`);
   state.thisQueryDate = new Date().toISOString().replace('T', ' ').replace('Z', '');
-  console.log(`this query date: ${state.thisQueryDate}`);
+  console.log(
+    `Current time, to be used to update lastQueryDate after this query: ${state.thisQueryDate}`
+  );
   return state;
 });
 
