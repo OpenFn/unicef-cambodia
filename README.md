@@ -36,7 +36,7 @@ _**Flow 2: OSCaR cases --> Primero**_
 
 
 ## (4) Flow Triggers
-**Trigger Type:** Timer
+### Trigger Type: Timer
 
 _Every hour_ OpenFn will run the 4 jobs to fetch new case information from the Primero and OSCaR systems. The flows may also be executed on-demand at any time by a designated OpenFn admin user by clicking the "Run" button on a job in OpenFn.org. 
 ![Run Job](/demo/run_job_now.png)
@@ -52,6 +52,10 @@ _Example Request_
 ``` 
 GET /api/cases?remote=true&scope[or][transitions_created_at]=or_op||date_range||07-05-2020.01-01-4020&scope[or][transitions_changed_at]=or_op||date_range||07-05-2020 00:40.01-01-4020 03:00&scope[service_response_types]=list||referral_to_oscar 
 ```
+### Assumptions 
+<To Discusss> 
+* Data entry assumptions (& video ?)
+* Agency registration 
 
 _**Flow 2: OSCaR cases --> Primero**_
 
@@ -66,10 +70,15 @@ _Example Request_
 ```
 
 ## (5) Flow Mappings & Transformations
-<Placeholder - To Discuss>
+<Link to Mapping Template - To Discuss>
 
 ## (6) Administration
-- [ ] OpenFn users & access levels confirmed? 
+### Provisioning, Hosting, & Maintenance
+This integration is hosted on OpenFn.org. 
+
+### Support 
+- [ ] OpenFn Admin users & access levels confirmed? 
 - [ ] Support POCs identified for each connected system? 
+- [ ] OpenFn Admin training
 
 
