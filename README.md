@@ -67,12 +67,12 @@ _Example Request_
 ### Assumptions 
 <To Discuss>
  
-* Data entry assumptions (& video ?)
-* Agency registration 
+* Data entry assumptions **(& video ?)**
+* Agency registration protocol
 
 ## (5) Flow Mappings & Transformations
 
-<Link to Mapping Template - To Discuss>
+**- Link to Mapping Template (To Discuss) - ***
 
 ## (6) Administration
 ### Provisioning, Hosting, & Maintenance
