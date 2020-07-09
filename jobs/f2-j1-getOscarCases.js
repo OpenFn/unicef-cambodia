@@ -38,6 +38,6 @@ post(
         referred_external: true,
       },
     },
-    state => ({ ...state, lastQueryDate: state.thisQueryDate })
+    state => ({ ...state, lastQueryDate: '2020-07-05 22:05:02' })
   )
 );
