@@ -5,6 +5,7 @@ Repository to manage OpenFn jobs to integrate the open-source UNICEF [**Primero*
 ### Note! Commits to master will deploy automatically to OpenFn.org. 
 
 ## About the integration
+### (1) Requirements
 Two integration flows have been implemented to facilitate a bi-directional sync between the Primero and OSCaR systems to share relevant case and referral data between systems. This is to support the following functional requirements.
 
 _**Flow 1: Primero cases --> OSCaR**_
@@ -17,14 +18,14 @@ _**Flow 2: OSCaR cases --> Primero**_
 ## About the OpenFn jobs
 To achieve the bi-direction sync, 4 OpenFn jobs have been implemented. On a timer-basis, these jobs will execute to ensure regular data syncs, but this flows may also be executed on-demand at any time by a designated OpenFn admin user.
 
-### APIs
+### (2) APIs
 These jobs were designed using:
 * Primero: [API v1.1](https://docs.google.com/document/d/1jpaT2_UBBnc3PxPYlLMBEzNUkyfuxRZiksywG5MKM0Q/edit?usp=sharing)
 * OSCaR: [API v1.0.0](https://app.swaggerhub.com/apis/Ro51/OSCaRInterop/1.0.0#/info). 
 
 **This project leverages OpenFn adaptor [language-primero](https://github.com/OpenFn/language-primero)** for quicker job-writing and helper functions.
 
-### Flows
+### (3) Flows
 
 _**Flow 1: Primero cases --> OSCaR**_
 1. [f1-j1-getPrimeroCases.js](https://github.com/OpenFn/unicef-cambodia/blob/master/jobs/f1-j1-getPrimeroCases.js)
@@ -35,7 +36,7 @@ _**Flow 2: OSCaR cases --> Primero**_
 2. [f2-j2-upsertCasesToPrimero.js](https://github.com/OpenFn/unicef-cambodia/blob/master/jobs/f2-j2-upsertCasesToPrimero.js)
 
 
-### Flow Triggers
+### (4) Flow Triggers
 On a ++timer-basis++ OpenFn will send the below HTTP GET requests to the Primero and OSCaR systems to fetch updated case information and new referrals. 
 _**Flow 1: Primero cases --> OSCaR**_
 
@@ -60,7 +61,7 @@ _Example Request_
  GET /api/v1/organizations/clients
 ```
 
-### Flow Mappings & Transformations
+### (5) Flow Mappings & Transformations
 <Placeholder - To Discuss>
 
 ## Questions about this implementation? 
