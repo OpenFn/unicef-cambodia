@@ -68,9 +68,8 @@ _Example Request_
 ## (5) Flow Mappings & Transformations
 <Placeholder - To Discuss>
 
-## Questions about this implementation? 
-Contact aleksa@openfn.org for more information. 
-
-<Administrator details> 
+## (6) Administration
+- [ ] OpenFn users & access levels confirmed? 
+- [ ] Support POCs identified for each connected system? 
 
 
