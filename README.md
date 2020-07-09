@@ -25,19 +25,24 @@ _**Flow 2: OSCaR cases --> Primero**_
 1. [f2-j1-getOscarCases.js](https://github.com/OpenFn/unicef-cambodia/blob/master/jobs/f2-j1-getOscarCases.js)
 2. [f2-j2-upsertCasesToPrimero.js](https://github.com/OpenFn/unicef-cambodia/blob/master/jobs/f2-j2-upsertCasesToPrimero.js)
 
-### API Versions
+### APIs
 These jobs were designed using [Primero API documentation v1.1](https://docs.google.com/document/d/1jpaT2_UBBnc3PxPYlLMBEzNUkyfuxRZiksywG5MKM0Q/edit?usp=sharing) and [OSCaR API documentation 1.0.0](https://app.swaggerhub.com/apis/Ro51/OSCaRInterop/1.0.0#/info). 
 
-### Mappings
-_<Do we want to document here?>_
+* This project leverages OpenFn adaptor [language-primero](https://github.com/OpenFn/language-primero) for quicker job-writing and helper functions. *
 
 ### Timed Data Syncs
 On a timer-basis OpenFn will send the below GET requests to the Primero and OSCaR systems to fetch updated case information and new referrals. 
 _**Flow 1: Primero cases --> OSCaR**_
-` GET /api/cases?remote=true&scope[or][transitions_created_at]=or_op||date_range||07-05-2020.01-01-4020&scope[or][transitions_changed_at]=or_op||date_range||07-05-2020 00:40.01-01-4020 03:00&scope[service_response_types]=list||referral_to_oscar `
+``` 
+GET /api/cases?remote=true&scope[or][transitions_created_at]=or_op||date_range||07-05-2020.01-01-4020&scope[or][transitions_changed_at]=or_op||date_range||07-05-2020 00:40.01-01-4020 03:00&scope[service_response_types]=list||referral_to_oscar 
+```
 
 _**Flow 2: OSCaR cases --> Primero**_
-` GET /api/v1/organizations/clients`
+```
+ GET /api/v1/organizations/clients
+```
+### Mappings
+_<Do we want to document here?>_
 
 ## Questions about this implementation? 
 Contact aleksa@openfn.org for more information. 
