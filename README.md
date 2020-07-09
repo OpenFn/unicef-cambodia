@@ -46,6 +46,7 @@ _**Flow 1: Primero cases --> OSCaR**_
 `f1-j1-getPrimeroCases.js` sends a GET request to Primero to list cases where: 
 1. New referrals have been created (indicated by Primero field `transitions_created_at`).
 2. Case updates made since the last OpenFn request, indicated by Primero field `transitions_changed_at`. (Note: This happens if the case owner, case owner’s phone, case owner’s Agency, or the Service Implemented On fields are changed.) 
+
 _Example Request_
 ``` 
 GET /api/cases?remote=true&scope[or][transitions_created_at]=or_op||date_range||07-05-2020.01-01-4020&scope[or][transitions_changed_at]=or_op||date_range||07-05-2020 00:40.01-01-4020 03:00&scope[service_response_types]=list||referral_to_oscar 
@@ -57,6 +58,7 @@ _**Flow 2: OSCaR cases --> Primero**_
 <!--`GET ... ` -->
 1. New external referrals have been created. 
 2. Case updates made since the last OpenFn request. 
+
 _Example Request_
 ```
  GET /api/v1/organizations/clients?since_date='2020-07-01 01:00:00'||'2020-07-01 00:00:00'&referred_external=true
