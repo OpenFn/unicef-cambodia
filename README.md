@@ -4,8 +4,7 @@ Repository to manage OpenFn jobs to integrate the open-source UNICEF [**Primero*
 
 ### Note! Commits to master will deploy automatically to OpenFn.org. 
 
-## About the integration
-### (1) Functional Requirements
+## (1) Functional Requirements
 Two integration flows have been implemented to facilitate a bi-directional sync between the Primero and OSCaR systems to share relevant case and referral data between systems. This is to support the following functional requirements.
 
 _**Flow 1: Primero cases --> OSCaR**_
@@ -16,7 +15,7 @@ _**Flow 2: OSCaR cases --> Primero**_
 * User Story 4: Sending OSCaR referrals to Primero
 
 
-### (2) APIs
+## (2) APIs
 These jobs were designed using:
 * Primero: [API v1.1](https://docs.google.com/document/d/1jpaT2_UBBnc3PxPYlLMBEzNUkyfuxRZiksywG5MKM0Q/edit?usp=sharing)
 * OSCaR: [API v1.0.0](https://app.swaggerhub.com/apis/Ro51/OSCaRInterop/1.0.0#/info). 
@@ -24,7 +23,7 @@ These jobs were designed using:
 **OpenFn language-packages** (API adaptors) implemented: 
 * [language-primero](https://github.com/OpenFn/language-primero)
 
-### (3) Flows
+## (3) Flows
 To achieve a bi-directional systems sync, 4 OpenFn jobs have been implemented.
 
 _**Flow 1: Primero cases --> OSCaR**_
@@ -36,7 +35,7 @@ _**Flow 2: OSCaR cases --> Primero**_
 2. [f2-j2-upsertCasesToPrimero.js](https://github.com/OpenFn/unicef-cambodia/blob/master/jobs/f2-j2-upsertCasesToPrimero.js) will upload OSCaR data to Primero
 
 
-### (4) Flow Triggers
+## (4) Flow Triggers
 **Trigger Type:** Timer
 On a **timer-basis** OpenFn will run the 4 jobs to fetch updated case information and new referrals from the Primero and OSCaR systems. The flows may also be executed on-demand at any time by a designated OpenFn admin user by clicking the "Run" button on a job in OpenFn.org. 
 
@@ -61,7 +60,7 @@ _Example Request_
  GET /api/v1/organizations/clients
 ```
 
-### (5) Flow Mappings & Transformations
+## (5) Flow Mappings & Transformations
 <Placeholder - To Discuss>
 
 ## Questions about this implementation? 
