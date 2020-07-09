@@ -72,7 +72,7 @@ Example Request:
 
 ## (5) Flow Mappings & Transformations
 
-**- Link to Mapping Template (To Discuss) - ***
+**-Link to Mapping Template (To Discuss)-**
 
 ## (6) Administration
 ### Provisioning, Hosting, & Maintenance
