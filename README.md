@@ -39,6 +39,7 @@ _**Flow 2: OSCaR cases --> Primero**_
 **Trigger Type:** Timer
 
 _Every hour_ OpenFn will run the 4 jobs to fetch new case information from the Primero and OSCaR systems. The flows may also be executed on-demand at any time by a designated OpenFn admin user by clicking the "Run" button on a job in OpenFn.org. 
+![Run Job](/demo/run_job.png)
 
 _**Flow 1: Primero cases --> OSCaR**_
 
