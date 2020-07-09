@@ -33,8 +33,8 @@ post(
         client: state.data.__headers.client,
         uid: state.configuration.username,
       }),
-      query: {
-        since_date: state.lastQueryDate || '2020-07-05 00:00:00', //harcoded option for testing '2020-06-15 00:00:00',
+      query: { //state.lastQueryDate
+        since_date: '2020-07-05 22:05:02' || '2020-07-05 00:00:00', //harcoded option for testing '2020-06-15 00:00:00',
         referred_external: true,
       },
     },
