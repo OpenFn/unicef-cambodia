@@ -15,8 +15,8 @@ _**Flow 2: OSCaR cases --> Primero**_
 * User Story 4: Sending OSCaR referrals to Primero
 
 
-## (2) APIs
-These jobs were designed using:
+## (2) System APIs
+**APIs** implemented:
 * Primero: [API v1.1](https://docs.google.com/document/d/1jpaT2_UBBnc3PxPYlLMBEzNUkyfuxRZiksywG5MKM0Q/edit?usp=sharing)
 * OSCaR: [API v1.0.0](https://app.swaggerhub.com/apis/Ro51/OSCaRInterop/1.0.0#/info). 
 
@@ -24,21 +24,21 @@ These jobs were designed using:
 * [language-primero](https://github.com/OpenFn/language-primero)
 
 ## (3) Flows
-To achieve a bi-directional systems sync, 4 OpenFn jobs have been implemented.
+To achieve a bi-directional systems sync, 4 OpenFn jobs have been implemented to sync case and referral data between systems.
 
 _**Flow 1: Primero cases --> OSCaR**_
-1. [f1-j1-getPrimeroCases.js](https://github.com/OpenFn/unicef-cambodia/blob/master/jobs/f1-j1-getPrimeroCases.js) will fetch Primero data
+1. [f1-j1-getPrimeroCases.js](https://github.com/OpenFn/unicef-cambodia/blob/master/jobs/f1-j1-getPrimeroCases.js) will fetch Primero case updates & referrals
 2. [f1-j2-casesToOscar.js](https://github.com/OpenFn/unicef-cambodia/blob/master/jobs/f1-j2-casesToOscar.js) will upload Primero data to OScaR
 
 _**Flow 2: OSCaR cases --> Primero**_
-1. [f2-j1-getOscarCases.js](https://github.com/OpenFn/unicef-cambodia/blob/master/jobs/f2-j1-getOscarCases.js) will fetch OSCaR data
+1. [f2-j1-getOscarCases.js](https://github.com/OpenFn/unicef-cambodia/blob/master/jobs/f2-j1-getOscarCases.js) will fetch OSCaR case updates & referrals
 2. [f2-j2-upsertCasesToPrimero.js](https://github.com/OpenFn/unicef-cambodia/blob/master/jobs/f2-j2-upsertCasesToPrimero.js) will upload OSCaR data to Primero
 
 
 ## (4) Flow Triggers
 **Trigger Type:** Timer
 
-_Every hour_ OpenFn will run the 4 jobs to fetch updated case information and new referrals from the Primero and OSCaR systems. The flows may also be executed on-demand at any time by a designated OpenFn admin user by clicking the "Run" button on a job in OpenFn.org. 
+_Every hour_ OpenFn will run the 4 jobs to fetch new case information from the Primero and OSCaR systems. The flows may also be executed on-demand at any time by a designated OpenFn admin user by clicking the "Run" button on a job in OpenFn.org. 
 
 _**Flow 1: Primero cases --> OSCaR**_
 
