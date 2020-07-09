@@ -43,7 +43,7 @@ _Every hour_ OpenFn will run the 4 jobs to fetch new case information from the P
 _**Flow 1: Primero cases --> OSCaR**_
 
 <!--`GET ... ` -->
-`f1-j1-getPrimeroCases.js` will send a GET request to Primero to list cases where: 
+`f1-j1-getPrimeroCases.js` sends a GET request to Primero to list cases where: 
 1. New referrals have been created (indicated by Primero field `transitions_created_at`).
 2. Case updates made since the last OpenFn request, indicated by Primero field `transitions_changed_at`. (Note: This happens if the case owner, case owner’s phone, case owner’s Agency, or the Service Implemented On fields are changed.) 
 _Example Request_
@@ -52,13 +52,14 @@ GET /api/cases?remote=true&scope[or][transitions_created_at]=or_op||date_range||
 ```
 
 _**Flow 2: OSCaR cases --> Primero**_
-`f2-j1-getOscarCases.js` will send a GET request to OSCaR to list cases where: 
+
+`f2-j1-getOscarCases.js` sends a GET request to OSCaR to list cases where: 
 <!--`GET ... ` -->
 1. New external referrals have been created. 
-2. Case updates made sinc the last OpenFn request. 
+2. Case updates made since the last OpenFn request. 
 _Example Request_
 ```
- GET /api/v1/organizations/clients
+ GET /api/v1/organizations/clients?since_date='2020-07-01 01:00:00'||'2020-07-01 00:00:00'&referred_external=true
 ```
 
 ## (5) Flow Mappings & Transformations
