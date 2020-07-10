@@ -34,7 +34,7 @@ post(
         uid: state.configuration.username,
       }),
       query: { 
-        since_date: state.lastQueryDate || '2020-06-01 00:00:00', //harcoded option for testing '2020-06-15 00:00:00',
+        since_date: '2020-07-05 00:00:00', //state.lastQueryDate || '2020-06-01 00:00:00', //harcoded option for testing '2020-06-15 00:00:00',
         referred_external: true,
       },
     },
