@@ -72,7 +72,7 @@ Example Request:
     - Primero Agency ID: `'agency-{organization_name}'` (e.g., `agency-cif`)
     - Primero Agency User: `'agency-{organization_name}-user'` (e.g., `agency-cif-user`)
 
-    In the mappings, Oscar `organzation_name: 'cif'` maps to --> Primero `owned_by: 'agency-cif'`)
+    In the mappings, Oscar `organzation_name: 'cif'` maps to --> Primero `owned_by: 'agency-cif-user'`)
 
 ## (5) Flow Mappings & Transformations
 
