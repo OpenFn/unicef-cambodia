@@ -66,7 +66,7 @@ Example Request:
 ```
 ### Assumptions 
 1. **Data Entry** - In order for data to be successfully exchanged as expected, users should follow the data entry protocols defined in the training sessions. **({See this video})** for an overview of the data entry steps in both the OSCaR and Primero systems. 
-2. **Services** are mapped between systems as defined in the [Service Map](https://docs.google.com/spreadsheets/d/1x-KUJgOhaZlZYzJ935q9QXhPM0yobjEEuN-IJgIvmwA/edit#gid=1841308930). _If any services change, this map and OpenFn jobs must be updated. _
+2. **Services** are mapped between systems as defined in the [Service Map](https://docs.google.com/spreadsheets/d/1x-KUJgOhaZlZYzJ935q9QXhPM0yobjEEuN-IJgIvmwA/edit#gid=1841308930). _If any services change, this map and OpenFn jobs must be updated._
 3. **Registering New Organizations/ Agencies** - Agency IDs and Users are mapped between systems as defined in [Agency User Map](https://docs.google.com/spreadsheets/d/1x-KUJgOhaZlZYzJ935q9QXhPM0yobjEEuN-IJgIvmwA/edit#gid=2080615206). If new Agencies are created, OSCaR and Primero teams will coordinate to manually register the new agencies in each system (this is _not_ an automated process). _Agency names and users should follow the below naming conventions, otherwise the OpenFn jobs must be updated_: 
     - Oscar Organization Name: `'{organization_name}'` (e.g., `cif`)
     - Primero Agency ID: `'agency-{organization_name}'` (e.g., `agency-cif`)
