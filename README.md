@@ -76,7 +76,7 @@ Example Request:
 
 ## (6) Administration
 ### Provisioning, Hosting, & Maintenance
-This integration is hosted on OpenFn.org. 
+This integration is hosted on [OpenFn.org](https://openfn.org/projects). 
 
 ### Support 
 - [ ] OpenFn Admin users & access levels confirmed? 
