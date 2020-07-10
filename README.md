@@ -80,7 +80,7 @@ Example Request:
 
 ## (6) Administration
 ### Provisioning, Hosting, & Maintenance
-This integration is hosted on [OpenFn.org](https://openfn.org/projects). 
+This integration is hosted on [OpenFn.org](https://openfn.org/projects) with Primero SaaS. 
 
 ### Support 
 - [ ] OpenFn Admin users & access levels confirmed? 
