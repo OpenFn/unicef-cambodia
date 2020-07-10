@@ -45,8 +45,8 @@ _**Flow 1: Primero cases --> OSCaR**_
 
 <!--`GET ... ` -->
 `f1-j1-getPrimeroCases.js` sends a GET request to Primero to list cases where: 
-1. New referrals have been created (indicated by Primero field `transitions_created_at`).
-2. Case updates made since the last OpenFn request, indicated by Primero field `transitions_changed_at`. (Note: This happens if the case owner, case owner’s phone, case owner’s Agency, or the Service Implemented On fields are changed.) 
+1. New referrals have been created (indicated by Primero _date_ field `transitions_created_at`).
+2. Case updates made since the last OpenFn request, indicated by Primero _date/time_field `transitions_changed_at`. (Note: This happens if the case owner, case owner’s phone, case owner’s Agency, or the Service Implemented On fields are changed.) 
 
 Example Request:
 ``` 
@@ -57,12 +57,12 @@ _**Flow 2: OSCaR cases --> Primero**_
 
 `f2-j1-getOscarCases.js` sends a GET request to OSCaR to list cases where: 
 <!--`GET ... ` -->
-1. New external referrals have been created. 
-2. Case updates made since the last OpenFn request. 
+1. New external referrals have been created (indicated by OSCaR field `referred_external`). 
+2. Case updates made since the last OpenFn request(indicated by OSCaR _date/time_ field `since_date`). 
 
 Example Request:
 ```
- GET /api/v1/organizations/clients?since_date='2020-07-01 01:00:00'||'2020-07-01 00:00:00'&referred_external=true
+ GET /api/v1/organizations/clients?since_date='2020-07-01 01:00:00'&referred_external=true
 ```
 ### Assumptions 
 1. **Data Entry** - In order for data to be successfully exchanged as expected, users should follow the data entry protocols defined in the training sessions. **(See this vide)** for an overview of the data entry steps in both the OSCaR and Primero systems. 
