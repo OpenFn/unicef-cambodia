@@ -18,7 +18,7 @@ _**Flow 2: OSCaR cases --> Primero**_
 ## (2) System APIs
 **APIs** implemented:
 * Primero: [API v1.1](https://docs.google.com/document/d/1jpaT2_UBBnc3PxPYlLMBEzNUkyfuxRZiksywG5MKM0Q/edit?usp=sharing)
-* OSCaR: [API v1.0.0](https://app.swaggerhub.com/apis/Ro51/OSCaRInterop/1.0.0#/info). 
+* OSCaR: [API v1.0.0](https://app.swaggerhub.com/apis/Ro51/OSCaRInterop/1.0.0#/info)
 
 **OpenFn language-packages** (API adaptors) implemented: 
 * [language-primero](https://github.com/OpenFn/language-primero)
