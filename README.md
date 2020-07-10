@@ -67,9 +67,9 @@ Example Request:
 ### Assumptions 
 <To Discuss>
  
-1. Data entry assumptions **(& video ?)**
+1. **Data Entry** - In order for data to be successfully exchanged as expected, users should follow the data entry protocols defined in the training sessions. **(See this vide)** for an overview of the data entry steps in both the OSCaR and Primero systems. 
 2. **Services** are mapped between systems as defined in the [Service Map](https://docs.google.com/spreadsheets/d/1x-KUJgOhaZlZYzJ935q9QXhPM0yobjEEuN-IJgIvmwA/edit#gid=1841308930). If any services change, this map and OpenFn jobs must be updated.  
-3. **New Organizations/ Agencies** - Agency Users are inserted as defined in [Agency User Map](https://docs.google.com/spreadsheets/d/1x-KUJgOhaZlZYzJ935q9QXhPM0yobjEEuN-IJgIvmwA/edit#gid=2080615206). 
+3. **Registering New Organizations/ Agencies** - Agency Users are inserted as defined in [Agency User Map](https://docs.google.com/spreadsheets/d/1x-KUJgOhaZlZYzJ935q9QXhPM0yobjEEuN-IJgIvmwA/edit#gid=2080615206). 
 - If new Organizations/ Agencies are created, OSCaR and Primero teams will coordinate to manually register the new agencies in each system (this is _not_ an automated process).  
 - If any new Agencies are created, the new Primero user created should follow the naming convention `agency-{organization_name}-user` (e.g., "agency-cif-user"). 
 - If new Agency Users _do not follow this naming convention_ in Primero, the Agency User map table and Flow 2 jobs should be updated to include the new agency user name.  
