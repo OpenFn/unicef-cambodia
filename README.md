@@ -72,7 +72,7 @@ Example Request:
 
 ## (5) Flow Mappings & Transformations
 
-**-Link to Mapping Template (To Discuss)-**
+[See this table](https://docs.google.com/spreadsheets/d/1x-KUJgOhaZlZYzJ935q9QXhPM0yobjEEuN-IJgIvmwA/edit?usp=sharing) for the field mappings & data transformation rules implemented in the OpenFn jobs. This includes detailed mappings for **Services** and **Agency Users**. 
 
 ## (6) Administration
 ### Provisioning, Hosting, & Maintenance
