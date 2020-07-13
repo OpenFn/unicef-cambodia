@@ -126,7 +126,41 @@ post(
           c.transitions &&
           c.transitions.sort((a, b) => (a.created_at < b.created_at ? 1 : -1))[0].notes;
 
-        console.log(`Data provided by Primero: ${JSON.stringify(c, null, 2)}`);
+        console.log(
+          `Data provided by Primero: ${JSON.stringify(
+            {
+              _id: c._id,
+              case_id: c.case_id,
+              case_id_display: c.case_id_display,
+              created_at: c.created_at,
+              location_current: c.location_current,
+              module_id: c.module_id,
+              owned_by: c.owned_by,
+              owned_by_agency: c.owned_by_agency,
+              owned_by_phone: c.owned_by_phone,
+              services_section: c.services_section.map(s => ({
+                oscar_case_worker_telephone: s.oscar_case_worker_telephone,
+                oscar_referring_organization: s.oscar_referring_organization,
+                service_implementing_agency: s.service_implementing_agency,
+                service_implementing_agency_individual: s.service_implementing_agency_individual,
+                service_status_referred: s.service_status_referred,
+                unique_id: s.unique_id,
+              })),
+              transitions: c.services_section.map(t => ({
+                created_at: t.created_at,
+                id: t.id,
+                service_section_unique_id: t.service_section_unique_id,
+                to_user_local: t.to_user_local,
+                to_user_local_status: t.to_user_local_status,
+                transitioned_by: t.transitioned_by,
+                type_of_export: t.type_of_export,
+                unique_id: t.unique_id,
+              })),
+            },
+            null,
+            2
+          )}`
+        );
 
         // Mappings for posting cases to Oscar
         const json = {
@@ -174,7 +208,28 @@ post(
 
         // NOTE: Comment this out (or disable console) in production to protect
         // against exposure of sensitive data.
-        console.log('Case data to be posted to Oscar: ', JSON.stringify(json, null, 2));
+        console.log(
+          'Case data to be posted to Oscar: ',
+          JSON.stringify(
+            {
+              external_id: c.external_id,
+              external_id_display: c.external_id_display,
+              global_id: c.global_id,
+              mosvy_number: c.mosvy_number,
+              location_current_village_code: c.location_current_village_code,
+              address_current_village_code: c.address_current_village_code,
+              external_case_worker_name: c.external_case_worker_name,
+              external_case_worker_id: c.external_case_worker_id,
+              external_case_worker_mobile: c.external_case_worker_mobile,
+              organization_name: c.organization_name,
+              organization_id: c.organization_id,
+              is_referred: c.is_referred,
+              services: c.services && c.services.map(s => ({ uuid: s.uuid })),
+            },
+            null,
+            2
+          )
+        );
 
         return json;
       },

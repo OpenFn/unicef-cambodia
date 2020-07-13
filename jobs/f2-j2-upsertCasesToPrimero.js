@@ -305,7 +305,8 @@ alterState(state => {
 
     const now = new Date();
 
-    // This is extremely verbose, but safer than dropping specific keys.
+    // NOTE: This is extremely VERBOSE but more secure, given that we don't know
+    // exactly what will be provided by the API.
     console.log(
       `Data provided by Oscar (ON: ${c.global_id} / extId: ${c.external_id}) : ${JSON.stringify(
         {
@@ -384,12 +385,9 @@ each(
     // Upsert Primero cases based on matching 'oscar_number' OR 'case_id'
     externalIds: ['oscar_number', 'case_id'],
     data: state => {
-      // NOTE: Comment this out (or disable console) in production to protect
-      // against exposure of sensitive data.
       const c = state.data;
-      console.log(c);
-      console.log(JSON.stringify(c.child.services_section, null, 2));
-      console.log(JSON.stringify(c.child.transitions, null, 2));
+      // NOTE: This is extremely VERBOSE but more secure, given that we don't
+      // know exactly what will be provided by the API.
       console.log(
         'Data provided to Primero `upsertCase`: ',
         JSON.stringify(
@@ -410,9 +408,6 @@ each(
               disclosure_other_orgs: c.child.consent_for_services,
               module_id: c.child.module_id,
               registration_date: c.child.registration_date,
-              // TODO: do we need the verbose stuff at the level of the service/transition?
-              // services_section: c.child.services_section,
-              // transitions: c.child.services_section,
               services_section: c.child.services_section.map(s => ({
                 unique_id: s.unique_id,
                 oscar_case_worker_name: s.oscar_case_worker_name,
