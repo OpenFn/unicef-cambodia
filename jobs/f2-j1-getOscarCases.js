@@ -34,14 +34,14 @@ post(
         uid: state.configuration.username,
       }),
       query: {
-        since_date: state.lastQueryDate || '2020-07-05 00:00:00', //harcoded option for testing '2020-06-15 00:00:00',
+        since_date: state.lastQueryDate || '2020-07-09 00:00:00', //harcoded option for testing '2020-06-15 00:00:00',
         referred_external: true,
       },
     },
     state => {
       console.log(
         `Oscar API responded with cases with global_ids: ${JSON.stringify(
-          state.data.data.map(c => c.case_id_display)
+          state.data.data.map(c => c.global_id)
         )}`
       );
       return { ...state, lastQueryDate: state.lastQueryDate };
