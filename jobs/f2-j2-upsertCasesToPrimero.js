@@ -305,9 +305,24 @@ alterState(state => {
 
     const now = new Date();
 
+    // This is extremely verbose, but safer than dropping specific keys.
     console.log(
       `Data provided by Oscar (ON: ${c.global_id} / extId: ${c.external_id}) : ${JSON.stringify(
-        c,
+        {
+          address_current_village_code: c.address_current_village_code,
+          external_case_worker_id: c.external_case_worker_id,
+          external_case_worker_name: c.external_case_worker_name,
+          external_id: c.external_id,
+          external_id_display: c.external_id_display,
+          global_id: c.global_id,
+          is_referred: c.is_referred,
+          location_current_village_code: c.location_current_village_code,
+          mosvy_number: c.mosvy_number,
+          organization_id: c.organization_id,
+          organization_name: c.organization_name,
+          services: c.services.map(s => ({ uuid: s.uuid })),
+          status: c.status,
+        },
         null,
         2
       )}`
@@ -371,7 +386,50 @@ each(
     data: state => {
       // NOTE: Comment this out (or disable console) in production to protect
       // against exposure of sensitive data.
-      console.log('Data provided to Primero `upsertCase`: ', JSON.stringify(state.data, null, 2));
+      const c = state.data;
+      console.log(c);
+      console.log(JSON.stringify(c.child.services_section, null, 2));
+      console.log(JSON.stringify(c.child.transitions, null, 2));
+      console.log(
+        'Data provided to Primero `upsertCase`: ',
+        JSON.stringify(
+          {
+            remote: true,
+            oscar_number: c.oscar_number,
+            case_id: c.case_id,
+            child: {
+              case_id: c.child.case_id,
+              oscar_number: c.child.oscar_number,
+              mosvy_number: c.child.mosvy_number,
+              location_current: c.child.location_current,
+              address_current: c.child.address_current,
+              oscar_status: c.child.oscar_status,
+              owned_by: c.child.owned_by,
+              has_referral: c.child.has_referral,
+              consent_for_services: c.child.consent_for_services,
+              disclosure_other_orgs: c.child.consent_for_services,
+              module_id: c.child.module_id,
+              registration_date: c.child.registration_date,
+              // TODO: do we need the verbose stuff at the level of the service/transition?
+              // services_section: c.child.services_section,
+              // transitions: c.child.services_section,
+              services_section: c.child.services_section.map(s => ({
+                unique_id: s.unique_id,
+                oscar_case_worker_name: s.oscar_case_worker_name,
+                oscar_referring_organization: s.oscar_referring_organization,
+                oscar_case_worker_telephone: s.oscar_case_worker_telephone,
+              })),
+              transitions: c.child.services_section.map(t => ({
+                service_section_unique_id: t.unique_id,
+                created_at: t.created_at,
+                type: t.type,
+              })),
+            },
+          },
+          null,
+          2
+        )
+      );
       return state.data;
     },
   })
