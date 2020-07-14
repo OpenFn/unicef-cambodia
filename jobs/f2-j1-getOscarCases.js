@@ -41,7 +41,7 @@ post(
     state => {
       console.log(
         `Oscar API responded with cases with global_ids: ${JSON.stringify(
-          state.data.data.map(c => c.global_id)
+          state.data.data ? state.data.data.map(c => c.global_id) : ''
         )}`
       );
       return { ...state, lastQueryDate: state.lastQueryDate };
