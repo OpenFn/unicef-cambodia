@@ -32,8 +32,7 @@ post(
         };
       },
       body: state => {
-        // TODO: This is very strange behaviour for an API. Let's confirm with
-        // Kiry that it's not indicative of bigger problems under the hood.
+        // NOTE: OSCaR API has unique behavior that requires us to send empty strings for null values. 
         function oscarStrings(data) {
           if (data) {
             return data;
@@ -45,7 +44,8 @@ post(
 
         function checkValue(data) {
           if (data !== 'NaN' && data) {
-            return '0'.repeat(8 - data.length) + data;
+            return data.length===7 ? '0'+data : data; //change to; only if 7 characters add leading 0
+            //return '0'.repeat(8 - data.length) + data; //REMOVE once tested
           } else {
             console.log('Converting location null values to OSCAR empty string.');
             return '';
@@ -174,7 +174,6 @@ post(
             family_name: oscarStrings(c.name_last),
             gender: oscarStrings(c.sex),
             date_of_birth: oscarStrings(c.date_of_birth && c.date_of_birth.replace(/\//g, '-')),
-            // location_current_village_code: oscarStrings(c.location_current),
             location_current_village_code: checkValue(c.location_current),
             address_current_village_code: oscarStrings(c.address_current),
             // reason_for_referral: oscarStrings(
@@ -206,25 +205,24 @@ post(
           },
         };
 
-        // NOTE: Comment this out (or disable console) in production to protect
-        // against exposure of sensitive data.
+        // NOTE: Logs for enhanced audit trail. 
         console.log(
           'Case data to be posted to Oscar: ',
           JSON.stringify(
             {
-              external_id: c.external_id,
-              external_id_display: c.external_id_display,
-              global_id: c.global_id,
-              mosvy_number: c.mosvy_number,
-              location_current_village_code: c.location_current_village_code,
-              address_current_village_code: c.address_current_village_code,
-              external_case_worker_name: c.external_case_worker_name,
-              external_case_worker_id: c.external_case_worker_id,
-              external_case_worker_mobile: c.external_case_worker_mobile,
-              organization_name: c.organization_name,
-              organization_id: c.organization_id,
-              is_referred: c.is_referred,
-              services: c.services && c.services.map(s => ({ uuid: s.uuid })),
+              external_id: c.organization.external_id,
+              external_id_display: c.organization.external_id_display,
+              global_id: c.organization.global_id,
+              mosvy_number: c.organization.mosvy_number,
+              location_current_village_code: c.organization.location_current_village_code,
+              address_current_village_code: c.organization.address_current_village_code,
+              external_case_worker_name: c.organization.external_case_worker_name,
+              external_case_worker_id: c.organization.external_case_worker_id,
+              external_case_worker_mobile: c.organization.external_case_worker_mobile,
+              organization_name: c.organization.organization_name,
+              organization_id: c.organization.organization_id,
+              is_referred: c.organization.is_referred,
+              services: c.organization.services && c.sorganization.ervices.map(s => ({ uuid: s.uuid })),
             },
             null,
             2
