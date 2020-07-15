@@ -32,8 +32,7 @@ post(
         };
       },
       body: state => {
-        // TODO: This is very strange behaviour for an API. Let's confirm with
-        // Kiry that it's not indicative of bigger problems under the hood.
+        // NOTE: OSCaR API has unique behavior that requires us to send empty strings for null values.
         function oscarStrings(data) {
           if (data) {
             return data;
@@ -45,7 +44,8 @@ post(
 
         function checkValue(data) {
           if (data !== 'NaN' && data) {
-            return '0'.repeat(8 - data.length) + data;
+            return data.length === 7 ? '0' + data : data; //change to; only if 7 characters add leading 0
+            //return '0'.repeat(8 - data.length) + data; //REMOVE once tested
           } else {
             console.log('Converting location null values to OSCAR empty string.');
             return '';
@@ -173,7 +173,6 @@ post(
           family_name: oscarStrings(c.name_last),
           gender: oscarStrings(c.sex),
           date_of_birth: oscarStrings(c.date_of_birth && c.date_of_birth.replace(/\//g, '-')),
-          // location_current_village_code: oscarStrings(c.location_current),
           location_current_village_code: checkValue(c.location_current),
           address_current_village_code: oscarStrings(c.address_current),
           // reason_for_referral: oscarStrings(
@@ -204,8 +203,7 @@ post(
           // transaction_id: oscarStrings(c.transition_id),
         };
 
-        // NOTE: Comment this out (or disable console) in production to protect
-        // against exposure of sensitive data.
+        // NOTE: Logs for enhanced audit trail.
         console.log(
           'Case data to be posted to Oscar: ',
           JSON.stringify(

@@ -250,7 +250,7 @@ alterState(state => {
     'agency-voice': 'agency-voice-user',
     'agency-wmo': 'agency-wmo-user',
   };
-
+/* NOTE: TO REMOVE ... confirm no longer using?
   const protectionMap = {
     'Living and working on street': 'unaccompanied',
     'Unaccompanied child': 'separated',
@@ -265,7 +265,7 @@ alterState(state => {
     'Domestic violated child': 'domestic_violated_child_28014',
     'Vulnerable child affected by alcohol': 'vulnerable_child_affected_by_alcohol_01558',
     'OSCaR referral': 'oscar_referral',
-  };
+  }; */ 
 
   state.cases = state.data.data.map(c => {
     function convert(arr) {
@@ -305,11 +305,12 @@ alterState(state => {
 
     const now = new Date();
 
-    // NOTE: This is extremely VERBOSE but more secure, given that we don't know
+    // NOTE: These logs are extremely VERBOSE but more secure, given that we don't know
     // exactly what will be provided by the API.
-    console.log(
+    console.log( 
       `Data provided by Oscar (ON: ${c.global_id} / extId: ${c.external_id}) : ${JSON.stringify(
         {
+          oscar_short_id: c.slug,
           address_current_village_code: c.address_current_village_code,
           external_case_worker_id: c.external_case_worker_id,
           external_case_worker_name: c.external_case_worker_name,
@@ -338,6 +339,7 @@ alterState(state => {
         // primero_field: oscar_field,
         case_id: c.external_id, // externalId for upsert (will fail if multiple found)
         oscar_number: c.global_id,
+        oscar_short_id: c.slug,
         mosvy_number: c.mosvy_number,
         name_first: c.given_name,
         name_last: c.family_name,
@@ -350,19 +352,17 @@ alterState(state => {
         address_current: c.address_current_village_code,
         oscar_status: c.status,
         protection_status: 'oscar_referral',
-        protection_status_oscar: c.reason_for_referral, //map string value from Oscar
-        owned_by:
+        protection_status_oscar: c.reason_for_referral,
+        owned_by: //Q: do we need to handle this differently for referrals? Add an agency-unicef-user?
           agencyMap[`agency-${c.organization_name}`] || `agency-${c.organization_name}-user`,
         oscar_reason_for_exiting: c.reason_for_exiting,
         has_referral: c.is_referred,
         consent_for_services: true,
         disclosure_other_orgs: true,
+        interview_subject: 'other',
+        content_source_other: 'OSCaR',
         module_id: 'primeromodule-cp',
         registration_date: now.toISOString().split('T')[0].replace(/-/g, '/'),
-        /* oscar_referral_consent_form:   //do not map consent form
-          c.referral_consent_form.length > 0
-            ? c.referral_consent_form.join(',')
-            : null, */
         services_section: convert(c.services),
         transitions: convert(c.services).map(t => {
           return {
@@ -399,6 +399,7 @@ each(
               case_id: c.child.case_id,
               oscar_number: c.child.oscar_number,
               mosvy_number: c.child.mosvy_number,
+              oscar_short_id: c.child.oscar_short_id,
               location_current: c.child.location_current,
               address_current: c.child.address_current,
               oscar_status: c.child.oscar_status,
@@ -406,6 +407,8 @@ each(
               has_referral: c.child.has_referral,
               consent_for_services: c.child.consent_for_services,
               disclosure_other_orgs: c.child.consent_for_services,
+              interview_subject: c.child.interview_subject,
+              content_source_other: c.child.content_source_other,
               module_id: c.child.module_id,
               registration_date: c.child.registration_date,
               services_section: c.child.services_section.map(s => ({
