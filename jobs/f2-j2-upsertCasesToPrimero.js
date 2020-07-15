@@ -353,7 +353,7 @@ alterState(state => {
         oscar_status: c.status,
         protection_status: 'oscar_referral',
         protection_status_oscar: c.reason_for_referral,
-        owned_by:
+        owned_by: //Q: do we need to handle this differently for referrals? Add an agency-unicef-user?
           agencyMap[`agency-${c.organization_name}`] || `agency-${c.organization_name}-user`,
         oscar_reason_for_exiting: c.reason_for_exiting,
         has_referral: c.is_referred,
