@@ -163,47 +163,45 @@ post(
         );
 
         // Mappings for posting cases to Oscar
-        const json = {
-          organization: {
-            // oscar_field, primero_field,
-            external_id: oscarStrings(c.case_id),
-            external_id_display: oscarStrings(c.case_id_display),
-            global_id: oscarStrings(c.oscar_number),
-            mosvy_number: oscarStrings(c.mosvy_number),
-            given_name: oscarStrings(c.name_first),
-            family_name: oscarStrings(c.name_last),
-            gender: oscarStrings(c.sex),
-            date_of_birth: oscarStrings(c.date_of_birth && c.date_of_birth.replace(/\//g, '-')),
-            // location_current_village_code: oscarStrings(c.location_current),
-            location_current_village_code: checkValue(c.location_current),
-            address_current_village_code: oscarStrings(c.address_current),
-            // reason_for_referral: oscarStrings(
-            //   protectionMap[c.protection_status] || c.protection_status
-            // ),
-            reason_for_referral: oscarStrings(lastTransitionNote),
-            external_case_worker_name: oscarStrings(c.owned_by),
-            external_case_worker_id: oscarStrings(c.owned_by_id),
-            external_case_worker_mobile: c.owned_by_phone || '000000000',
-            organization_name: 'cif', // hardcoding to one of the orgs in Oscar staging system for testing
-            //organization_name: oscarStrings(c.owned_by_agency.substring(7)), // add back in before go-live
-            organization_id: oscarStrings(c.owned_by_agency_id),
-            is_referred: true,
-            services: [].concat.apply(
-              [],
-              c.services_section
-                .filter(s => s.service_subtype)
-                .map(s => {
-                  return s.service_subtype.map(st => {
-                    return {
-                      uuid: oscarStrings(s.unique_id),
-                      name: serviceMap[st] || 'Other',
-                    };
-                  });
-                })
-            ),
-            transaction_id: c.transition_id,
-            // transaction_id: oscarStrings(c.transition_id),
-          },
+        const oscar = {
+          // oscar_field, primero_field,
+          external_id: oscarStrings(c.case_id),
+          external_id_display: oscarStrings(c.case_id_display),
+          global_id: oscarStrings(c.oscar_number),
+          mosvy_number: oscarStrings(c.mosvy_number),
+          given_name: oscarStrings(c.name_first),
+          family_name: oscarStrings(c.name_last),
+          gender: oscarStrings(c.sex),
+          date_of_birth: oscarStrings(c.date_of_birth && c.date_of_birth.replace(/\//g, '-')),
+          // location_current_village_code: oscarStrings(c.location_current),
+          location_current_village_code: checkValue(c.location_current),
+          address_current_village_code: oscarStrings(c.address_current),
+          // reason_for_referral: oscarStrings(
+          //   protectionMap[c.protection_status] || c.protection_status
+          // ),
+          reason_for_referral: oscarStrings(lastTransitionNote),
+          external_case_worker_name: oscarStrings(c.owned_by),
+          external_case_worker_id: oscarStrings(c.owned_by_id),
+          external_case_worker_mobile: c.owned_by_phone || '000000000',
+          organization_name: 'cif', // hardcoding to one of the orgs in Oscar staging system for testing
+          //organization_name: oscarStrings(c.owned_by_agency.substring(7)), // add back in before go-live
+          organization_id: oscarStrings(c.owned_by_agency_id),
+          is_referred: true,
+          services: [].concat.apply(
+            [],
+            c.services_section
+              .filter(s => s.service_subtype)
+              .map(s => {
+                return s.service_subtype.map(st => {
+                  return {
+                    uuid: oscarStrings(s.unique_id),
+                    name: serviceMap[st] || 'Other',
+                  };
+                });
+              })
+          ),
+          transaction_id: c.transition_id,
+          // transaction_id: oscarStrings(c.transition_id),
         };
 
         // NOTE: Comment this out (or disable console) in production to protect
@@ -212,26 +210,28 @@ post(
           'Case data to be posted to Oscar: ',
           JSON.stringify(
             {
-              external_id: c.external_id,
-              external_id_display: c.external_id_display,
-              global_id: c.global_id,
-              mosvy_number: c.mosvy_number,
-              location_current_village_code: c.location_current_village_code,
-              address_current_village_code: c.address_current_village_code,
-              external_case_worker_name: c.external_case_worker_name,
-              external_case_worker_id: c.external_case_worker_id,
-              external_case_worker_mobile: c.external_case_worker_mobile,
-              organization_name: c.organization_name,
-              organization_id: c.organization_id,
-              is_referred: c.is_referred,
-              services: c.services && c.services.map(s => ({ uuid: s.uuid })),
+              organization: {
+                external_id: oscar.external_id,
+                external_id_display: oscar.external_id_display,
+                global_id: oscar.global_id,
+                mosvy_number: oscar.mosvy_number,
+                location_current_village_code: oscar.location_current_village_code,
+                address_current_village_code: oscar.address_current_village_code,
+                external_case_worker_name: oscar.external_case_worker_name,
+                external_case_worker_id: oscar.external_case_worker_id,
+                external_case_worker_mobile: oscar.external_case_worker_mobile,
+                organization_name: oscar.organization_name,
+                organization_id: oscar.organization_id,
+                is_referred: oscar.is_referred,
+                services: oscar.services && oscar.services.map(s => ({ uuid: s.uuid })),
+              },
             },
             null,
             2
           )
         );
 
-        return json;
+        return { organization: oscar };
       },
     })
   )
