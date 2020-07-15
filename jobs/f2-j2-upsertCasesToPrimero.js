@@ -310,6 +310,7 @@ alterState(state => {
     console.log(
       `Data provided by Oscar (ON: ${c.global_id} / extId: ${c.external_id}) : ${JSON.stringify(
         {
+          oscar_short_id: c.slug,
           address_current_village_code: c.address_current_village_code,
           external_case_worker_id: c.external_case_worker_id,
           external_case_worker_name: c.external_case_worker_name,
@@ -338,6 +339,7 @@ alterState(state => {
         // primero_field: oscar_field,
         case_id: c.external_id, // externalId for upsert (will fail if multiple found)
         oscar_number: c.global_id,
+        oscar_short_id: c.slug, 
         mosvy_number: c.mosvy_number,
         name_first: c.given_name,
         name_last: c.family_name,
