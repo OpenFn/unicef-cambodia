@@ -250,7 +250,7 @@ alterState(state => {
     'agency-voice': 'agency-voice-user',
     'agency-wmo': 'agency-wmo-user',
   };
-/* NOTE: TO REMOVE ... confirm no longer using?
+  /* NOTE: TO REMOVE ... confirm no longer using?
   const protectionMap = {
     'Living and working on street': 'unaccompanied',
     'Unaccompanied child': 'separated',
@@ -265,7 +265,7 @@ alterState(state => {
     'Domestic violated child': 'domestic_violated_child_28014',
     'Vulnerable child affected by alcohol': 'vulnerable_child_affected_by_alcohol_01558',
     'OSCaR referral': 'oscar_referral',
-  }; */ 
+  }; */
 
   state.cases = state.data.data.map(c => {
     function convert(arr) {
@@ -307,7 +307,7 @@ alterState(state => {
 
     // NOTE: These logs are extremely VERBOSE but more secure, given that we don't know
     // exactly what will be provided by the API.
-    console.log( 
+    console.log(
       `Data provided by Oscar (ON: ${c.global_id} / extId: ${c.external_id}) : ${JSON.stringify(
         {
           oscar_short_id: c.slug,
@@ -331,7 +331,7 @@ alterState(state => {
     );
 
     // Mappings for upserting cases in Primero (update if existing, insert if new)
-    return {
+    const primeroCase = {
       remote: true,
       oscar_number: c.global_id,
       case_id: c.external_id !== '' ? c.external_id : null,
@@ -353,7 +353,8 @@ alterState(state => {
         oscar_status: c.status,
         protection_status: 'oscar_referral',
         protection_status_oscar: c.reason_for_referral,
-        owned_by: //Q: do we need to handle this differently for referrals? Add an agency-unicef-user?
+        // Q: do we need to handle this differently for referrals? Add an agency-unicef-user?
+        owned_by:
           agencyMap[`agency-${c.organization_name}`] || `agency-${c.organization_name}-user`,
         oscar_reason_for_exiting: c.reason_for_exiting,
         has_referral: c.is_referred,
@@ -374,6 +375,18 @@ alterState(state => {
         }),
       },
     };
+
+    // Note: Sometimes OSCAR sends `null`, sometimes they send `''` (empty
+    // strings). Primero wants to discard both of these before making upserts.
+    const removeEmpty = obj => {
+      Object.keys(obj).forEach(key => {
+        if (obj[key] && typeof obj[key] === 'object') removeEmpty(obj[key]);
+        else if (obj[key] == null || obj[key] == '') delete obj[key];
+      });
+    };
+
+    removeEmpty(primeroCase);
+    return primeroCase;
   });
 
   return state;
