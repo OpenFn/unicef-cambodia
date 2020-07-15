@@ -250,7 +250,7 @@ alterState(state => {
     'agency-voice': 'agency-voice-user',
     'agency-wmo': 'agency-wmo-user',
   };
-
+/* NOTE: TO REMOVE ... confirm no longer using?
   const protectionMap = {
     'Living and working on street': 'unaccompanied',
     'Unaccompanied child': 'separated',
@@ -265,7 +265,7 @@ alterState(state => {
     'Domestic violated child': 'domestic_violated_child_28014',
     'Vulnerable child affected by alcohol': 'vulnerable_child_affected_by_alcohol_01558',
     'OSCaR referral': 'oscar_referral',
-  };
+  }; */ 
 
   state.cases = state.data.data.map(c => {
     function convert(arr) {
@@ -305,9 +305,9 @@ alterState(state => {
 
     const now = new Date();
 
-    // NOTE: This is extremely VERBOSE but more secure, given that we don't know
+    // NOTE: These logs are extremely VERBOSE but more secure, given that we don't know
     // exactly what will be provided by the API.
-    console.log(
+    console.log( 
       `Data provided by Oscar (ON: ${c.global_id} / extId: ${c.external_id}) : ${JSON.stringify(
         {
           oscar_short_id: c.slug,
