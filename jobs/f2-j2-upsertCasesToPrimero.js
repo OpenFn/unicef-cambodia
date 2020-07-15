@@ -359,12 +359,10 @@ alterState(state => {
         has_referral: c.is_referred,
         consent_for_services: true,
         disclosure_other_orgs: true,
+        interview_subject: 'other', 
+        content_source_other: 'OSCaR',
         module_id: 'primeromodule-cp',
         registration_date: now.toISOString().split('T')[0].replace(/-/g, '/'),
-        /* oscar_referral_consent_form:   //do not map consent form
-          c.referral_consent_form.length > 0
-            ? c.referral_consent_form.join(',')
-            : null, */
         services_section: convert(c.services),
         transitions: convert(c.services).map(t => {
           return {
