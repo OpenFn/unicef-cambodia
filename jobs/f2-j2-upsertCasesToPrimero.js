@@ -324,6 +324,7 @@ alterState(state => {
           organization_name: c.organization_name,
           services: c.services.map(s => ({ uuid: s.uuid })),
           status: c.status,
+          gender: c.gender,
         },
         null,
         2
@@ -411,6 +412,7 @@ each(
             oscar_number: c.oscar_number,
             case_id: c.case_id,
             child: {
+              sex: c.child.sex,
               case_id: c.child.case_id,
               oscar_number: c.child.oscar_number,
               mosvy_number: c.child.mosvy_number,
