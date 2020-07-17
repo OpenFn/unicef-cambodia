@@ -324,7 +324,6 @@ alterState(state => {
           organization_name: c.organization_name,
           services: c.services.map(s => ({ uuid: s.uuid })),
           status: c.status,
-          gender: c.gender,
         },
         null,
         2
@@ -354,7 +353,6 @@ alterState(state => {
         oscar_status: c.status,
         protection_status: 'oscar_referral',
         protection_status_oscar: c.reason_for_referral,
-        // Q: do we need to handle this differently for referrals? Add an agency-unicef-user?
         owned_by:
           c.external_id && c.external_id !== ''
             ? null
@@ -412,7 +410,6 @@ each(
             oscar_number: c.oscar_number,
             case_id: c.case_id,
             child: {
-              sex: c.child.sex,
               case_id: c.child.case_id,
               oscar_number: c.child.oscar_number,
               mosvy_number: c.child.mosvy_number,
