@@ -344,7 +344,7 @@ alterState(state => {
         mosvy_number: c.mosvy_number,
         name_first: c.given_name,
         name_last: c.family_name,
-        sex: c.gender && c.gender !== 'male' || c.gender && c.gender !== 'female' ? 'other' : c.gender,
+        sex: c.gender && c.gender !== 'male' && c.gender !== 'female' ? 'other' : c.gender,
         date_of_birth: c.date_of_birth,
         location_current:
           c.location_current_village_code !== ''
