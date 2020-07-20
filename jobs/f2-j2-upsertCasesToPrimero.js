@@ -341,10 +341,11 @@ alterState(state => {
         oscar_number: c.global_id,
         oscar_short_id: c.slug,
         mosvy_number: c.mosvy_number,
-        name_first: c.given_name,
-        name_last: c.family_name,
+        name_first: c.external_id && c.external_id !== '' ? null : c.given_name,
+        name_last: c.external_id && c.external_id !== '' ? null : c.family_name,
         sex: c.gender && c.gender !== 'male' && c.gender !== 'female' ? 'other' : c.gender,
-        date_of_birth: c.date_of_birth,
+        date_of_birth: c.external_id && c.external_id !== '' ? null : c.date_of_birth,
+        age: c.external_id && c.external_id !== '' ? null : 0, //TODO: calculate age based on DOB
         location_current:
           c.location_current_village_code !== ''
             ? parseInt(c.location_current_village_code, 10).toString()
@@ -359,12 +360,12 @@ alterState(state => {
             : agencyMap[`agency-${c.organization_name}`] || `agency-${c.organization_name}-user`,
         oscar_reason_for_exiting: c.reason_for_exiting,
         has_referral: c.is_referred,
-        consent_for_services: true,
-        disclosure_other_orgs: true,
-        interview_subject: 'other',
-        content_source_other: 'OSCaR',
+        consent_for_services: c.external_id && c.external_id !== '' ? null : true,
+        disclosure_other_orgs: c.external_id && c.external_id !== '' ? null : true,
+        interview_subject: c.external_id && c.external_id !== '' ? null : 'other',
+        content_source_other: c.external_id && c.external_id !== '' ? null : 'OSCaR',
         module_id: 'primeromodule-cp',
-        registration_date: now.toISOString().split('T')[0].replace(/-/g, '/'),
+        registration_date: c.external_id && c.external_id !== '' ? null : now.toISOString().split('T')[0].replace(/-/g, '/'),
         services_section: convert(c.services),
         transitions: convert(c.services).map(t => {
           return {
