@@ -268,6 +268,13 @@ alterState(state => {
   }; */
 
   state.cases = state.data.data.map(c => {
+    function oscarValue(item, output) {
+      if (item && item !== '') {
+        return output;
+      }
+      return null;
+    }
+
     function convert(arr) {
       const obj = arr
         .map(s => {
@@ -330,42 +337,70 @@ alterState(state => {
       )}`
     );
 
+    function genderTransform(str) {
+      switch (str) {
+        case 'male':
+        case 'female':
+          return str;
+
+        case undefined:
+        case null:
+        case '':
+          return null;
+
+        default:
+          return 'other';
+      }
+    }
+
+    function calcAge(str) {
+      var today = new Date();
+      var birthDate = new Date(str);
+      var age = today.getFullYear() - birthDate.getFullYear();
+      var m = today.getMonth() - birthDate.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      return age;
+    }
+
     // Mappings for upserting cases in Primero (update if existing, insert if new)
     const primeroCase = {
       remote: true,
       oscar_number: c.global_id,
-      case_id: c.external_id !== '' ? c.external_id : null,
+      case_id: oscarValue(c.external_id) ? c.external_id : null,
+      case_id: oscarValue(c.external_id) ? c.external_id : null,
       child: {
         // primero_field: oscar_field,
         case_id: c.external_id, // externalId for upsert (will fail if multiple found)
         oscar_number: c.global_id,
         oscar_short_id: c.slug,
         mosvy_number: c.mosvy_number,
-        name_first: c.external_id && c.external_id !== '' ? null : c.given_name,
-        name_last: c.external_id && c.external_id !== '' ? null : c.family_name,
-        sex: c.gender && c.gender !== 'male' && c.gender !== 'female' ? 'other' : c.gender,
-        date_of_birth: c.external_id && c.external_id !== '' ? null : c.date_of_birth,
-        age: c.external_id && c.external_id !== '' ? null : 0, //TODO: calculate age based on DOB
-        location_current:
-          c.location_current_village_code !== ''
-            ? parseInt(c.location_current_village_code, 10).toString()
-            : null,
+        name_first: oscarValue(c.external_id) ? null : c.given_name,
+        name_last: oscarValue(c.external_id) ? null : c.family_name,
+        sex: oscarValue(c.external_id) ? null : genderTransform(c.gender),
+        date_of_birth: oscarValue(c.external_id) ? null : c.date_of_birth,
+        age: oscarValue(c.external_id) ? null : calcAge(c.date_of_birth),
+        location_current: oscarValue(c.location_current_village_code)
+          ? parseInt(c.location_current_village_code, 10).toString()
+          : null,
         address_current: c.address_current_village_code,
         oscar_status: c.status,
         protection_status: 'oscar_referral',
         protection_status_oscar: c.reason_for_referral,
-        owned_by:
-          c.external_id && c.external_id !== ''
-            ? null
-            : agencyMap[`agency-${c.organization_name}`] || `agency-${c.organization_name}-user`,
+        owned_by: oscarValue(c.external_id)
+          ? null
+          : agencyMap[`agency-${c.organization_name}`] || `agency-${c.organization_name}-user`,
         oscar_reason_for_exiting: c.reason_for_exiting,
         has_referral: c.is_referred,
-        consent_for_services: c.external_id && c.external_id !== '' ? null : true,
-        disclosure_other_orgs: c.external_id && c.external_id !== '' ? null : true,
-        interview_subject: c.external_id && c.external_id !== '' ? null : 'other',
-        content_source_other: c.external_id && c.external_id !== '' ? null : 'OSCaR',
+        consent_for_services: oscarValue(c.external_id) ? null : true,
+        disclosure_other_orgs: oscarValue(c.external_id) ? null : true,
+        interview_subject: oscarValue(c.external_id) ? null : 'other',
+        content_source_other: oscarValue(c.external_id) ? null : 'OSCaR',
         module_id: 'primeromodule-cp',
-        registration_date: c.external_id && c.external_id !== '' ? null : now.toISOString().split('T')[0].replace(/-/g, '/'),
+        registration_date: oscarValue(c.external_id)
+          ? null
+          : now.toISOString().split('T')[0].replace(/-/g, '/'),
         services_section: convert(c.services),
         transitions: convert(c.services).map(t => {
           return {
@@ -388,6 +423,7 @@ alterState(state => {
     };
 
     removeEmpty(primeroCase);
+    console.log(primeroCase);
     return primeroCase;
   });
 
