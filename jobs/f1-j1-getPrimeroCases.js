@@ -45,7 +45,7 @@ getCases(
     const lastCreationParts = creationDates[0] && creationDates[0].split('/');
 
     if (lastCreationParts) {
-      console.log("Found cases, updating 'last created case' date.");
+      console.log("Found new cases, updating 'last created case' date.");
       state.lastCreated = `${lastCreationParts[2]}-${lastCreationParts[1]}-${lastCreationParts[0]}`;
     }
 
@@ -59,7 +59,7 @@ getCases(
     const lastUpdateParts = updateDates[0] && updateDates[0].split('/');
 
     if (lastUpdateParts) {
-      console.log(`Found cases, updating 'last updated case' date.`);
+      console.log(`Found cases w/ updates, updating 'last updated case' date.`);
       const lastUpdateDay = lastUpdateParts[2].split(' ')[0];
       const lastUpdateTimes = lastUpdateParts[2].split(' ')[1].split(':');
       state.lastUpdated = `${lastUpdateDay}-${lastUpdateParts[1]}-${lastUpdateParts[0]} ${lastUpdateTimes[0]}:${lastUpdateTimes[1]}`;
