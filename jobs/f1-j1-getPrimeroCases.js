@@ -57,11 +57,11 @@ getCases(
       .sort((a, b) => b - a);
 
     const lastUpdateParts = updateDates[0] && updateDates[0].split('/');
-    const lastUpdateDay = lastUpdateParts[2].split(' ')[0];
-    const lastUpdateTimes = lastUpdateParts[2].split(' ')[1].split(':');
 
     if (lastUpdateParts) {
       console.log(`Found cases, updating 'last updated case' date.`);
+      const lastUpdateDay = lastUpdateParts[2].split(' ')[0];
+      const lastUpdateTimes = lastUpdateParts[2].split(' ')[1].split(':');
       state.lastUpdated = `${lastUpdateDay}-${lastUpdateParts[1]}-${lastUpdateParts[0]} ${lastUpdateTimes[0]}:${lastUpdateTimes[1]}`;
     }
 
