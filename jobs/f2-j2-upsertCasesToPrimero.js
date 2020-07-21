@@ -447,6 +447,7 @@ each(
             oscar_number: c.oscar_number,
             case_id: c.case_id,
             child: {
+              date_of_birth: c.child.date_of_birth, 
               age: c.child.age,
               case_id: c.child.case_id,
               oscar_number: c.child.oscar_number,
