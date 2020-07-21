@@ -268,11 +268,11 @@ alterState(state => {
   }; */
 
   state.cases = state.data.data.map(c => {
-    function oscarValue(item, output) {
+    function oscarValue(item) {
       if (item && item !== '') {
-        return output;
+        return true;
       }
-      return null;
+      return false;
     }
 
     function convert(arr) {
@@ -369,7 +369,6 @@ alterState(state => {
       remote: true,
       oscar_number: c.global_id,
       case_id: oscarValue(c.external_id) ? c.external_id : null,
-      case_id: oscarValue(c.external_id) ? c.external_id : null,
       child: {
         // primero_field: oscar_field,
         case_id: c.external_id, // externalId for upsert (will fail if multiple found)
@@ -423,7 +422,6 @@ alterState(state => {
     };
 
     removeEmpty(primeroCase);
-    console.log(primeroCase);
     return primeroCase;
   });
 
@@ -443,11 +441,11 @@ each(
         'Data provided to Primero `upsertCase`: ',
         JSON.stringify(
           {
-            remote: true,
+            remote: c.remote,
             oscar_number: c.oscar_number,
             case_id: c.case_id,
             child: {
-              date_of_birth: c.child.date_of_birth, 
+              date_of_birth: c.child.date_of_birth,
               age: c.child.age,
               case_id: c.child.case_id,
               oscar_number: c.child.oscar_number,
