@@ -277,10 +277,24 @@ alterState(state => {
 
     function convertDate(str) {
       const date = new Date(str);
-      var month = date.getMonth() + 1;
-      var day = date.getDate();
-      var year = date.getFullYear();
-      return `${month}/${day}/${year} 00:00`;
+      monthNames = [
+        'jan',
+        'feb',
+        'mar',
+        'apr',
+        'may',
+        'jun',
+        'jul',
+        'aug',
+        'sep',
+        'oct',
+        'nov',
+        'dec',
+      ];
+      var dd = date.getDate();
+      var mmm = monthNames[date.getMonth()];
+      var yyyy = date.getFullYear();
+      return `${dd}-${mmm}-${yyyy} 00:00`;
     }
 
     function convert(arr) {
