@@ -276,26 +276,28 @@ alterState(state => {
     }
 
     function convertDate(str) {
-      const date = new Date(str);
-      monthNames = [
-        'jan',
-        'feb',
-        'mar',
-        'apr',
-        'may',
-        'jun',
-        'jul',
-        'aug',
-        'sep',
-        'oct',
-        'nov',
-        'dec',
-      ];
-      var dd = date.getDate();
-      var mmm = monthNames[date.getMonth()];
-      var yyyy = date.getFullYear();
-      // return `${dd}-${mmm}-${yyyy} 00:00`;
-      return `${dd}-${mmm}-${yyyy}`;
+      if (oscarValue(str)) {
+        const date = new Date(str);
+        monthNames = [
+          'jan',
+          'feb',
+          'mar',
+          'apr',
+          'may',
+          'jun',
+          'jul',
+          'aug',
+          'sep',
+          'oct',
+          'nov',
+          'dec',
+        ];
+        var dd = date.getDate();
+        var mmm = monthNames[date.getMonth()];
+        var yyyy = date.getFullYear();
+        return `${dd}-${mmm}-${yyyy} 00:00`;
+      }
+      return null;
     }
 
     function convert(arr) {
@@ -379,17 +381,14 @@ alterState(state => {
     }
 
     function calcAge(str) {
-      if (oscarValue(str)) {
-        var today = new Date();
-        var birthDate = new Date(str);
-        var age = today.getFullYear() - birthDate.getFullYear();
-        var m = today.getMonth() - birthDate.getMonth();
-        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-          age--;
-        }
-        return age;
+      var today = new Date();
+      var birthDate = new Date(str);
+      var age = today.getFullYear() - birthDate.getFullYear();
+      var m = today.getMonth() - birthDate.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
       }
-      return null;
+      return age;
     }
 
     // Mappings for upserting cases in Primero (update if existing, insert if new)
