@@ -294,7 +294,8 @@ alterState(state => {
       var dd = date.getDate();
       var mmm = monthNames[date.getMonth()];
       var yyyy = date.getFullYear();
-      return `${dd}-${mmm}-${yyyy} 00:00`;
+      // return `${dd}-${mmm}-${yyyy} 00:00`;
+      return `${dd}-${mmm}-${yyyy}`;
     }
 
     function convert(arr) {
