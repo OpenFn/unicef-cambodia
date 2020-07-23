@@ -353,7 +353,7 @@ alterState(state => {
           mosvy_number: c.mosvy_number,
           organization_id: c.organization_id,
           organization_name: c.organization_name,
-          services: c.services.map(s => ({ uuid: s.uuid })),
+          services: c.services.map(s => ({ uuid: s.uuid, enrollment_date: s.enrollment_date })),
           status: c.status,
         },
         null,
