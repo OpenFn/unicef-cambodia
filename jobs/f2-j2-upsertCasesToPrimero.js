@@ -378,14 +378,17 @@ alterState(state => {
     }
 
     function calcAge(str) {
-      var today = new Date();
-      var birthDate = new Date(str);
-      var age = today.getFullYear() - birthDate.getFullYear();
-      var m = today.getMonth() - birthDate.getMonth();
-      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-        age--;
+      if (oscarValue(str)) {
+        var today = new Date();
+        var birthDate = new Date(str);
+        var age = today.getFullYear() - birthDate.getFullYear();
+        var m = today.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+          age--;
+        }
+        return age;
       }
-      return age;
+      return null;
     }
 
     // Mappings for upserting cases in Primero (update if existing, insert if new)
