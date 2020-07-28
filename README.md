@@ -83,8 +83,15 @@ Example Request:
 This integration is hosted on [OpenFn.org](https://openfn.org/projects) with Primero SaaS. 
 
 ### Support 
-- [ ] OpenFn Admin users & access levels confirmed? 
+Contact support@openfn.org with any questions. 
+
+## Training Materials
+- System Administrators: [See here](https://docs.google.com/presentation/d/1ln55ye9qN7vR9GeCntRTXZC08EjlxccBUp7X9aMitSI/edit?usp=sharing) for the training deck presented during the July System Administrator training. 
+
+## Checklist
+- [x] OpenFn Admin users & access levels confirmed? 
+- [x] OpenFn Admin training
 - [ ] Support POCs identified for each connected system? 
-- [ ] OpenFn Admin training
+
 
 
