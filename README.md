@@ -23,7 +23,7 @@ _**Flow 2: OSCaR cases --> Primero**_
 **OpenFn language-packages** (API adaptors) implemented: 
 * [language-primero](https://github.com/OpenFn/language-primero)
 
-## (3) Flows
+## (3) Data Flows
 To achieve a bi-directional systems sync, 4 OpenFn jobs have been implemented to sync case and referral data between systems.
 
 _**Flow 1: Primero cases --> OSCaR**_
@@ -64,26 +64,35 @@ Example Request:
 ```
  GET /api/v1/organizations/clients?since_date='2020-07-01 01:00:00'&referred_external=true
 ```
-### Assumptions 
-1. **Data Entry** - In order for data to be successfully exchanged as expected, users should follow the data entry protocols defined in the training sessions. **({See this video})** for an overview of the data entry steps in both the OSCaR and Primero systems. 
-2. **Services** are mapped between systems as defined in the [Service Map](https://docs.google.com/spreadsheets/d/1x-KUJgOhaZlZYzJ935q9QXhPM0yobjEEuN-IJgIvmwA/edit#gid=1841308930). _If any services change, this map and OpenFn jobs must be updated._
-3. **Registering New Organizations/ Agencies** - Agency IDs and Users are mapped between systems as defined in [Agency User Map](https://docs.google.com/spreadsheets/d/1x-KUJgOhaZlZYzJ935q9QXhPM0yobjEEuN-IJgIvmwA/edit#gid=2080615206). If new Agencies are created, OSCaR and Primero teams will coordinate to manually register the new agencies in each system (this is _not_ an automated process). _Agency names and users should follow the below naming conventions, otherwise the OpenFn jobs must be updated_: 
+### Integration Assumptions 
+1. **Data Entry** - In order for data to be successfully exchanged as expected, users should follow the data entry protocols defined in the training sessions. For an overview of the data entry steps in both the OSCaR and Primero systems (see the below videos). If these data entry steps are _not_ followed, then these cases may not be eligble for case sharing and referrals between systems. 
+   - OSCaR case referral process: 
+   - Primero case referral process: 
+2. **Unique Identifiers** - OpenFn will perform `upsert()` (update if record exists, create if new) operations in both the Primero and OSCaR systems when syncing data. To ensure no duplicate cases are entered, OpenFn will use the below identifiers to check for existing cases. _We assume that these identifiers are unique_. 
+   - OSCaR unique id: `global_id` (represented as `oscar_number` in Primero system)
+   - Primero unique id: `case_id` (represented as `external_id` in OSCaR system)
+3. **Services** are mapped between systems as defined in the [Service Map](https://docs.google.com/spreadsheets/d/1x-KUJgOhaZlZYzJ935q9QXhPM0yobjEEuN-IJgIvmwA/edit#gid=1841308930). _If any services change, this map and OpenFn jobs must be updated._
+4. **Primero Case Owner Assignment** - When cases are synced with Primero, they will be automatically assigned to a Province user case owner by OpenFn (see `owned_by` field in mappings). The Province will be determined by the location code of the child provided by OSCaR. See [Province User Map] for the list of generic Primero Province users. 
+5. **Registering New Organizations/ Agencies** - Agency IDs and Users are mapped between systems as defined in [Agency User Map](https://docs.google.com/spreadsheets/d/1x-KUJgOhaZlZYzJ935q9QXhPM0yobjEEuN-IJgIvmwA/edit#gid=2080615206). If new Agencies are created, OSCaR and Primero teams will coordinate to manually register the new agencies in each system (this is _not_ an automated process). _Agency names and users should follow the below naming conventions, otherwise the OpenFn jobs must be updated_: 
     - Oscar Organization Name: `'{organization_name}'` (e.g., `cif`)
     - Primero Agency ID: `'agency-{organization_name}'` (e.g., `agency-cif`)
     - Primero Agency User: `'agency-{organization_name}-user'` (e.g., `agency-cif-user`)
 
-    In the mappings, Oscar `organzation_name: 'cif'` maps to --> Primero `owned_by: 'agency-cif-user'`)
 
-## (5) Flow Mappings & Transformations
+## (5) Data Flow Mappings & Transformations
 
-[See this table](https://docs.google.com/spreadsheets/d/1x-KUJgOhaZlZYzJ935q9QXhPM0yobjEEuN-IJgIvmwA/edit?usp=sharing) for the field mappings & data transformation rules implemented in the OpenFn jobs. This includes detailed mappings for **Services** and **Agency Users**. 
+[See this table](https://docs.google.com/spreadsheets/d/1x-KUJgOhaZlZYzJ935q9QXhPM0yobjEEuN-IJgIvmwA/edit?usp=sharing) for the field mappings & data transformation rules implemented in the OpenFn jobs. This includes detailed mappings for **Services** and **Province Users**. 
 
 ## (6) Administration
 ### Provisioning, Hosting, & Maintenance
-This integration is hosted on [OpenFn.org](https://openfn.org/projects) with Primero SaaS. 
+This integration is hosted on [OpenFn.org](https://openfn.org/projects) with Primero SaaS. OpenFn will provide ongoing maintenance support. 
 
 ### Support 
-Contact support@openfn.org with any questions. 
+Primero system administrators will be responsible for ongoing integration monitoring and management.
+- Primero System Administrators:
+- OSCaR System Administrators:
+
+Contact support@openfn.org with any questions or troubleshooting support. 
 
 ## Training Materials
 - System Administrators: [See here](https://docs.google.com/presentation/d/1ln55ye9qN7vR9GeCntRTXZC08EjlxccBUp7X9aMitSI/edit?usp=sharing) for the training deck presented during the July System Administrator training. 
