@@ -16,9 +16,11 @@ _**Flow 2: OSCaR cases --> Primero**_
 
 
 ## (2) System APIs
-**APIs** implemented:
+**APIs*** implemented:
 * Primero: [API v1.1](https://docs.google.com/document/d/1jpaT2_UBBnc3PxPYlLMBEzNUkyfuxRZiksywG5MKM0Q/edit?usp=sharing)
 * OSCaR: [API v1.0.0](https://app.swaggerhub.com/apis/Ro51/OSCaRInterop/1.0.0#/info)
+
+_*Note that these APIs are newly implemented and were developed at the start of this integration implementation._
 
 **OpenFn language-packages** (API adaptors) implemented: 
 * [language-primero](https://github.com/OpenFn/language-primero)
@@ -79,7 +81,7 @@ Example Request:
 
 ## (5) Data Flow Mappings & Transformations
 
-[See this table](https://docs.google.com/spreadsheets/d/1x-KUJgOhaZlZYzJ935q9QXhPM0yobjEEuN-IJgIvmwA/edit?usp=sharing) for the field mappings & data transformation rules implemented in the OpenFn jobs. This includes detailed mappings for **Services** and **Province Users**. 
+[See this table](https://docs.google.com/spreadsheets/d/1x-KUJgOhaZlZYzJ935q9QXhPM0yobjEEuN-IJgIvmwA/edit?usp=sharing) for the integration field mappings & data transformation rules implemented in the OpenFn jobs. This includes detailed mappings for **Services** and **Province Users**. 
 
 ## (6) Administration
 ### Provisioning, Hosting, & Maintenance
