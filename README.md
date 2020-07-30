@@ -73,11 +73,9 @@ Example Request:
    - Primero unique id: `case_id` (represented as `external_id` in OSCaR system)
 3. **Services** are mapped between systems as defined in the [Service Map](https://docs.google.com/spreadsheets/d/1x-KUJgOhaZlZYzJ935q9QXhPM0yobjEEuN-IJgIvmwA/edit#gid=1841308930). _If any services change, this map and OpenFn jobs must be updated._
 4. **Primero Case Owner Assignment** - When cases are synced with Primero, they will be automatically assigned to a Province user case owner by OpenFn (see `owned_by` field in mappings). The Province will be determined by the location code of the child provided by OSCaR. See [Province User Map] for the list of generic Primero Province users. 
-5. **Registering New Organizations/ Agencies** - Agency IDs and Users are mapped between systems as defined in [Agency User Map](https://docs.google.com/spreadsheets/d/1x-KUJgOhaZlZYzJ935q9QXhPM0yobjEEuN-IJgIvmwA/edit#gid=2080615206). If new Agencies are created, OSCaR and Primero teams will coordinate to manually register the new agencies in each system (this is _not_ an automated process). _Agency names and users should follow the below naming conventions, otherwise the OpenFn jobs must be updated_: 
+5. **Organization/ Agency names** - Agency IDs and Names are mapped between systems assuming specific naming conventions (see below). Any new organizations/agencies should be registered following the same naming conventions, otherwise the OpenFn jobs may need to be updated.  
     - Oscar Organization Name: `'{organization_name}'` (e.g., `cif`)
     - Primero Agency ID: `'agency-{organization_name}'` (e.g., `agency-cif`)
-    - Primero Agency User: `'agency-{organization_name}-user'` (e.g., `agency-cif-user`)
-
 
 ## (5) Data Flow Mappings & Transformations
 
