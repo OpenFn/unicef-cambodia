@@ -83,7 +83,16 @@ Example Request:
 
 [See this table](https://docs.google.com/spreadsheets/d/1x-KUJgOhaZlZYzJ935q9QXhPM0yobjEEuN-IJgIvmwA/edit?usp=sharing) for the integration field mappings & data transformation rules implemented in the OpenFn jobs. This includes detailed mappings for **Services** and **Province Users**. 
 
-## (6) Administration
+## (6) Change Management
+System administrators are responsible for identifying if changes may impact the OpenFn integration. 
+1. If login credentials are changed for either system, the relevant **Credential** must be updated in OpenFn.org. 
+2. If system changes are made to any of the **fields** referenced in the [field mappings](https://docs.google.com/spreadsheets/d/1x-KUJgOhaZlZYzJ935q9QXhPM0yobjEEuN-IJgIvmwA/edit?usp=sharing), the OpenFn jobs should be reviewed and tested to confirm no impact on the integration. 
+3. If the list of available **Province Users** or **Services** in either system changes, then the Services and Province User Map should be reviewed in the [mapping document](https://docs.google.com/spreadsheets/d/1x-KUJgOhaZlZYzJ935q9QXhPM0yobjEEuN-IJgIvmwA/edit?usp=sharing) to confirm no updates are required in the OpenFn jobs. 
+4. If **new Agencies/ Organizations are created** in either system, OSCaR and Primero teams will coordinate to manually register the new agencies in each system (this is _not_ an automated process). _Agency/Organization Ids should follow the below naming conventions, otherwise the OpenFn mappings may need to be updated_: 
+    - Oscar Organization Name: `'{organization_name}'` (e.g., `cif`)
+    - Primero Agency ID: `'agency-{organization_name}'` (e.g., `agency-cif`)
+
+## (7) Administration
 ### Provisioning, Hosting, & Maintenance
 This integration is hosted on [OpenFn.org](https://openfn.org/projects) with Primero SaaS. OpenFn will provide ongoing maintenance support. 
 
@@ -97,14 +106,6 @@ Contact support@openfn.org with any questions or troubleshooting support.
 ### Training Materials
 - System Administrators: [See here](https://docs.google.com/presentation/d/1ln55ye9qN7vR9GeCntRTXZC08EjlxccBUp7X9aMitSI/edit?usp=sharing) for the training deck presented during the July System Administrator training. This includes an overview of integration monitoring, error codes, and troubleshooting. 
 
-## (7) Change Management
-System administrators are responsible for identifying if changes may impact the OpenFn integration. 
-1. If login credentials are changed for either system, the relevant **Credential** must be updated in OpenFn.org. 
-2. If system changes are made to any of the **fields** referenced in the [field mappings](https://docs.google.com/spreadsheets/d/1x-KUJgOhaZlZYzJ935q9QXhPM0yobjEEuN-IJgIvmwA/edit?usp=sharing), the OpenFn jobs should be reviewed and tested to confirm no impact on the integration. 
-3. If the list of available **Province Users** or **Services** in either system changes, then the Services and Province User Map should be reviewed in the [mapping document](https://docs.google.com/spreadsheets/d/1x-KUJgOhaZlZYzJ935q9QXhPM0yobjEEuN-IJgIvmwA/edit?usp=sharing) to confirm no updates are required in the OpenFn jobs. 
-4. If **new Agencies/ Organizations are created** in either system, OSCaR and Primero teams will coordinate to manually register the new agencies in each system (this is _not_ an automated process). _Agency/Organization Ids should follow the below naming conventions, otherwise the OpenFn mappings may need to be updated_: 
-    - Oscar Organization Name: `'{organization_name}'` (e.g., `cif`)
-    - Primero Agency ID: `'agency-{organization_name}'` (e.g., `agency-cif`)
 
 ## Checklist
 - [x] OpenFn Admin users & access levels confirmed? 
