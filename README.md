@@ -67,7 +67,7 @@ Example Request:
  GET /api/v1/organizations/clients?since_date='2020-07-01 01:00:00'&referred_external=true
 ```
 ### Integration Assumptions 
-1. **Data Entry** - In order for data to be successfully exchanged as expected, users should follow the data entry protocols defined in the training sessions. For an overview of the data entry steps in both the OSCaR and Primero systems (see the below videos). If these data entry steps are _not_ followed, then these cases may not be eligble for case sharing and referrals between systems. 
+1. **Data Sharing** - In order for data to be successfully exchanged as expected, users should follow the data entry protocols defined in the training sessions. For an overview of the data entry steps in both the OSCaR and Primero systems (see the below videos). If these data entry steps are _not_ followed and consent is _not_ provided in the Primero system, then these cases may not be eligble for case sharing and referrals between systems. 
    - OSCaR case referral process: 
    - Primero case referral process: 
 2. **Unique Identifiers** - OpenFn will perform `upsert()` (update if record exists, create if new) operations in both the Primero and OSCaR systems when syncing data. To ensure no duplicate cases are entered, OpenFn will use the below identifiers to check for existing cases. _We assume that these identifiers are unique_. 
