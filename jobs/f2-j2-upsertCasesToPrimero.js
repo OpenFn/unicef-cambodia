@@ -427,15 +427,16 @@ alterState(state => {
         registration_date: oscarValue(c.external_id)
           ? null
           : now.toISOString().split('T')[0].replace(/-/g, '/'),
-        services_section: convert(c.services),
-        transitions: convert(c.services).map(t => {
-          return {
-            service_section_unique_id: t.unique_id,
-            service: t.service_type,
-            created_at: now.toISOString().split('T')[0].replace(/-/g, '/'),
-            type: 'referral',
-          };
-        }),
+        services_section: convert(c.services).map(s => ({
+          ...s,
+          service_referral_notes: c.reason_for_referral,
+        })),
+        transitions: convert(c.services).map(t => ({
+          service_section_unique_id: t.unique_id,
+          service: t.service_type,
+          created_at: now.toISOString().split('T')[0].replace(/-/g, '/'),
+          type: 'referral',
+        })),
       },
     };
 
