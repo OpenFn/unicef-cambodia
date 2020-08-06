@@ -457,7 +457,6 @@ alterState(state => {
     };
 
     removeEmpty(primeroCase);
-    console.log(primeroCase.child);
     if (primeroCase.child.owned_by) {
       return primeroCase;
     } else {
