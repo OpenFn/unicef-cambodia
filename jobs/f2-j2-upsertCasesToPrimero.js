@@ -201,55 +201,6 @@ alterState(state => {
     'Other Service': { subtype: 'other_other_service', type: 'other' },
   };
 
-  const agencyMap = {
-    'agency-agh': 'agency-agh-user',
-    'agency-ahc': 'agency-ahc-user',
-    'agency-ajl': 'agency-ajl-user',
-    'agency-auscam': 'agency-auscam-user',
-    'agency-brc': 'agency-brc-user',
-    'agency-cccu': 'agency-cccu-user',
-    'agency-cct': 'agency-cct-user',
-    'agency-cfi': 'agency-cfi-user',
-    'agency-cif': 'agency-cif-user',
-    'agency-css': 'agency-css-user',
-    'agency-cvcd': 'agency-cvcd-user',
-    'agency-cwd': 'agency-cwd-user',
-    'agency-demo': 'agency-demo-user',
-    'agency-fco': 'agency-fco-user',
-    'agency-fit': 'agency-fit-user',
-    'agency-fsc': 'agency-fsc-user',
-    'agency-fsi': 'agency-fsi-user',
-    'agency-fts': 'agency-fts-user',
-    'agency-gca': 'agency-gca-user',
-    'agency-gct': 'agency-gct-user',
-    'agency-hfj': 'agency-hfj-user',
-    'agency-hol': 'agency-hol-user',
-    'agency-holt': 'agency-holt-user',
-    'agency-icf': 'agency-icf-user',
-    'agency-isf': 'agency-isf-user',
-    'agency-kmo': 'agency-kmo-user',
-    'agency-kmr': 'agency-kmr-user',
-    'agency-lwb': 'agency-lwb-user',
-    'agency-mande': 'agency-mande-user',
-    'agency-mho': 'agency-mho-user',
-    'agency-mrs': 'agency-mrs-user',
-    'agency-msl': 'agency-msl-user',
-    'agency-mtp': 'agency-mtp-user',
-    'agency-my': 'agency-my-user',
-    'agency-myan': 'agency-myan-user',
-    'agency-newsmile': 'agency-newsmile-user',
-    'agency-pepy': 'agency-pepy-user',
-    'agency-rok': 'agency-rok-user',
-    'agency-scc': 'agency-scc-user',
-    'agency-shk': 'agency-shk-user',
-    'agency-spo': 'agency-spo-user',
-    'agency-ssc': 'agency-ssc-user',
-    'agency-tlc': 'agency-tlc-user',
-    'agency-tmw': 'agency-tmw-user',
-    'agency-tutorials': 'agency-tutorials-user',
-    'agency-voice': 'agency-voice-user',
-    'agency-wmo': 'agency-wmo-user',
-  };
   /* NOTE: TO REMOVE ... confirm no longer using?
   const protectionMap = {
     'Living and working on street': 'unaccompanied',
@@ -395,6 +346,54 @@ alterState(state => {
       return oscarValue(c.external_id) ? c.external_id : null;
     }
 
+    function setUser(c) {
+      const provinceUserMap = {
+        '12': 'mgrpnh',
+        '08': 'mgrkdl',
+        '17': 'mgrsrp',
+        '02': 'mgrbtb',
+        '18': 'mgrshv',
+        '22': 'mgrstg',
+        '16': 'mgrrtk',
+        '11': 'mgrmdk',
+        '10': 'mgrkrt',
+        '25': 'mgrtkm',
+        '03': 'mgrkcm',
+        '22': 'mgromc',
+        '13': 'mgrpvh',
+        '06': 'mgrktm',
+        '01': 'mgrbmc',
+        '24': 'mgrpln',
+        '15': 'mgrpst',
+        '23': 'mgrkep',
+        '21': 'mgrtakeo',
+        '09': 'mgrkkg',
+        '07': 'mgrkpt',
+        '05': 'mgrksp',
+        '20': 'mgrsvg',
+        '14': 'mgrpvg',
+        '04': 'mgrkch',
+      };
+
+      const { location_current_village_code, organization_address_code } = c;
+
+      const source =
+        (oscarValue(location_current_village_code) && location_current_village_code) ||
+        (oscarValue(organization_address_code) && organization_address_code);
+
+      if (source) {
+        const subCode = source.slice(0, 2);
+        user = provinceUserMap[subCode];
+        if (user) {
+          return user;
+        } else {
+          throw 'Cannot determine user from provinceUserMap';
+        }
+      } else {
+        return null;
+      }
+    }
+
     // Mappings for upserting cases in Primero (update if existing, insert if new)
     const primeroCase = {
       remote: true,
@@ -424,9 +423,7 @@ alterState(state => {
         oscar_status: c.status,
         protection_status: 'oscar_referral',
         service_implementing_agency: `agency-${c.organization_name}`,
-        owned_by: oscarValue(c.external_id)
-          ? null
-          : agencyMap[`agency-${c.organization_name}`] || `agency-${c.organization_name}-user`,
+        owned_by: oscarValue(c.external_id) ? null : setUser(c),
         oscar_reason_for_exiting: c.reason_for_exiting,
         has_referral: c.is_referred,
         consent_for_services: oscarValue(c.external_id) ? null : true,
@@ -460,10 +457,19 @@ alterState(state => {
     };
 
     removeEmpty(primeroCase);
-    return primeroCase;
+    console.log(primeroCase.child);
+    if (primeroCase.child.owned_by) {
+      return primeroCase;
+    } else {
+      console.warn(
+        'WARNING: Invalid Oscar location_current_village_code or address_current_village_code'
+      );
+      return false;
+    }
   });
 
-  return state;
+  // This removes all cases set to `false`;
+  return { ...state, cases: state.cases.filter(c => c) };
 });
 
 each(
