@@ -392,7 +392,6 @@ alterState(state => {
     }
 
     function primeroId(c) {
-      console.log('hello!');
       return oscarValue(c.external_id) ? c.external_id : null;
     }
 
