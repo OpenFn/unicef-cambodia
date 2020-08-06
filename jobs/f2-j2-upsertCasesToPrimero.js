@@ -396,6 +396,10 @@ alterState(state => {
       remote: true,
       oscar_number: c.global_id,
       case_id: oscarValue(c.external_id) ? c.external_id : null,
+      // NOTE: unique_identifier duplicates `case_id` but has been requested by
+      // Primero as a workaround for certain uuid/external_id duplicate issues
+      // in v1 of their public API. This will likely change soon.
+      unique_identifier: oscarValue(c.external_id) ? c.external_id : null,
       child: {
         // primero_field: oscar_field,
         case_id: c.external_id, // externalId for upsert (will fail if multiple found)
