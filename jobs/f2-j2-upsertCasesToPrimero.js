@@ -413,7 +413,7 @@ alterState(state => {
         address_current: c.address_current_village_code,
         oscar_status: c.status,
         protection_status: 'oscar_referral',
-        protection_status_oscar: c.reason_for_referral,
+        service_implementing_agency: `agency-${c.organization_name}`,
         owned_by: oscarValue(c.external_id)
           ? null
           : agencyMap[`agency-${c.organization_name}`] || `agency-${c.organization_name}-user`,
