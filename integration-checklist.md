@@ -9,7 +9,7 @@
 
 ### (2) System APIs
 - [ ] APIs built? 
-- [ ] API documementation available? 
+- [ ] API documentation available? 
 - [ ] Access to system dev/test environments? 
 - [ ] APIs tested? 
 
