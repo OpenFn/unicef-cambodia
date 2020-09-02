@@ -1,5 +1,4 @@
 post(
-  //Oscar authentication  --> To update?
   '/api/v1/auth/sign_in',
   {
     keepCookie: true,
@@ -9,8 +8,8 @@ post(
     },
   },
   state => {
-  state.body = {}
-  state.references = []
-  return state;
+    state.body = {}
+    state.references = []
+    return state;
   }
 );
