@@ -8,7 +8,8 @@ post(
     },
   },
   state => {
-    console.log(state)
+    state.configuration = 'REDACTED'
+    console.log(JSON.stringify(state, null, 2));
     state.body = {}
     state.references = []
     return state;
