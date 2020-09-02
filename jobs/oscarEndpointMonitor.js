@@ -8,6 +8,7 @@ post(
     },
   },
   state => {
+    console.log(state)
     state.body = {}
     state.references = []
     return state;
