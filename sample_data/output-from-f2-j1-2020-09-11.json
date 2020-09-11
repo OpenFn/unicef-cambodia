@@ -1,0 +1,162 @@
+{
+  "references": [
+    {},
+    {
+      "__cookie": "",
+      "__headers": {
+        "content-type": "application/json; charset=utf-8",
+        "transfer-encoding": "chunked",
+        "connection": "close",
+        "status": "200 OK",
+        "cache-control": "max-age=0, private, must-revalidate",
+        "vary": "Origin",
+        "x-xss-protection": "1; mode=block",
+        "access-token": "[--REDACTED--]",
+        "x-request-id": "be7b5c88-475d-4f58-8377-88757b4d5c99",
+        "token-type": "Bearer",
+        "expiry": "1600429836",
+        "uid": "[--REDACTED--]",
+        "client": "[--REDACTED--]",
+        "x-frame-options": "SAMEORIGIN",
+        "etag": "W/\"ebb8092eade531f3f4e1f82aaaef8007\"",
+        "x-content-type-options": "nosniff",
+        "x-runtime": "0.728019",
+        "date": "Fri, 11 Sep 2020 11:50:37 GMT",
+        "x-powered-by": "Phusion Passenger 5.1.0",
+        "server": "nginx/1.10.2 + Phusion Passenger 5.1.0"
+      },
+      "body": {
+        "data": {
+          "id": 20,
+          "first_name": "External User",
+          "last_name": "External User",
+          "roles": "case worker",
+          "start_date": null,
+          "job_title": "",
+          "mobile": "",
+          "date_of_birth": null,
+          "archived": false,
+          "province_id": null,
+          "department_id": null,
+          "email": "api.user@example.com",
+          "clients_count": 0,
+          "cases_count": 0,
+          "tasks_count": 0,
+          "provider": "email",
+          "uid": "[--REDACTED--]",
+          "admin": true,
+          "changelogs_count": 0,
+          "organization_id": null,
+          "disable": false,
+          "expires_at": null,
+          "task_notify": true,
+          "manager_id": null,
+          "calendar_integration": false,
+          "pin_number": null,
+          "manager_ids": [],
+          "program_warning": false,
+          "staff_performance_notification": true,
+          "pin_code": "",
+          "domain_warning": false,
+          "referral_notification": true,
+          "gender": "prefer not to say",
+          "enable_gov_log_in": false,
+          "enable_research_log_in": false,
+          "deleted_at": null,
+          "activated_at": null,
+          "deactivated_at": null,
+          "preferred_language": "en",
+          "organization_name": null,
+          "profile": null
+        }
+      }
+    }
+  ],
+  "data": {
+    "__cookie": "_cif-web_session=N0dCRkJETjRJMXpwakhCYkY4ZndzUDFWNmNLOHpkZmRWTDczeFQ2ajdhOFdtblBQWkIvcXlyUVFsVUYvYytYeUlMUHJLRUwrY2NzWlVlWjZ4enFaa0xuQlI2NlRHQmxJcHF5N2hydVV0a01Bc3pWcWxEdllld0RFNHI2NVB4U3EycktPVzJVVHkyMUc2Y2s2R1FydTdRPT0tLTNYMG0xdmF0NDFpK0VFQ2xxM1NpeXc9PQ%3D%3D--a8fbf14429375febde65b65d70db9a0a64efcd3e",
+    "__headers": {
+      "content-type": "application/json; charset=utf-8",
+      "transfer-encoding": "chunked",
+      "connection": "close",
+      "status": "200 OK",
+      "cache-control": "max-age=0, private, must-revalidate",
+      "vary": "Origin",
+      "x-xss-protection": "1; mode=block",
+      "x-request-id": "2089f039-0f13-401c-9d1a-470b0270a490",
+      "etag": "W/\"9eebb768836a6089599c9ac88dc457a2\"",
+      "x-frame-options": "SAMEORIGIN",
+      "x-runtime": "5.617226",
+      "x-content-type-options": "nosniff",
+      "date": "Fri, 11 Sep 2020 11:50:43 GMT",
+      "set-cookie": [
+        "_cif-web_session=N0dCRkJETjRJMXpwakhCYkY4ZndzUDFWNmNLOHpkZmRWTDczeFQ2ajdhOFdtblBQWkIvcXlyUVFsVUYvYytYeUlMUHJLRUwrY2NzWlVlWjZ4enFaa0xuQlI2NlRHQmxJcHF5N2hydVV0a01Bc3pWcWxEdllld0RFNHI2NVB4U3EycktPVzJVVHkyMUc2Y2s2R1FydTdRPT0tLTNYMG0xdmF0NDFpK0VFQ2xxM1NpeXc9PQ%3D%3D--a8fbf14429375febde65b65d70db9a0a64efcd3e; path=/; HttpOnly"
+      ],
+      "x-powered-by": "Phusion Passenger 5.1.0",
+      "server": "nginx/1.10.2 + Phusion Passenger 5.1.0"
+    },
+    "data": [
+      {
+        "slug": "rqwk-1751",
+        "global_id": "01ED6A8KWD1454FGXEPRNBV23N",
+        "external_id": "d7e78498-6ae1-45ff-b2e9-20d98520fec6",
+        "external_id_display": "520fec6",
+        "mosvy_number": "480",
+        "given_name": "Taylor",
+        "family_name": "Downs",
+        "gender": "prefer_not_to_say",
+        "date_of_birth": "2011-01-01",
+        "location_current_village_code": "",
+        "address_current_village_code": "",
+        "organization_id": 46,
+        "organization_name": "cif",
+        "external_case_worker_name": null,
+        "external_case_worker_id": null,
+        "reason_for_referral": "test",
+        "services": [],
+        "status": "Accepted",
+        "case_worker_name": "Janani Panchalingam",
+        "case_worker_mobile": "8765432",
+        "is_referred": true,
+        "referral_consent_form": [
+          "https://cif-web-assets-staging.s3.amazonaws.com/uploads/referral/consent_form/87/myAvatar_2_.png"
+        ],
+        "organization_address_code": "120611"
+      },
+      {
+        "given_name": "Aleksa",
+        "family_name": "",
+        "local_given_name": "",
+        "local_family_name": "",
+        "gender": "male",
+        "date_of_birth": null,
+        "global_id": "01EHY1S54RM2TYJG2BM6X7RC0J",
+        "slug": "wuol-1789",
+        "external_id": "",
+        "external_id_display": "",
+        "mosvy_number": "",
+        "location_current_village_code": null
+      },
+      {
+        "given_name": "Mamadou",
+        "family_name": "Cisse",
+        "local_given_name": "Mamadou",
+        "local_family_name": "Cisse",
+        "gender": "male",
+        "date_of_birth": "2012-04-23",
+        "global_id": "01E6AT3ANS1PFSR6S00VPX8PVR",
+        "slug": "cie-836",
+        "external_id": null,
+        "external_id_display": null,
+        "mosvy_number": null,
+        "location_current_village_code": null
+      }
+    ]
+  },
+  "configuration": {
+    "baseUrl": "[--REDACTED--]",
+    "username": "[--REDACTED--]",
+    "password": "[--REDACTED--]"
+  },
+  "thisQueryDate": "2020-09-11 11:50:36",
+  "lastQueryDate": "2020-07-14 00:00:00"
+}
