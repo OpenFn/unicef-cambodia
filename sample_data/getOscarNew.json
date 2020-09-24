@@ -1,0 +1,248 @@
+{
+    "references": [
+      {},
+      {
+        "__cookie": "",
+        "__headers": {
+          "content-type": "application/json; charset=utf-8",
+          "transfer-encoding": "chunked",
+          "connection": "close",
+          "status": "200 OK",
+          "cache-control": "max-age=0, private, must-revalidate",
+          "vary": "Origin",
+          "x-xss-protection": "1; mode=block",
+          "access-token": "ozLM2ZxtZq2JmA8dpR7eOg",
+          "x-request-id": "a4e92c5c-b74a-40c9-8966-e51ccdaf4039",
+          "token-type": "Bearer",
+          "expiry": "1601533618",
+          "uid": "api.user@example.com",
+          "client": "2vvW3DoFxJxE5cfxQo-lEg",
+          "x-frame-options": "SAMEORIGIN",
+          "etag": "W/\"ebb8092eade531f3f4e1f82aaaef8007\"",
+          "x-content-type-options": "nosniff",
+          "x-runtime": "0.789223",
+          "date": "Thu, 24 Sep 2020 06:26:59 GMT",
+          "x-powered-by": "Phusion Passenger 5.1.0",
+          "server": "nginx/1.10.2 + Phusion Passenger 5.1.0"
+        },
+        "body": {
+          "data": {
+            "id": 20,
+            "first_name": "External User",
+            "last_name": "External User",
+            "roles": "case worker",
+            "start_date": null,
+            "job_title": "",
+            "mobile": "",
+            "date_of_birth": null,
+            "archived": false,
+            "province_id": null,
+            "department_id": null,
+            "email": "api.user@example.com",
+            "clients_count": 0,
+            "cases_count": 0,
+            "tasks_count": 0,
+            "provider": "email",
+            "uid": "api.user@example.com",
+            "admin": true,
+            "changelogs_count": 0,
+            "organization_id": null,
+            "disable": false,
+            "expires_at": null,
+            "task_notify": true,
+            "manager_id": null,
+            "calendar_integration": false,
+            "pin_number": null,
+            "manager_ids": [],
+            "program_warning": false,
+            "staff_performance_notification": true,
+            "pin_code": "",
+            "domain_warning": false,
+            "referral_notification": true,
+            "gender": "prefer not to say",
+            "enable_gov_log_in": false,
+            "enable_research_log_in": false,
+            "deleted_at": null,
+            "activated_at": null,
+            "deactivated_at": null,
+            "preferred_language": "en",
+            "organization_name": null,
+            "profile": null
+          }
+        }
+      }
+    ],
+    "data": {
+      "__cookie": "_cif-web_session=OUVuUm0rbHpKeXdKemsvNWI4eTA4UFg5Tkt6dE9ZbHFoMmU2YzFSNC9QMTBUU3pmbnpQSW13NjBLQlZEdnNOeXhqaDI0TGp4Ty9kcklxamcwSnhvek1iYVoxUmxQNjV3WGdVbHFMRzJnU2ZIN2R2bzFGVDRKV212cWpNWEJweXlwT3l2b3ZmRHZXS1QrMEVIY09oTVlBPT0tLVFUM3ptYnIvQkdYL1NlOERiNHFTUFE9PQ%3D%3D--9c7a6d357846fdd8921bd23f045b402822429e44",
+      "__headers": {
+        "content-type": "application/json; charset=utf-8",
+        "transfer-encoding": "chunked",
+        "connection": "close",
+        "status": "200 OK",
+        "cache-control": "max-age=0, private, must-revalidate",
+        "vary": "Origin",
+        "x-xss-protection": "1; mode=block",
+        "x-request-id": "c2470b28-737c-4f62-a546-9bf7937193c3",
+        "etag": "W/\"a555ab5e91cae2491444b697b144ebbc\"",
+        "x-frame-options": "SAMEORIGIN",
+        "x-runtime": "9.678494",
+        "x-content-type-options": "nosniff",
+        "date": "Thu, 24 Sep 2020 06:27:09 GMT",
+        "set-cookie": [
+          "_cif-web_session=OUVuUm0rbHpKeXdKemsvNWI4eTA4UFg5Tkt6dE9ZbHFoMmU2YzFSNC9QMTBUU3pmbnpQSW13NjBLQlZEdnNOeXhqaDI0TGp4Ty9kcklxamcwSnhvek1iYVoxUmxQNjV3WGdVbHFMRzJnU2ZIN2R2bzFGVDRKV212cWpNWEJweXlwT3l2b3ZmRHZXS1QrMEVIY09oTVlBPT0tLVFUM3ptYnIvQkdYL1NlOERiNHFTUFE9PQ%3D%3D--9c7a6d357846fdd8921bd23f045b402822429e44; path=/; HttpOnly"
+        ],
+        "x-powered-by": "Phusion Passenger 5.1.0",
+        "server": "nginx/1.10.2 + Phusion Passenger 5.1.0"
+      },
+      "data": [
+        {
+          "slug": "qvmx-1787",
+          "global_id": "01EHAZ3XN6DJX0GQGR8R5KV7AZ",
+          "external_id": "",
+          "external_id_display": "",
+          "mosvy_number": "",
+          "given_name": "Mamadou",
+          "family_name": "Lakhassane",
+          "gender": "other",
+          "date_of_birth": "2014-09-08",
+          "location_current_village_code": "02040302",
+          "address_current_village_code": "02040302",
+          "organization_id": 46,
+          "organization_name": "cif",
+          "external_case_worker_name": null,
+          "external_case_worker_id": null,
+          "reason_for_referral": "reason",
+          "services": [],
+          "status": "Accepted",
+          "case_worker_name": "Aleksa Krolls",
+          "case_worker_mobile": "0963052453",
+          "is_referred": true,
+          "referral_consent_form": [
+            "https://cif-web-assets-staging.s3.amazonaws.com/uploads/referral/consent_form/180/Screen_Shot_2020-09-06_at_11.37.37_PM.png"
+          ],
+          "organization_address_code": "120611"
+        },
+        {
+          "slug": "lxis-1762",
+          "global_id": "01EDB4PA6B9D0P8C9B119SM02R",
+          "external_id": "",
+          "external_id_display": "",
+          "mosvy_number": "",
+          "given_name": "Julia",
+          "family_name": "Test",
+          "gender": "prefer_not_to_say",
+          "date_of_birth": "2012-02-02",
+          "location_current_village_code": "",
+          "address_current_village_code": "",
+          "organization_id": 46,
+          "organization_name": "cif",
+          "external_case_worker_name": null,
+          "external_case_worker_id": null,
+          "reason_for_referral": "reason",
+          "services": [
+            {
+              "enrollment_date": "2020-07-16",
+              "uuid": "11226c6d-d7b8-4272-b45e-85cf635b9fba",
+              "name": "Long term foster care"
+            },
+            {
+              "enrollment_date": "2020-07-16",
+              "uuid": "21905571-81c2-4870-ab33-db6cde56bbbe",
+              "name": "Domestic adoption support"
+            }
+          ],
+          "status": "Active",
+          "case_worker_name": "Janani Panchalingam",
+          "case_worker_mobile": "8765432",
+          "is_referred": true,
+          "referral_consent_form": [
+            "https://cif-web-assets-staging.s3.amazonaws.com/uploads/referral/consent_form/101/myAvatar.png"
+          ],
+          "organization_address_code": "120611"
+        },
+        {
+          "slug": "mxwt-1753",
+          "global_id": "01EDAP5N1WBWBSRSH59K64H3GJ",
+          "external_id": "",
+          "external_id_display": "",
+          "mosvy_number": "",
+          "given_name": "John",
+          "family_name": "OSCaR",
+          "gender": "female",
+          "date_of_birth": "2012-02-02",
+          "location_current_village_code": "",
+          "address_current_village_code": "",
+          "organization_id": 46,
+          "organization_name": "cif",
+          "external_case_worker_name": null,
+          "external_case_worker_id": null,
+          "reason_for_referral": "reason for referral",
+          "services": [
+            {
+              "enrollment_date": "2020-07-15",
+              "uuid": "827ba321-5ed9-49ce-8494-b70993934733",
+              "name": "Therapeutic interventions"
+            },
+            {
+              "enrollment_date": "2020-07-15",
+              "uuid": "8982daae-2349-4a3b-a0ad-5b0a9560e227",
+              "name": "Disability-aid provision"
+            }
+          ],
+          "status": "Active",
+          "case_worker_name": "Janani Panchalingam",
+          "case_worker_mobile": "8765432",
+          "is_referred": true,
+          "referral_consent_form": [
+            "https://cif-web-assets-staging.s3.amazonaws.com/uploads/referral/consent_form/89/myAvatar.png"
+          ],
+          "organization_address_code": "120611"
+        },
+        {
+          "given_name": "Nica",
+          "family_name": "James",
+          "local_given_name": "Nica",
+          "local_family_name": "James",
+          "gender": "female",
+          "date_of_birth": null,
+          "global_id": "01E6AT3AADBE1DF6R442JGB5BC",
+          "slug": "bja-1022",
+          "external_id": "",
+          "external_id_display": "",
+          "mosvy_number": "",
+          "location_current_village_code": "",
+          "case_worker_name": "Aleksa Krolls",
+          "case_worker_mobile": "0969331660",
+          "is_referred": false,
+          "organization_name": "cif",
+          "organization_address_code": "120611"
+        },
+        {
+          "given_name": "Test",
+          "family_name": "Sok",
+          "local_given_name": "ទី",
+          "local_family_name": "សុខ",
+          "gender": "male",
+          "date_of_birth": "2006-01-15",
+          "global_id": "01E6AT3BEAFMQDVBHTJHZZ8Y00",
+          "slug": "eiu-890",
+          "external_id": "",
+          "external_id_display": "",
+          "mosvy_number": "",
+          "location_current_village_code": "01070101",
+          "case_worker_name": "Aleksa Krolls",
+          "case_worker_mobile": "089 57 07 37, 0963052453",
+          "is_referred": false,
+          "organization_name": "cif",
+          "organization_address_code": "120611"
+        }
+      ]
+    },
+    "configuration": {
+      "baseUrl": "http://start.oscarhq-staging.com",
+      "username": "user",
+      "password": "pwd"
+    },
+    "thisQueryDate": "2020-09-24 06:27:30",
+    "lastQueryDate": "2020-07-14 00:00:00"
+  }
