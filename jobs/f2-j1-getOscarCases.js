@@ -44,7 +44,9 @@ post(
           state.data.data ? state.data.data.map(c => c.global_id) : ''
         )}`
       );
-      return { ...state, lastQueryDate: state.thisQueryDate };
+      state.lastQueryDate = state.thisQueryDate;
+      console.log(`Updated state.lastQueryDate to: ${state.lastQueryDate}`);
+      return state;
     }
   )
 );
