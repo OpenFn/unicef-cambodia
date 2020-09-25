@@ -402,7 +402,7 @@ alterState(state => {
         if (user) {
           return user;
         } else {
-          throw 'Cannot determine user from provinceUserMap';
+          throw 'Province user not found for this case. Check the case location and list of available province users.';
         }
       } else {
         return null;
@@ -464,7 +464,7 @@ alterState(state => {
       if (source) {
         return agencyMap[`agency-${source}`];
       } else {
-        throw 'No agency user found for the organization ${organization_name}. Please create an agency user for this organization and update the job accordingly.';
+        throw `No agency user found for the organization ${c.organization_name}. Please create an agency user for this organization and update the job accordingly.`;
       }
     }
 
@@ -498,7 +498,7 @@ alterState(state => {
         protection_status: oscarValue(c.external_id) ? null : 'oscar_referral',
         service_implementing_agency: `agency-${c.organization_name}`,
         owned_by: oscarValue(c.external_id) ? null : setUser(c),
-        owned_by_text: `${c.case_worker_name}`+' '+`${c.case_worker_mobile}`,
+        owned_by_text: `${c.case_worker_name} ${c.case_worker_mobile}`,
         oscar_reason_for_exiting: c.reason_for_exiting,
         has_referral: c.is_referred,
         consent_for_services: oscarValue(c.external_id) ? null : true,
@@ -532,14 +532,7 @@ alterState(state => {
     };
 
     removeEmpty(primeroCase);
-    if (primeroCase.child.owned_by) {
-      return primeroCase;
-    } else {
-      console.warn(
-        'WARNING: Invalid Oscar location_current_village_code or address_current_village_code'
-      );
-      return false;
-    }
+    return primeroCase;
   });
 
   // This removes all cases set to `false`;
