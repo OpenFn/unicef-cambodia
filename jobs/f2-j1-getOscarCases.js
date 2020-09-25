@@ -44,7 +44,7 @@ post(
           state.data.data ? state.data.data.map(c => c.global_id) : ''
         )}`
       );
-      return { ...state, lastQueryDate: '2020-07-14 00:00:00'}; //state.lastQueryDate };
+      return { ...state, lastQueryDate: state.lastQueryDate };
     }
   )
 );
