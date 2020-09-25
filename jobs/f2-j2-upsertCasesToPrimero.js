@@ -460,7 +460,8 @@ alterState(state => {
         'agency-wmo': 'agency-wmo-user',
       };
 
-      const source = oscarValue(c.organization_name);
+      const source = oscarValue(c.organization_name) && c.organization_name;
+
       if (source) {
         return agencyMap[`agency-${source}`];
       } else {
