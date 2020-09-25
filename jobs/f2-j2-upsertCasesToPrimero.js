@@ -1,6 +1,14 @@
 // Oscar cases ---> Primero
 // User Story 2: 'View Oscar cases in Primero' AND User Story 4: 'Sending referrals to Primero'
 alterState(state => {
+  // ===========================================================================
+  // NOTE: As of September 25, 2020, Oscar has changed the structure of this
+  // payload for a subset of cases, depending on whether or not data exists in
+  // the services array. Below, we create an empty array (if it's been removed
+  // to ensure that all payloads adhere to the integration contract.
+  state.data.data = state.data.data.map(c => ({ ...c, services: c.services || [] }));
+  // ===========================================================================
+
   const serviceMap = {
     'Generalist social work / case work': {
       subtype: 'social_work_case_work_generalist',
