@@ -34,7 +34,7 @@ post(
         uid: state.configuration.username,
       }),
       query: {
-        since_date: state.lastQueryDate || '2020-07-09 00:00:00', //'2020-07-14 00:00:00',
+        since_date: state.lastQueryDate || '2020-09-20 00:00:00', //'2020-07-14 00:00:00',
         //referred_external: true, //pull ALL cases, not just referrals
       },
     },
@@ -44,7 +44,7 @@ post(
           state.data.data ? state.data.data.map(c => c.global_id) : ''
         )}`
       );
-      return { ...state, lastQueryDate: state.lastQueryDate };
+      return { ...state, lastQueryDate: state.thisQueryDate };
     }
   )
 );
