@@ -2,8 +2,8 @@
 alterState(state => {
   console.log('The last transition update before this run is: ' + state.lastUpdated);
   console.log('The last transition creation before this run is: ' + state.lastCreated);
-  state.data = {};
-  return state;
+  
+  return { ...state, data: {}, references: [] };
 });
 
 // GET new Primero cases
@@ -68,6 +68,6 @@ getCases(
 
     console.log('The last transition update is now: ' + state.lastUpdated);
     console.log('The last transition creation is now: ' + state.lastCreated);
-    return { ...state, references: [] };
+    return state;
   }
 );
