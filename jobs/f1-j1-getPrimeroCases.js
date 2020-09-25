@@ -18,10 +18,10 @@ getCases(
       or: {
         //TO DISCUSS --> date filters, OR operator
         transitions_created_at: `or_op||date_range||${
-          state.lastCreated || '20-09-2020'
+          state.lastCreated || '10-09-2020'
         }.01-01-4020`,
         transitions_changed_at: `or_op||date_range||${
-          state.lastUpdated || '20-09-2020 00:00'
+          state.lastUpdated || '10-09-2020 00:00'
         }.01-01-4020 00:00`,
       },
       service_response_types: 'list||referral_to_oscar',
