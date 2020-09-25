@@ -2,7 +2,7 @@
 alterState(state => {
   console.log('The last transition update before this run is: ' + state.lastUpdated);
   console.log('The last transition creation before this run is: ' + state.lastCreated);
-  
+
   return { ...state, data: {}, references: [] };
 });
 
@@ -18,10 +18,10 @@ getCases(
       or: {
         //TO DISCUSS --> date filters, OR operator
         transitions_created_at: `or_op||date_range||${
-          state.lastCreated || '03-06-2020'
+          state.lastCreated || '20-09-2020'
         }.01-01-4020`,
         transitions_changed_at: `or_op||date_range||${
-          state.lastUpdated || '03-06-2020 00:00'
+          state.lastUpdated || '20-09-2020 00:00'
         }.01-01-4020 00:00`,
       },
       service_response_types: 'list||referral_to_oscar',
