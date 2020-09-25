@@ -1,7 +1,8 @@
 // Clear data from previous runs.
 alterState(state => {
+  console.log('The last transition update before this run is: ' + state.lastUpdated);
+  console.log('The last transition creation before this run is: ' + state.lastCreated);
   state.data = {};
-  state.references = [];
   return state;
 });
 
@@ -65,9 +66,8 @@ getCases(
       state.lastUpdated = `${lastUpdateDay}-${lastUpdateParts[1]}-${lastUpdateParts[0]} ${lastUpdateTimes[0]}:${lastUpdateTimes[1]}`;
     }
 
-    console.log('The last transition update is: ' + state.lastUpdated);
-    console.log('The last transition creation is: ' + state.lastCreated);
-
-    return state;
+    console.log('The last transition update is now: ' + state.lastUpdated);
+    console.log('The last transition creation is now: ' + state.lastCreated);
+    return { ...state, references: [] };
   }
 );
