@@ -12,11 +12,8 @@ getCases(
   {
     remote: true,
     scope: {
-      /*transitions_created_at: `date_range||${
-          state.lastCreated || '01-01-2020'
-        }.01-01-4020`,*/
       or: {
-        //TO DISCUSS --> date filters, OR operator
+        //Two case date fields we must check for updates
         transitions_created_at: `or_op||date_range||${
           state.lastCreated || '10-09-2020'
         }.01-01-4020`,
@@ -24,7 +21,7 @@ getCases(
           state.lastUpdated || '10-09-2020 00:00'
         }.01-01-4020 00:00`,
       },
-      service_response_types: 'list||referral_to_oscar',
+      service_response_types: 'list||referral_to_oscar', 
     },
   },
   state => {
@@ -51,8 +48,6 @@ getCases(
     }
 
     const updateDates = state.data
-      // Do we need to check for transitions_changed_at date specifically? It
-      // seems like transitions_changed_at should be the ONLY cursor we use.
       .filter(x => x.transitions_changed_at)
       .map(x => x.transitions_changed_at)
       .sort((a, b) => b - a);
