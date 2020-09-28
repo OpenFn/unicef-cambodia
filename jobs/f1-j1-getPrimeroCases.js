@@ -21,7 +21,8 @@ getCases(
           state.lastUpdated || '10-09-2020 00:00'
         }.01-01-4020 00:00`,
       },
-      service_response_types: 'list||referral_to_oscar', 
+    oscar_number:'range||*.*', //new filter to fetch ALL oscar cases
+      //service_response_types: 'list||referral_to_oscar', //old filter -only pulls cases w/ referrals
     },
   },
   state => {
