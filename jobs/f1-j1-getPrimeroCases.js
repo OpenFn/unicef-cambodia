@@ -15,10 +15,10 @@ getCases(
       or: {
         //Two case date fields we must check for updates
         transitions_created_at: `or_op||date_range||${
-          state.lastCreated || '10-09-2020'
+          '25-09-2020'//state.lastCreated || '10-09-2020' //TEST CURSOS
         }.01-01-4020`,
         transitions_changed_at: `or_op||date_range||${
-          state.lastUpdated || '10-09-2020 00:00'
+          '25-09-2020 00:00'//state.lastUpdated || '10-09-2020 00:00'//TEST CURSOS
         }.01-01-4020 00:00`,
       },
       oscar_number: 'range||*.*', //new filter to fetch ALL oscar cases
