@@ -1,5 +1,6 @@
 // Clear data from previous runs.
 alterState(state => {
+  console.log(state);
   console.log('The last transition update before this run is: ' + state.lastUpdated);
   console.log('The last transition creation before this run is: ' + state.lastCreated);
 
@@ -21,7 +22,7 @@ getCases(
           state.lastUpdated || '10-09-2020 00:00'
         }.01-01-4020 00:00`,
       },
-    oscar_number:'range||*.*', //new filter to fetch ALL oscar cases
+      oscar_number: 'range||*.*', //new filter to fetch ALL oscar cases
       //service_response_types: 'list||referral_to_oscar', //old filter -only pulls cases w/ referrals
     },
   },
