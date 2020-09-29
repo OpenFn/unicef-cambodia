@@ -46,10 +46,6 @@ getCases(
         }
         return c.transitions_changed_at;
       })
-      .map(x => {
-        console.log(x);
-        return x;
-      })
       .sort((a, b) => b - a)[0];
 
     if (lastCreation) {
@@ -61,17 +57,13 @@ getCases(
     const lastUpdate = state.data
       .filter(x => x.transitions_changed_at)
       .map(x => x.transitions_changed_at)
-      .map(x => {
-        console.log(x);
-        return x;
-      })
       .sort((a, b) => b - a)[0];
 
     if (lastUpdate) {
       console.log(`Found cases w/ updates, updating 'last updated case' date using ${lastUpdate}.`);
       var { y, m, d, t } = parseDates(lastUpdate);
-      var [h, m, s] = t.split(':');
-      state.lastUpdated = `${d}-${m}-${y} ${h}:${m}`;
+      var [hr, min, sec] = t.split(':');
+      state.lastUpdated = `${d}-${m}-${y} ${hr}:${min}`;
     }
 
     console.log('The last transition update is now: ' + state.lastUpdated);
