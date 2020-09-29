@@ -20,10 +20,10 @@ getCases(
         transitions_changed_at: `or_op||date_range||${
           state.lastUpdated || '25-09-2020 00:00' // TEST CURSOR
         }.01-01-4020 00:00`,
-        oscar_number: 'range||*.*', //new filter to fetch ALL oscar cases
-        service_response_types: 'list||referral_to_oscar', //old filter -only pulls referrals
       },
-      
+      //oscar_number: 'range||*.*', //new filter to fetch ALL oscar cases
+      service_response_types: 'list||referral_to_oscar', //old filter -only pulls referrals
+
     },
     per: 1000,
   },
