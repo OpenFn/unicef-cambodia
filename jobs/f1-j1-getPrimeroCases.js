@@ -24,6 +24,7 @@ getCases(
       oscar_number: 'range||*.*', //new filter to fetch ALL oscar cases
       //service_response_types: 'list||referral_to_oscar', //old filter -only pulls cases w/ referrals
     },
+    per: 1000,
   },
   state => {
     console.log(
