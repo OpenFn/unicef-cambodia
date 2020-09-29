@@ -1,6 +1,6 @@
 // Clear data from previous runs.
 alterState(state => {
-  console.log(state);
+  console.log(state.references);
   console.log('The last transition update before this run is: ' + state.lastUpdated);
   console.log('The last transition creation before this run is: ' + state.lastCreated);
 
