@@ -1,5 +1,20 @@
 // Primero cases --> OSCaR
 // User Story 1: Generating government referrals, creating referrals in Oscar
+alterState(state => {
+  // ===========================================================================
+  // NOTE: As of September 25, 2020, Oscar has changed the structure of this
+  // payload for a subset of cases, depending on whether or not data exists in
+  // the services array. Below, we create an empty array (if it's been removed
+  // to ensure that all payloads adhere to the integration contract.
+  state.data = state.data.map(c => ({
+    ...c,
+    services_section: c.services_section || [],
+    transitions: c.transitions || [],
+  }));
+  // ===========================================================================
+  return state;
+});
+
 post(
   // Oscar authentication, once per run
   '/api/v1/auth/sign_in',
@@ -123,7 +138,7 @@ post(
 
         const c = state.data;
         const lastTransitionNote =
-          c.transitions &&
+          c.transitions.length > 0 &&
           c.transitions.sort((a, b) => (a.created_at < b.created_at ? 1 : -1))[0].notes;
 
         console.log(
