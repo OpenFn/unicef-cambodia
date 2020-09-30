@@ -502,9 +502,9 @@ alterState(state => {
         owned_by_text: `${c.case_worker_name} ${c.case_worker_mobile}`,
         oscar_reason_for_exiting: c.reason_for_exiting,
         has_referral: c.is_referred,
-        consent_for_services: oscarValue(c.external_id) || (c.is_referred==false) ? null : true,
-        disclosure_other_orgs: oscarValue(c.external_id)|| (c.is_referred==false) ? null : true,
-        interview_subject: oscarValue(c.external_id) || (c.is_referred==false) ? null : 'other',
+        consent_for_services: oscarValue(c.external_id) || c.is_referred == false ? null : true,
+        disclosure_other_orgs: oscarValue(c.external_id) || c.is_referred == false ? null : true,
+        interview_subject: oscarValue(c.external_id) || c.is_referred == false ? null : 'other',
         content_source_other: oscarValue(c.external_id) ? null : 'OSCaR',
         module_id: 'primeromodule-cp',
         registration_date: oscarValue(c.external_id)

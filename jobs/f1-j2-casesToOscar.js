@@ -2,7 +2,7 @@
 // User Story 1: Generating government referrals, creating referrals in Oscar
 alterState(state => {
   // ===========================================================================
-  // NOTE: As of September 25, 2020, Oscar has changed the structure of this
+  // NOTE: As of September 25, 2020, Primero has changed the structure of this
   // payload for a subset of cases, depending on whether or not data exists in
   // the services array. Below, we create an empty array (if it's been removed
   // to ensure that all payloads adhere to the integration contract.
