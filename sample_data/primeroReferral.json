@@ -1,0 +1,362 @@
+{
+  "references": [
+    {}
+  ],
+  "data": [
+    {
+      "owned_by": "mgrbtb",
+      "owned_by_agency": "agency-cwd",
+      "module_id": "primeromodule-cp",
+      "created_at": "2020/08/24 13:17:05 +0000",
+      "case_id_display": "31de2d0",
+      "oscar_number": "01EGG9DKEQNRB1G6T2JW1EZVVW",
+      "oscar_short_id": "kzcf-1300",
+      "oscar_status": "Active",
+      "name_last": "oscar",
+      "name_first": "test",
+      "sex": "male",
+      "date_of_birth": "2012/02/02",
+      "age": 8,
+      "location_current": "2020202",
+      "interview_subject": "other",
+      "services_section": [
+        {
+          "unique_id": "69bcca6c-535b-4f22-b9b6-6d1d22955a61",
+          "service_response_type": "referral_to_oscar",
+          "service_type": "anti_trafficking",
+          "service_subtype": [
+            "anti_trafficking_transitional_accomodation",
+            "anti_trafficking_post_trafficking"
+          ],
+          "service_response_day_time": "2020/09/03 13:42:00 +0000",
+          "service_response_timeframe": "1_day",
+          "service_implementing_agency": "agency-hfj",
+          "service_implementing_agency_individual": "agency-hfj-user",
+          "service_implemented": "implemented",
+          "service_implemented_day_time": "2020/08/11 13:36:00 +0000"
+        },
+        {
+          "unique_id": "042ffb1c-51de-404b-b69b-fdb9e15c9d36",
+          "service_response_type": "referral_from_oscar",
+          "service_type": "social_work_case_work",
+          "service_subtype": [
+            "social_work_case_work_generalist"
+          ],
+          "service_type_text": "social_work_case_work",
+          "service_referral_notes": "\r\n* Contact Phone Number\r\n* What is the reason for this referral?",
+          "service_implemented": "implemented",
+          "service_implemented_day_time": "2020/08/24 00:00:00 +0000",
+          "service_type_details_text": "n/a",
+          "oscar_case_worker_name": "Aleksa Krolls",
+          "oscar_referring_organization": "agency-demo"
+        },
+        {
+          "unique_id": "155c6b46-ac10-4226-b9fd-6e117111b08c",
+          "service_response_type": "referral_from_oscar",
+          "service_type": "family_based_care",
+          "service_subtype": [
+            "family_based_care_emergency_foster"
+          ],
+          "service_type_text": "family_based_care",
+          "service_referral_notes": "\r\n* Contact Phone Number\r\n* What is the reason for this referral?",
+          "service_implemented": "implemented",
+          "service_implemented_day_time": "2020/08/24 00:00:00 +0000",
+          "service_type_details_text": "n/a",
+          "oscar_case_worker_name": "Aleksa Krolls",
+          "oscar_referring_organization": "agency-demo"
+        },
+        {
+          "unique_id": "7b97ef20-4c25-4d83-b2cb-60efc1ba300f",
+          "service_response_type": "referral_from_oscar",
+          "service_type": "medical_support",
+          "service_subtype": [
+            "medical_support_access_care"
+          ],
+          "service_type_text": "medical_support",
+          "service_referral_notes": "\r\n* Contact Phone Number\r\n* What is the reason for this referral?",
+          "service_implemented": "implemented",
+          "service_implemented_day_time": "2020/08/24 00:00:00 +0000",
+          "service_type_details_text": "n/a",
+          "oscar_case_worker_name": "Aleksa Krolls",
+          "oscar_referring_organization": "agency-demo"
+        }
+      ],
+      "transitions": [
+        {
+          "unique_id": "d21736d7-bd4f-471b-b481-4e7e92b53365",
+          "type": "referral",
+          "service": "medical_support",
+          "service_section_unique_id": "7b97ef20-4c25-4d83-b2cb-60efc1ba300f",
+          "created_at": "2020/09/03",
+          "id": "edf6931e-2264-46bc-a94e-27b3a605569f"
+        },
+        {
+          "unique_id": "6f00dc80-d985-4ba8-a230-34bcaf5a91c9",
+          "type": "referral",
+          "service": "family_based_care",
+          "service_section_unique_id": "155c6b46-ac10-4226-b9fd-6e117111b08c",
+          "created_at": "2020/09/03",
+          "id": "f0aab6b5-d9f7-43e3-86fe-08c57ce20a66"
+        },
+        {
+          "unique_id": "11526f8c-7e8d-4303-8f8a-b00836267b73",
+          "type": "referral",
+          "service": "social_work_case_work",
+          "service_section_unique_id": "042ffb1c-51de-404b-b69b-fdb9e15c9d36",
+          "created_at": "2020/09/03",
+          "id": "ee4c6073-5e25-4bfc-ac6e-1e1b9261f9b4"
+        }
+      ],
+      "_id": "e57b7a4b475f6b851ccc96eaa52ef44b",
+      "case_id": "c5c387b2-dd9e-4bba-bce1-d4ac831de2d0",
+      "protection_status": "oscar_referral",
+      "transitions_changed_at": "2020/08/25 10:45:32 +0000"
+    },
+    {
+        "owned_by": "agency-cif-user",
+        "owned_by_agency": "agency-cif",
+        "owned_by_phone": "",
+        "module_id": "primeromodule-cp",
+        "created_at": "2020/10/02 03:45:24 +0000",
+        "case_id_display": "2e3732f",
+        "oscar_number": "01EDN2NA02W3WB5DH4WS6AKX5X",
+        "oscar_short_id": "efnt-1539",
+        "name_last": "Krolls",
+        "name_first": "Aleksa",
+        "sex": "female",
+        "date_of_birth": "2010/08/12",
+        "age": 10,
+        "location_current": "14050503",
+        "_id": "62ec45de9fc977e732a87729de4a480d",
+        "case_id": "6f4c1d5b-ef25-4651-9c82-650af2e3732f",
+        "protection_status": "oscar_referral"
+      },
+      {
+        "owned_by": "mgrbmc",
+        "owned_by_agency": "agency-cwd",
+        "owned_by_phone": "",
+        "module_id": "primeromodule-cp",
+        "created_at": "2020/09/29 21:33:33 +0000",
+        "case_id_display": "cedb069",
+        "oscar_number": "01EKDWDA7S4X0FMA36BXWRXQ3E",
+        "oscar_short_id": "saki-1306",
+        "oscar_status": "Active",
+        "name_last": "Weasley",
+        "name_first": "Ron",
+        "sex": "male",
+        "date_of_birth": "2014/07/29",
+        "age": 6,
+        "location_current": "1040202",
+        "interview_subject": "other",
+        "services_section": [
+          {
+            "unique_id": "042ffb1c-51de-404b-b69b-fdb9e15c9d36",
+            "service_response_type": "referral_from_oscar",
+            "service_type": "social_work_case_work",
+            "service_subtype": [
+              "social_work_case_work_generalist"
+            ],
+            "service_type_text": "social_work_case_work",
+            "service_referral_notes": "reason",
+            "service_implemented": "implemented",
+            "service_implemented_day_time": "2020/09/30 00:00:00 +0000",
+            "service_type_details_text": "n/a",
+            "oscar_case_worker_name": "ABLE Test",
+            "oscar_referring_organization": "agency-demo",
+            "oscar_case_worker_telephone": "+61433736766"
+          },
+          {
+            "unique_id": "155c6b46-ac10-4226-b9fd-6e117111b08c",
+            "service_response_type": "referral_from_oscar",
+            "service_type": "family_based_care",
+            "service_subtype": [
+              "family_based_care_emergency_foster",
+              "family_based_care_family_preservation"
+            ],
+            "service_type_text": "family_based_care",
+            "service_referral_notes": "reason",
+            "service_implemented": "implemented",
+            "service_implemented_day_time": "2020/09/30 00:00:00 +0000",
+            "service_type_details_text": "n/a",
+            "oscar_case_worker_name": "ABLE Test",
+            "oscar_referring_organization": "agency-demo",
+            "oscar_case_worker_telephone": "+61433736766"
+          },
+          {
+            "unique_id": "7b97ef20-4c25-4d83-b2cb-60efc1ba300f",
+            "service_response_type": "referral_from_oscar",
+            "service_type": "medical_support",
+            "service_subtype": [
+              "medical_support_access_care"
+            ],
+            "service_type_text": "medical_support",
+            "service_referral_notes": "reason",
+            "service_implemented": "implemented",
+            "service_implemented_day_time": "2020/09/30 00:00:00 +0000",
+            "service_type_details_text": "n/a",
+            "oscar_case_worker_name": "ABLE Test",
+            "oscar_referring_organization": "agency-demo",
+            "oscar_case_worker_telephone": "+61433736766"
+          },
+          {
+            "unique_id": "a5647de9-4849-4106-a85c-6dbc0ac0ba50",
+            "service_response_type": "referral_from_oscar",
+            "service_type": "training_education",
+            "service_subtype": [
+              "training_education_school_support",
+              "training_education_scholarships"
+            ],
+            "service_type_text": "training_education",
+            "service_referral_notes": "reason",
+            "service_implemented": "implemented",
+            "service_implemented_day_time": "2020/09/30 00:00:00 +0000",
+            "service_type_details_text": "n/a",
+            "oscar_case_worker_name": "ABLE Test",
+            "oscar_referring_organization": "agency-demo",
+            "oscar_case_worker_telephone": "+61433736766"
+          }
+        ],
+        "transitions": [
+          {
+            "unique_id": "f9857b96-bcef-4fe5-9229-908acbc7ac6e",
+            "type": "referral",
+            "service": "social_work_case_work",
+            "service_section_unique_id": "042ffb1c-51de-404b-b69b-fdb9e15c9d36",
+            "created_at": "2020/09/30",
+            "id": "6157f527-e088-4f18-9d17-cc80c737fa68"
+          },
+          {
+            "unique_id": "867a63e3-1d99-4e91-9fcb-0224510561ab",
+            "type": "referral",
+            "service": "family_based_care",
+            "service_section_unique_id": "155c6b46-ac10-4226-b9fd-6e117111b08c",
+            "created_at": "2020/09/30",
+            "id": "9ffda054-6f63-48cc-8d5d-910d1bf2c102"
+          },
+          {
+            "unique_id": "30594606-03fd-4738-a706-3fdabeb1b717",
+            "type": "referral",
+            "service": "medical_support",
+            "service_section_unique_id": "7b97ef20-4c25-4d83-b2cb-60efc1ba300f",
+            "created_at": "2020/09/30",
+            "id": "2298bc29-a0b4-4d84-a111-e33793f04c46"
+          },
+          {
+            "unique_id": "c875cca9-a356-41f0-9b4d-cf3cfc1ba657",
+            "type": "referral",
+            "service": "training_education",
+            "service_section_unique_id": "a5647de9-4849-4106-a85c-6dbc0ac0ba50",
+            "created_at": "2020/09/30",
+            "id": "a381aa29-763b-46be-9366-99df8fddab29"
+          },
+          {
+            "unique_id": "8b7f04d5-4c30-4226-843f-c7cdf5c5e732",
+            "type": "referral",
+            "service": "social_work_case_work",
+            "service_section_unique_id": "042ffb1c-51de-404b-b69b-fdb9e15c9d36",
+            "created_at": "2020/09/30",
+            "id": "520f4dfa-1df2-4f08-a1b9-ec20c0db212e"
+          },
+          {
+            "unique_id": "763246a2-a362-4609-90ca-430094e520cc",
+            "type": "referral",
+            "service": "family_based_care",
+            "service_section_unique_id": "155c6b46-ac10-4226-b9fd-6e117111b08c",
+            "created_at": "2020/09/30",
+            "id": "4d81ea53-018b-4f1c-bc99-cce254217c94"
+          },
+          {
+            "unique_id": "e5ca0369-3398-4513-87fd-7a17a9ff54f1",
+            "type": "referral",
+            "service": "medical_support",
+            "service_section_unique_id": "7b97ef20-4c25-4d83-b2cb-60efc1ba300f",
+            "created_at": "2020/09/30",
+            "id": "43a8c664-a2e1-4591-bcf3-7bd3a230644f"
+          },
+          {
+            "unique_id": "1a846928-edb6-4211-8741-c54fb337f452",
+            "type": "referral",
+            "service": "training_education",
+            "service_section_unique_id": "a5647de9-4849-4106-a85c-6dbc0ac0ba50",
+            "created_at": "2020/09/30",
+            "id": "9a1e8a4d-c7f0-47d2-a08f-faef166119f6"
+          },
+          {
+            "unique_id": "cd8fb20b-970a-47b2-9661-7e18482cd09c",
+            "type": "referral",
+            "service": "social_work_case_work",
+            "service_section_unique_id": "042ffb1c-51de-404b-b69b-fdb9e15c9d36",
+            "created_at": "2020/09/30",
+            "id": "242077e4-f720-436e-802e-17fa59b16268"
+          },
+          {
+            "unique_id": "99a287cf-3548-414b-a3b8-2fedba8895d2",
+            "type": "referral",
+            "service": "family_based_care",
+            "service_section_unique_id": "155c6b46-ac10-4226-b9fd-6e117111b08c",
+            "created_at": "2020/09/30",
+            "id": "bddda9c5-cbfe-4bbb-8568-03bba03d29ca"
+          },
+          {
+            "unique_id": "27134c91-8f22-46d1-848c-81694b6c6970",
+            "type": "referral",
+            "service": "medical_support",
+            "service_section_unique_id": "7b97ef20-4c25-4d83-b2cb-60efc1ba300f",
+            "created_at": "2020/09/30",
+            "id": "1ed537b9-406c-417a-8479-192cd2cf5270"
+          },
+          {
+            "unique_id": "246492b6-ec6a-4cd8-bf2e-2ab7094bbef0",
+            "type": "referral",
+            "service": "training_education",
+            "service_section_unique_id": "a5647de9-4849-4106-a85c-6dbc0ac0ba50",
+            "created_at": "2020/09/30",
+            "id": "80b89f55-47dc-43ca-ad4f-902d5fa23ee2"
+          },
+          {
+            "unique_id": "ef8ca1e2-7df7-4bb8-b560-7ec8bcdac6db",
+            "type": "referral",
+            "service": "social_work_case_work",
+            "service_section_unique_id": "042ffb1c-51de-404b-b69b-fdb9e15c9d36",
+            "created_at": "2020/09/30",
+            "id": "b91b72d6-5f77-4142-a53b-73dd2b99cb10"
+          },
+          {
+            "unique_id": "6eaad5d2-1c49-4562-894b-22418fd3625d",
+            "type": "referral",
+            "service": "family_based_care",
+            "service_section_unique_id": "155c6b46-ac10-4226-b9fd-6e117111b08c",
+            "created_at": "2020/09/30",
+            "id": "080de662-d8ae-4cc0-88bd-817b02d99105"
+          },
+          {
+            "unique_id": "35315a28-2d59-4668-a4dd-8e2e9533f648",
+            "type": "referral",
+            "service": "medical_support",
+            "service_section_unique_id": "7b97ef20-4c25-4d83-b2cb-60efc1ba300f",
+            "created_at": "2020/09/30",
+            "id": "e7fe32de-c526-4521-8cce-e0d7277762ab"
+          },
+          {
+            "unique_id": "b99cf4d9-2908-4422-9fe2-d74fc806bb8c",
+            "type": "referral",
+            "service": "training_education",
+            "service_section_unique_id": "a5647de9-4849-4106-a85c-6dbc0ac0ba50",
+            "created_at": "2020/09/30",
+            "id": "45742eac-3ea2-47c7-a5c6-26251d60c21e"
+          }
+        ],
+        "_id": "5bbe4490d6073556b54206145c3ebe17",
+        "case_id": "0ccc6d29-6c85-4265-8b9b-486f4cedb069",
+        "protection_status": "oscar_referral",
+        "transitions_changed_at": "2020/09/30 07:19:58 +0000"
+      }
+  ],
+  "configuration": {
+    "baseUrl": "https://start.oscarhq.com",
+    "username": "LP-oscar-prod-demo",
+    "password": "LP-pwd"
+  },
+  "lastCreated": "02-10-2020",
+  "lastUpdated": "02-10-2020 09:30"
+}
