@@ -7,9 +7,7 @@ alterState(state => {
   // the services array. Below, we create an empty array (if it's been removed
   // to ensure that all payloads adhere to the integration contract.
   state.data.data = state.data.data.map(c => {
-    console.log(`Services for this case: ${(c.services && c.services.length) || 'none!'}`);
     const normalizedServicesArray = c.services || [];
-    console.log(`Normalized services array: ${normalizedServicesArray}`);
     return { ...c, services: normalizedServicesArray };
   });
   // ===========================================================================
