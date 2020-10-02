@@ -200,20 +200,20 @@ post(
           organization_name: 'demo', // hardcoding to one of the orgs in Oscar staging system for testing
           //organization_name: oscarStrings(c.owned_by_agency.substring(7)), // add back in before go-live
           organization_id: oscarStrings(c.owned_by_agency_id),
-          is_referred: c.oscar_number ? null : true,
-          services: [].concat.apply(
-            [],
-            c.services_section
-              .filter(s => s.service_subtype)
-              .map(s => {
-                return s.service_subtype.map(st => {
-                  return {
-                    uuid: oscarStrings(s.unique_id),
-                    name: serviceMap[st] || 'Other',
-                  };
-                });
-              })
-          ),
+          is_referred: c.services_section
+            .map(s => s.service_response_type)
+            .includes('referral_to_oscar'),
+          services: c.services_section
+            .filter(s => s.service_subtype)
+            .map(s => {
+              return s.service_subtype.map(st => {
+                return {
+                  uuid: oscarStrings(s.unique_id),
+                  name: serviceMap[st] || 'Other',
+                };
+              });
+            })
+            .flat(),
           transaction_id: c.transition_id,
           // transaction_id: oscarStrings(c.transition_id),
         };
