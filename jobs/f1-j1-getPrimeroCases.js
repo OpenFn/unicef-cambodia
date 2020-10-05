@@ -8,6 +8,7 @@ alterState(state => {
 
 // GET new Primero cases
 // User Story 1: Generating government referrals
+// #1 - Request oscar referrals only ===========================================
 getCases(
   {
     remote: true,
@@ -21,15 +22,50 @@ getCases(
           state.lastUpdated || '25-09-2020 00:00' // TEST CURSOR
         }.01-01-4020 00:00`,
       },
-      // oscar_number: 'range||*.*', // new filter to fetch ALL oscar cases
-      service_response_types: 'list||referral_to_oscar', // old filter -only pulls referrals
+      service_response_types: 'list||referral_to_oscar', // only cases with referral services
     },
     per: 1000,
   },
   state => {
     console.log(
-      `Primero API responded with cases: ${JSON.stringify(state.data.map(x => x.case_id_display))}`
+      `Primero responded with Oscar referral cases: ${JSON.stringify(
+        state.data.map(x => x.case_id_display)
+      )}`
     );
+
+    state.oscarRefs = state.data;
+    return { ...state, data: {}, references: [] };
+  }
+);
+
+// #2 - Request all oscar cases ================================================
+getCases(
+  {
+    remote: true,
+    scope: {
+      or: {
+        // Two case date fields we must check for updates
+        transitions_created_at: `or_op||date_range||${
+          state.lastCreated || '25-09-2020' // TEST CURSOR
+        }.01-01-4020`,
+        transitions_changed_at: `or_op||date_range||${
+          state.lastUpdated || '25-09-2020 00:00' // TEST CURSOR
+        }.01-01-4020 00:00`,
+      },
+      oscar_number: 'range||*.*', // all oscar cases that might not have referrals
+    },
+    per: 1000,
+  },
+  state => {
+    console.log(
+      `Primero responded with other Oscar cases: ${JSON.stringify(
+        state.data.map(x => x.case_id_display)
+      )}`
+    );
+
+    // #3 - Combine cases, then identify last timestamps and reformat them =====
+    state.data = state.data.concat(state.oscarRefs);
+    delete state.oscarRefs;
 
     function parseDates(str) {
       const [y, m, dtz] = str.split('/');
