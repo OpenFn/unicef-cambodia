@@ -13,7 +13,7 @@ getCases(
     remote: true,
     scope: {
       or: {
-        //Two case date fields we must check for updates
+        // Two case date fields we must check for updates
         transitions_created_at: `or_op||date_range||${
           state.lastCreated || '25-09-2020' // TEST CURSOR
         }.01-01-4020`,
@@ -21,9 +21,8 @@ getCases(
           state.lastUpdated || '25-09-2020 00:00' // TEST CURSOR
         }.01-01-4020 00:00`,
       },
-      //oscar_number: 'range||*.*', //new filter to fetch ALL oscar cases
-      service_response_types: 'list||referral_to_oscar', //old filter -only pulls referrals
-
+      // oscar_number: 'range||*.*', // new filter to fetch ALL oscar cases
+      service_response_types: 'list||referral_to_oscar', // old filter -only pulls referrals
     },
     per: 1000,
   },
