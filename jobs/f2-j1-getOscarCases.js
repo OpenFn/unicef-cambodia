@@ -14,7 +14,7 @@ alterState(state => {
 // User Story 2: 'View Oscar cases in Primero' AND User Story 4: 'Sending referrals to Primero'
 post(
   //Oscar authentication  --> To update?
-  '/api/v1/auth/sign_in',
+  '/api/v1/admin_auth/sign_in',
   {
     keepCookie: true,
     body: {
