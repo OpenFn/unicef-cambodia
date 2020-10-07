@@ -1,5 +1,5 @@
 post(
-  '/api/v1/auth/sign_in',
+  '/api/v1/admin_auth/sign_in',
   {
     keepCookie: true,
     body: {
