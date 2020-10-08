@@ -6,7 +6,7 @@ alterState(state => {
   return { ...state, data: {}, references: [] };
 });
 
-// GET new Primero cases
+// GET Primero cases with oscar referrals
 // User Story 1: Generating government referrals
 // #1 - Request oscar referrals only ===========================================
 getCases(
@@ -38,6 +38,8 @@ getCases(
   }
 );
 
+// GET new Primero cases with oscar_number
+// User Story 2: View all Oscar cases in Primero
 // #2 - Request all oscar cases ================================================
 getCases(
   {
@@ -45,7 +47,7 @@ getCases(
     scope: {
       or: {
         // Two case date fields we must check for updates
-        transitions_created_at: `or_op||date_range||${
+        created_at: `or_op||date_range||${
           state.lastCreated || '25-09-2020' // TEST CURSOR
         }.01-01-4020`,
         transitions_changed_at: `or_op||date_range||${
