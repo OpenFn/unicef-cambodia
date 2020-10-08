@@ -1,5 +1,6 @@
 // Clear data from previous runs.
 alterState(state => {
+  console.log('The last case creation before this run is: ' + state.lastCaseCreated);
   console.log('The last transition update before this run is: ' + state.lastUpdated);
   console.log('The last transition creation before this run is: ' + state.lastCreated);
 
@@ -27,11 +28,7 @@ getCases(
     per: 1000,
   },
   state => {
-    console.log(
-      `Primero responded with Oscar referral cases: ${JSON.stringify(
-        state.data.map(x => x.case_id_display)
-      )}`
-    );
+    console.log(`Oscar referral cases: ${JSON.stringify(state.data.map(x => x.case_id_display))}`);
 
     state.oscarRefs = state.data;
     return { ...state, data: {}, references: [] };
@@ -48,7 +45,7 @@ getCases(
       or: {
         // Two case date fields we must check for updates
         created_at: `or_op||date_range||${
-          state.lastCreated || '25-09-2020' // TEST CURSOR
+          state.lastCaseCreated || '25-09-2020' // TEST CURSOR
         }.01-01-4020`,
         transitions_changed_at: `or_op||date_range||${
           state.lastUpdated || '25-09-2020 00:00' // TEST CURSOR
@@ -59,11 +56,7 @@ getCases(
     per: 1000,
   },
   state => {
-    console.log(
-      `Primero responded with other Oscar cases: ${JSON.stringify(
-        state.data.map(x => x.case_id_display)
-      )}`
-    );
+    console.log(`Other cases: ${JSON.stringify(state.data.map(x => x.case_id_display))}`);
 
     // #3 - Combine cases, then identify last timestamps and reformat them =====
     state.data = state.data.concat(state.oscarRefs);
@@ -75,7 +68,19 @@ getCases(
       return { y, m, d, t, z };
     }
 
-    // Get latest transition from all cases.
+    // Get latest case creation from all cases. ================================
+    const lastCaseCreation = state.data.map(c => c.created_at).sort((a, b) => b - a)[0];
+
+    if (lastCaseCreation) {
+      console.log(
+        `Found new cases w/o transitions, updating 'last case creation' date using ${lastCaseCreation}.`
+      );
+      var { y, m, d } = parseDates(lastCaseCreation);
+      state.lastCaseCreated = `${d}-${m}-${y}`;
+    }
+    // =========================================================================
+
+    // Get latest transition from all cases. ===================================
     const lastCreation = state.data
       .map(c => {
         if (c.transitions && c.transitions.length > 0) {
@@ -103,7 +108,9 @@ getCases(
       var [hr, min, sec] = t.split(':');
       state.lastUpdated = `${d}-${m}-${y} ${hr}:${min}`;
     }
+    // =========================================================================
 
+    console.log('The last case creation is now: ' + state.lastCaseCreated);
     console.log('The last transition update is now: ' + state.lastUpdated);
     console.log('The last transition creation is now: ' + state.lastCreated);
     return state;
