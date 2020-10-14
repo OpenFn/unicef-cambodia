@@ -34,9 +34,9 @@ post(
         uid: state.configuration.username,
       }),
       query: {
-        //since_date: '2020-09-29 00:00:00',
-        since_date: state.lastQueryDate || '2020-09-20 00:00:00', //'2020-07-14 00:00:00',
-        //referred_external: true, //pull ALL cases, not just referrals
+        since_date: '2020-10-14 00:00:00',
+        //since_date: state.lastQueryDate || '2020-09-20 00:00:00', // since_date must always have 00:00:00 timestamp in order to return referrals! 
+        //referred_external: true, //old query parameter - to remove to pull ALL cases, not just referrals
       },
     },
     state => {
