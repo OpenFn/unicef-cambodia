@@ -3,9 +3,11 @@ alterState(state => {
   state.data = {};
   state.references = [];
   console.log(`lastQueryDate (from the previous run): ${state.lastQueryDate}`);
-  state.thisQueryDate = new Date().toISOString().replace('T', ' ').slice(0, 19);
+
+  const now = new Date().toISOString().replace('T', ' ').slice(0, 10);
+  state.thisQueryDate = `${now} 00:00:00`;
   console.log(
-    `Current time, to be used to update lastQueryDate after this query: ${state.thisQueryDate}`
+    `Current datetime, rounded to 00:00:00, to be used to update lastQueryDate after this query: ${state.thisQueryDate}`
   );
   return state;
 });
@@ -34,8 +36,8 @@ post(
         uid: state.configuration.username,
       }),
       query: {
-        since_date: '2020-10-14 00:00:00',
-        //since_date: state.lastQueryDate || '2020-09-20 00:00:00', // since_date must always have 00:00:00 timestamp in order to return referrals! 
+        // NOTE: since_date must be rounded to 00:00:00 to work with Oscar API.
+        since_date: state.lastQueryDate || '2020-10-14 00:00:00',
         //referred_external: true, //old query parameter - to remove to pull ALL cases, not just referrals
       },
     },
