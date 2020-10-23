@@ -412,6 +412,20 @@ alterState(state => {
       }
     }
 
+    function createName(given, local) {
+      if (given && local) {
+        return `${given} (${local})`;
+      }
+      if (given && !local) {
+        return given;
+      }
+      if (!given && local) {
+        return local;
+      } else {
+        return null;
+      }
+    }
+
     function setAgencyUser(c) {
       const agencyMap = {
         'agency-agh': 'agency-agh-user',
@@ -489,8 +503,8 @@ alterState(state => {
         oscar_number: c.global_id,
         oscar_short_id: c.slug,
         mosvy_number: c.mosvy_number,
-        name_first: oscarValue(c.external_id) ? null : c.given_name,
-        name_last: oscarValue(c.external_id) ? null : c.family_name,
+        name_first: createName(c.given_name, c.local_given_name),
+        name_last: createName(c.family_name, c.local_family_name),
         sex: oscarValue(c.external_id) ? null : genderTransform(c.gender),
         date_of_birth: oscarValue(c.external_id) ? null : c.date_of_birth,
         age: oscarValue(c.external_id) ? null : calcAge(c.date_of_birth),
@@ -505,7 +519,7 @@ alterState(state => {
         owned_by_text: `${c.case_worker_name} ${c.case_worker_mobile}`,
         oscar_reason_for_exiting: c.reason_for_exiting,
         has_referral: c.is_referred,
-        risk_level: c.is_referred==true ? 'Medium' : null, //new risk level mapping for referrlas only
+        risk_level: c.is_referred == true ? 'Medium' : null, //new risk level mapping for referrlas only
         consent_for_services: oscarValue(c.external_id) || c.is_referred == false ? null : true,
         disclosure_other_orgs: oscarValue(c.external_id) || c.is_referred == false ? null : true,
         interview_subject: oscarValue(c.external_id) || c.is_referred == false ? null : 'other',
