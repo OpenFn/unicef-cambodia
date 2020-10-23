@@ -230,15 +230,8 @@ alterState(state => {
   }; */
 
   state.cases = state.data.data.map(c => {
-    function oscarValue(item) {
-      if (item && item !== '') {
-        return true;
-      }
-      return false;
-    }
-
     function convertDate(str) {
-      if (oscarValue(str)) {
+      if (str) {
         const date = new Date(str);
         monthNames = [
           'jan',
@@ -354,7 +347,7 @@ alterState(state => {
     }
 
     function primeroId(c) {
-      return oscarValue(c.external_id) ? c.external_id : null;
+      return c.external_id ? c.external_id : null;
     }
 
     function setUser(c) {
@@ -394,10 +387,7 @@ alterState(state => {
       };
 
       const { location_current_village_code, organization_address_code } = c;
-
-      const source =
-        (oscarValue(location_current_village_code) && location_current_village_code) ||
-        (oscarValue(organization_address_code) && organization_address_code);
+      const source = location_current_village_code || organization_address_code;
 
       if (source) {
         const subCode = source.slice(0, 2);
@@ -477,14 +467,14 @@ alterState(state => {
         'agency-wmo': 'agency-wmo-user',
       };
 
-      const source = oscarValue(c.organization_name) && c.organization_name;
-
-      if (source) {
-        return agencyMap[`agency-${source}`];
+      if (c.organization_name) {
+        return agencyMap[`agency-${c.organization_name}`];
       } else {
         throw `No agency user found for the organization ${c.organization_name}. Please create an agency user for this organization and update the job accordingly.`;
       }
     }
+
+    const isUpdate = c.external_id;
 
     // Mappings for upserting cases in Primero (update if existing, insert if new)
     const primeroCase = {
@@ -503,33 +493,29 @@ alterState(state => {
         oscar_number: c.global_id,
         oscar_short_id: c.slug,
         mosvy_number: c.mosvy_number,
-        name_first: oscarValue(c.external_id) ? null : createName(c.given_name, c.local_given_name),
-        name_last: oscarValue(c.external_id)
-          ? null
-          : createName(c.family_name, c.local_family_name),
-        sex: oscarValue(c.external_id) ? null : genderTransform(c.gender),
-        date_of_birth: oscarValue(c.external_id) ? null : c.date_of_birth,
-        age: oscarValue(c.external_id) ? null : calcAge(c.date_of_birth),
-        location_current: oscarValue(c.location_current_village_code)
+        name_first: isUpdate ? null : createName(c.given_name, c.local_given_name),
+        name_last: isUpdate ? null : createName(c.family_name, c.local_family_name),
+        sex: isUpdate ? null : genderTransform(c.gender),
+        date_of_birth: isUpdate ? null : c.date_of_birth,
+        age: isUpdate ? null : calcAge(c.date_of_birth),
+        location_current: c.location_current_village_code
           ? parseInt(c.location_current_village_code, 10).toString()
           : null,
         address_current: c.address_current_village_code,
         oscar_status: c.status,
-        protection_status: oscarValue(c.external_id) ? null : 'oscar_referral',
+        protection_status: isUpdate ? null : 'oscar_referral',
         service_implementing_agency: `agency-${c.organization_name}`,
-        owned_by: oscarValue(c.external_id) ? null : setUser(c),
+        owned_by: isUpdate ? null : setUser(c),
         owned_by_text: `${c.case_worker_name} ${c.case_worker_mobile}`,
         oscar_reason_for_exiting: c.reason_for_exiting,
         has_referral: c.is_referred,
         risk_level: c.is_referred == true ? 'Medium' : null, //new risk level mapping for referrlas only
-        consent_for_services: oscarValue(c.external_id) || c.is_referred == false ? null : true,
-        disclosure_other_orgs: oscarValue(c.external_id) || c.is_referred == false ? null : true,
-        interview_subject: oscarValue(c.external_id) || c.is_referred == false ? null : 'other',
-        content_source_other: oscarValue(c.external_id) ? null : 'OSCaR',
+        consent_for_services: isUpdate || c.is_referred == false ? null : true,
+        disclosure_other_orgs: isUpdate || c.is_referred == false ? null : true,
+        interview_subject: isUpdate || c.is_referred == false ? null : 'other',
+        content_source_other: isUpdate ? null : 'OSCaR',
         module_id: 'primeromodule-cp',
-        registration_date: oscarValue(c.external_id)
-          ? null
-          : now.toISOString().split('T')[0].replace(/-/g, '/'),
+        registration_date: isUpdate ? null : now.toISOString().split('T')[0].replace(/-/g, '/'),
         services_section: convert(c.services).map(s => ({
           ...s,
           service_referral_notes: c.reason_for_referral,
