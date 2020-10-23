@@ -413,8 +413,8 @@ alterState(state => {
     }
 
     function createName(given, local) {
-      if (given && local) {
-        return `${given} (${local})`;
+      if (local && given) {
+        return `${local} (${given})`; //Format: khmer name (engligh name)
       }
       if (given && !local) {
         return given;
