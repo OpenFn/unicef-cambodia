@@ -503,8 +503,10 @@ alterState(state => {
         oscar_number: c.global_id,
         oscar_short_id: c.slug,
         mosvy_number: c.mosvy_number,
-        name_first: createName(c.given_name, c.local_given_name),
-        name_last: createName(c.family_name, c.local_family_name),
+        name_first: oscarValue(c.external_id) ? null : createName(c.given_name, c.local_given_name),
+        name_last: oscarValue(c.external_id)
+          ? null
+          : createName(c.family_name, c.local_family_name),
         sex: oscarValue(c.external_id) ? null : genderTransform(c.gender),
         date_of_birth: oscarValue(c.external_id) ? null : c.date_of_birth,
         age: oscarValue(c.external_id) ? null : calcAge(c.date_of_birth),
