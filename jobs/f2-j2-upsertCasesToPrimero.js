@@ -515,7 +515,7 @@ alterState(state => {
           : null,
         address_current: c.address_current_village_code,
         oscar_status: c.status,
-        protection_status: oscarValue(c.external_id) ? null : 'oscar_referral',
+        protection_status: oscarValue(c.external_id) && c.is_referred == true ? null : 'oscar_referral',
         service_implementing_agency: `agency-${c.organization_name}`,
         owned_by: oscarValue(c.external_id) ? null : setUser(c),
         owned_by_text: `${c.case_worker_name} ${c.case_worker_mobile}`,
