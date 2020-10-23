@@ -120,22 +120,6 @@ post(
           other_other_service: 'Other Service',
         };
 
-        const protectionMap = {
-          unaccompanied: 'Living and working on street',
-          separated: 'Unaccompanied child',
-          migrant_child_13820: 'Migrant child',
-          trafficked_child_47822: 'Trafficked child',
-          sexually_exploited_child_71438: 'Sexually exploited child',
-          abandoned_child_98628: 'Abandoned child',
-          orphan_child_99287: 'Orphan child',
-          hiv_aids_88169: 'HIV/AIDS',
-          physical_impairment_03566: 'Physical impairment',
-          mental_impairment_27429: 'Mental impairment',
-          domestic_violated_child_28014: 'Domestic violated child',
-          vulnerable_child_affected_by_alcohol_01558: 'Vulnerable child affected by alcohol',
-          oscar_referral: 'OSCaR referral',
-        };
-
         const c = state.data;
         const lastTransitionNote =
           c.transitions.length > 0 &&
@@ -190,9 +174,6 @@ post(
           date_of_birth: oscarStrings(c.date_of_birth && c.date_of_birth.replace(/\//g, '-')),
           location_current_village_code: checkValue(c.location_current),
           address_current_village_code: oscarStrings(c.address_current),
-          // reason_for_referral: oscarStrings(
-          //   protectionMap[c.protection_status] || c.protection_status
-          // ),
           reason_for_referral: oscarStrings(lastTransitionNote),
           external_case_worker_name: oscarStrings(c.owned_by),
           external_case_worker_id: oscarStrings(c.owned_by_id),
@@ -217,9 +198,9 @@ post(
           transaction_id: c.transition_id,
           // transaction_id: oscarStrings(c.transition_id),
         };
-
+        console.warn('!!!: ',JSON.stringify({organization:oscar} , null, 2));
         // NOTE: Logs for enhanced audit trail.
-        console.log(
+        console.log( 
           'Case data to be posted to Oscar: ',
           JSON.stringify(
             {

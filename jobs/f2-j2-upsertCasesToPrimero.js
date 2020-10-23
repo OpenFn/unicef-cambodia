@@ -260,7 +260,7 @@ alterState(state => {
         .map(s => {
           return {
             unique_id: s.uuid,
-            service_implemented_day_time: convertDate(s.enrollment_date),
+            //service_implemented_day_time: convertDate(s.enrollment_date),
             service_subtype: (serviceMap[s.name] && serviceMap[s.name].subtype) || 'Other',
             service_type: (serviceMap[s.name] && serviceMap[s.name].type) || 'Other',
             service_type_text: (serviceMap[s.name] && serviceMap[s.name].type) || 'Other',
@@ -277,7 +277,7 @@ alterState(state => {
       const newArr = Object.keys(obj).map(key => {
         return {
           unique_id: obj[key][0].unique_id,
-          service_implemented_day_time: obj[key][0].service_implemented_day_time,
+          //service_implemented_day_time: obj[key][0].service_implemented_day_time,
           service_subtype: obj[key].map(st => st.service_subtype),
           service_type: key,
           service_type_text: key,
@@ -403,8 +403,8 @@ alterState(state => {
     }
 
     function createName(given, local) {
-      if (given && local) {
-        return `${given} (${local})`;
+      if (local && given) {
+        return `${local} (${given})`; //Format: khmer name (engligh name)
       }
       if (given && !local) {
         return given;
@@ -503,7 +503,7 @@ alterState(state => {
           : null,
         address_current: c.address_current_village_code,
         oscar_status: c.status,
-        protection_status: isUpdate ? null : 'oscar_referral',
+        protection_status: isUpdate && c.is_referred == true ? null : 'oscar_referral',
         service_implementing_agency: `agency-${c.organization_name}`,
         owned_by: isUpdate ? null : setUser(c),
         owned_by_text: `${c.case_worker_name} ${c.case_worker_mobile}`,
@@ -582,7 +582,7 @@ each(
               registration_date: c.child.registration_date,
               services_section: c.child.services_section.map(s => ({
                 unique_id: s.unique_id,
-                service_implemented_day_time: s.service_implemented_day_time,
+                //service_implemented_day_time: s.service_implemented_day_time,
                 oscar_case_worker_name: s.oscar_case_worker_name,
                 oscar_referring_organization: s.oscar_referring_organization,
                 oscar_case_worker_telephone: s.oscar_case_worker_telephone,
