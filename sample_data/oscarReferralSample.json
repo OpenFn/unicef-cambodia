@@ -1,0 +1,38 @@
+    {
+          "slug": "lxis-1762",
+          "global_id": "01EDB4PA6B9D0P8C9B119SM02R",
+          "external_id": "",
+          "external_id_display": "",
+          "mosvy_number": "",
+          "given_name": "Julia",
+          "family_name": "Test",
+          "gender": "prefer_not_to_say",
+          "date_of_birth": "2012-02-02",
+          "location_current_village_code": "",
+          "address_current_village_code": "",
+          "organization_id": 46,
+          "organization_name": "cif",
+          "external_case_worker_name": null,
+          "external_case_worker_id": null,
+          "is_referred": true,
+          "reason_for_referral": "example reason",
+          "services": [
+            {
+              "enrollment_date": "2020-07-16",
+              "uuid": "11226c6d-d7b8-4272-b45e-85cf635b9fba",
+              "name": "Long term foster care"
+            },
+            {
+              "enrollment_date": "2020-07-16",
+              "uuid": "21905571-81c2-4870-ab33-db6cde56bbbe",
+              "name": "Domestic adoption support"
+            }
+          ],
+          "status": "Active",
+          "case_worker_name": "Janani Panchalingam",
+          "case_worker_mobile": "8765432",
+          "referral_consent_form": [
+            "https://cif-web-assets-staging.s3.amazonaws.com/uploads/referral/consent_form/101/myAvatar.png"
+          ],
+          "organization_address_code": "120611"
+      }
