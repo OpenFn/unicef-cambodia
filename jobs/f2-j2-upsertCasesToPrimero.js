@@ -520,7 +520,7 @@ alterState(state => {
         services_section: 
         convert(c.services).map(s => ({
           ...s,
-          service_referral_notes: c.reason_for_referral,
+          //service_referral_notes: c.reason_for_referral, //mapping notes to case-level now
         })),
         transitions: convert(c.services).map(t => ({
           service_section_unique_id: t.unique_id,
@@ -582,6 +582,7 @@ each(
               content_source_other: c.child.content_source_other,
               module_id: c.child.module_id,
               registration_date: c.child.registration_date,
+              referral_notes_oscar: c.reason_for_referral,
               services_section: c.child.services_section.map(s => ({
                 unique_id: s.unique_id,
                 //service_implemented_day_time: s.service_implemented_day_time, //remove mapping
