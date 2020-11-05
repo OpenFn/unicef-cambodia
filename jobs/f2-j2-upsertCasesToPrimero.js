@@ -277,12 +277,12 @@ alterState(state => {
       const newArr = Object.keys(obj).map(key => {
         return {
           unique_id: obj[key][0].unique_id,
-          //service_implemented_day_time: obj[key][0].service_implemented_day_time,
+          //service_implemented_day_time: obj[key][0].service_implemented_day_time, //remove
           service_subtype: obj[key].map(st => st.service_subtype),
           service_type: key,
           service_type_text: key,
           service_type_details_text: obj[key][0].service_type_details_text,
-          service_response_type: 'referral_from_oscar',
+          service_response_type: 'service_being_provided_by_oscar_partner_47618',//'referral_from_oscar', 
           oscar_case_worker_name: c.case_worker_name,
           oscar_referring_organization: `agency-${c.organization_name}`,
           oscar_case_worker_telephone: c.case_worker_mobile,
@@ -516,7 +516,9 @@ alterState(state => {
         content_source_other: isUpdate ? null : 'OSCaR',
         module_id: 'primeromodule-cp',
         registration_date: isUpdate ? null : now.toISOString().split('T')[0].replace(/-/g, '/'),
-        services_section: convert(c.services).map(s => ({
+        referral_notes_oscar: c.reason_for_referral, //new services referral notes field
+        services_section: 
+        convert(c.services).map(s => ({
           ...s,
           service_referral_notes: c.reason_for_referral,
         })),
@@ -582,7 +584,7 @@ each(
               registration_date: c.child.registration_date,
               services_section: c.child.services_section.map(s => ({
                 unique_id: s.unique_id,
-                //service_implemented_day_time: s.service_implemented_day_time,
+                //service_implemented_day_time: s.service_implemented_day_time, //remove mapping
                 oscar_case_worker_name: s.oscar_case_worker_name,
                 oscar_referring_organization: s.oscar_referring_organization,
                 oscar_case_worker_telephone: s.oscar_case_worker_telephone,
