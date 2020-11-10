@@ -160,6 +160,10 @@ post(
             2
           )}`
         );
+        
+        const isReferral = c.services_section
+        .map(s => s.service_response_type)
+        .includes('referral_to_oscar'); 
 
         // Mappings for posting cases to Oscar
         const oscar = {
@@ -168,22 +172,21 @@ post(
           external_id_display: oscarStrings(c.case_id_display),
           global_id: oscarStrings(c.oscar_number),
           mosvy_number: oscarStrings(c.mosvy_number),
-          given_name: oscarStrings(c.name_first),
-          family_name: oscarStrings(c.name_last),
-          gender: oscarStrings(c.sex),
-          date_of_birth: oscarStrings(c.date_of_birth && c.date_of_birth.replace(/\//g, '-')),
-          location_current_village_code: checkValue(c.location_current),
-          address_current_village_code: oscarStrings(c.address_current),
-          reason_for_referral: oscarStrings(lastTransitionNote),
+          given_name: isReferral ? oscarStrings(c.name_first) : null,
+          family_name: isReferral ? oscarStrings(c.name_last) : null,
+          gender: isReferral ?  oscarStrings(c.sex) : null,
+          date_of_birth:  isReferral ? oscarStrings(c.date_of_birth && c.date_of_birth.replace(/\//g, '-')) : null,
+          location_current_village_code: isReferral ? checkValue(c.location_current) : null,
+          address_current_village_code: isReferral ? oscarStrings(c.address_current) : null,
+          reason_for_referral: isReferral ? oscarStrings(lastTransitionNote) : null,
           external_case_worker_name: oscarStrings(c.owned_by),
           external_case_worker_id: oscarStrings(c.owned_by_id),
           external_case_worker_mobile: c.owned_by_phone || '000000000',
           organization_name: 'demo', // hardcoding to one of the orgs in Oscar staging system for testing
           //organization_name: oscarStrings(c.owned_by_agency.substring(7)), // add back in before go-live
-          organization_id: oscarStrings(c.owned_by_agency_id),
-          is_referred: c.services_section
-            .map(s => s.service_response_type)
-            .includes('referral_to_oscar'),
+          //Q:^^ replace with service_implementing_agency ??
+          organization_id: oscarStrings(c.owned_by_agency_id), //Q: replace with service_implementing_agency ??
+          is_referred: isReferral,
           services: c.services_section
             .filter(s => s.service_subtype)
             .map(s => {
@@ -198,7 +201,7 @@ post(
           transaction_id: c.transition_id,
           // transaction_id: oscarStrings(c.transition_id),
         };
-        console.warn('!!!: ',JSON.stringify({organization:oscar} , null, 2));
+        console.warn('FULL LOGS FOR TESTING ONLY!!!: ',JSON.stringify({organization:oscar} , null, 2));
         // NOTE: Logs for enhanced audit trail.
         console.log( 
           'Case data to be posted to Oscar: ',
