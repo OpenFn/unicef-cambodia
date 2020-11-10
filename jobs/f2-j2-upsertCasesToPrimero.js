@@ -484,12 +484,12 @@ alterState(state => {
         location_current: c.location_current_village_code
           ? parseInt(c.location_current_village_code, 10).toString()
           : null,
-        address_current: c.address_current_village_code,
-        oscar_status: c.status,
+        address_current: isUpdate ? null : c.address_current_village_code,
+        oscar_status: isUpdate ? null : c.status,
         protection_status: isUpdate && c.is_referred == true ? null : 'oscar_referral',
         service_implementing_agency: `agency-${c.organization_name}`,
         owned_by: isUpdate ? null : setUser(c),
-        owned_by_text: `${c.case_worker_name} ${c.case_worker_mobile}`,
+        owned_by_text: isUpdate ? null : `${c.case_worker_name} ${c.case_worker_mobile}`,
         oscar_reason_for_exiting: c.reason_for_exiting,
         has_referral: c.is_referred,
         risk_level: c.is_referred == true ? 'Medium' : null, //new risk level mapping for referrlas only
