@@ -459,6 +459,8 @@ alterState(state => {
 
     const isUpdate = c.external_id;
 
+    const locationCode = c.location_current_village_code ? parseInt(c.location_current_village_code, 10).toString(): null;
+
     // Mappings for upserting cases in Primero (update if existing, insert if new)
     const primeroCase = {
       remote: true,
@@ -481,12 +483,10 @@ alterState(state => {
         sex: isUpdate ? null : genderTransform(c.gender),
         date_of_birth: isUpdate ? null : c.date_of_birth,
         age: isUpdate ? null : calcAge(c.date_of_birth),
-        location_current: c.location_current_village_code
-          ? parseInt(c.location_current_village_code, 10).toString()
-          : null,
+        location_current: isUpdate ? null : locationCode,
         address_current: isUpdate ? null : c.address_current_village_code,
         oscar_status: isUpdate ? null : c.status,
-        protection_status: isUpdate && c.is_referred == true ? null : 'oscar_referral',
+        protection_status: !isUpdate && c.is_referred == true ? 'oscar_referral' : null,
         service_implementing_agency: `agency-${c.organization_name}`,
         owned_by: isUpdate ? null : setUser(c),
         owned_by_text: isUpdate ? null : `${c.case_worker_name} ${c.case_worker_mobile}`,
