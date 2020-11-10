@@ -212,23 +212,6 @@ alterState(state => {
     'Other Service': { subtype: 'other_other_service', type: 'other' },
   };
 
-  /* NOTE: TO REMOVE ... confirm no longer using?
-  const protectionMap = {
-    'Living and working on street': 'unaccompanied',
-    'Unaccompanied child': 'separated',
-    'Migrant child': 'migrant_child_13820',
-    'Trafficked child': 'trafficked_child_47822',
-    'Sexually exploited child': 'sexually_exploited_child_71438',
-    'Abandoned child': 'abandoned_child_98628',
-    'Orphan child': 'orphan_child_99287',
-    'HIV/AIDS': 'hiv_aids_88169',
-    'Physical impairment': 'physical_impairment_03566',
-    'Mental impairment': 'mental_impairment_27429',
-    'Domestic violated child': 'domestic_violated_child_28014',
-    'Vulnerable child affected by alcohol': 'vulnerable_child_affected_by_alcohol_01558',
-    'OSCaR referral': 'oscar_referral',
-  }; */
-
   state.cases = state.data.data.map(c => {
     function convertDate(str) {
       if (str) {
