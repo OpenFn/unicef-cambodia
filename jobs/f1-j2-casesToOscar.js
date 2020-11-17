@@ -160,10 +160,10 @@ post(
             2
           )}`
         );
-        
+
         const isReferral = c.services_section
-        .map(s => s.service_response_type)
-        .includes('referral_to_oscar'); 
+          .map(s => s.service_response_type)
+          .includes('referral_to_oscar');
 
         // Mappings for posting cases to Oscar
         const oscar = {
@@ -201,9 +201,12 @@ post(
           transaction_id: c.transition_id,
           // transaction_id: oscarStrings(c.transition_id),
         };
-        console.warn('FULL LOGS FOR TESTING ONLY!!!: ',JSON.stringify({organization:oscar} , null, 2));
+        console.warn(
+          'FULL LOGS FOR TESTING ONLY!!!: ',
+          JSON.stringify({ organization: oscar }, null, 2)
+        );
         // NOTE: Logs for enhanced audit trail.
-        console.log( 
+        console.log(
           'Case data to be posted to Oscar: ',
           JSON.stringify(
             {
