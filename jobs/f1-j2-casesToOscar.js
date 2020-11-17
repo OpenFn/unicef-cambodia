@@ -4,7 +4,7 @@ alterState(state => {
   // ===========================================================================
   // NOTE: As of September 25, 2020, Primero has changed the structure of this
   // payload for a subset of cases, depending on whether or not data exists in
-  // the services array. Below, we create an empty array (if it's been removed
+  // the services array. Below, we create an empty array, if it's been removed,
   // to ensure that all payloads adhere to the integration contract.
   state.data = state.data.map(c => ({
     ...c,
@@ -12,6 +12,25 @@ alterState(state => {
     transitions: c.transitions || [],
   }));
   // ===========================================================================
+
+  state.cases = { referrals: [], nonReferrals: [] };
+
+  state.data.forEach(c =>
+    c.services_section.map(s => s.service_response_type).includes('referral_to_oscar')
+      ? state.cases.referrals.push(c)
+      : state.cases.nonReferrals.push(c)
+  );
+
+  state.oscarStrings = value => {
+    // NOTE: OSCaR API has unique behavior that requires us to send empty strings for null values.
+    if (value) {
+      return value;
+    } else {
+      console.log('Converting key to an empty string for OSCAR.');
+      return '';
+    }
+  };
+
   return state;
 });
 
@@ -28,7 +47,7 @@ post(
   // User Story 1.8b: Create referrals in Oscar
   each(
     merge(
-      '$.references[1][*]',
+      '$.cases.referrals[*]',
       // Bring down the authentication info for use in each case post.
       fields(
         field('__token', dataValue("__headers['access-token']")),
@@ -47,15 +66,7 @@ post(
         };
       },
       body: state => {
-        // NOTE: OSCaR API has unique behavior that requires us to send empty strings for null values.
-        function oscarStrings(data) {
-          if (data) {
-            return data;
-          } else {
-            console.log('Converting key to an empty string for OSCAR.');
-            return '';
-          }
-        }
+        const { oscarStrings } = state;
 
         function checkValue(data) {
           if (data !== 'NaN' && data) {
@@ -161,10 +172,6 @@ post(
           )}`
         );
 
-        const isReferral = c.services_section
-          .map(s => s.service_response_type)
-          .includes('referral_to_oscar');
-
         // Mappings for posting cases to Oscar
         const oscar = {
           // oscar_field, primero_field,
@@ -172,8 +179,8 @@ post(
           external_id_display: oscarStrings(c.case_id_display),
           global_id: oscarStrings(c.oscar_number),
           mosvy_number: oscarStrings(c.mosvy_number),
-          given_name: isReferral ? oscarStrings(c.name_first) : null,
-          family_name: isReferral ? oscarStrings(c.name_last) : null,
+          given_name: oscarStrings(c.name_first),
+          family_name: oscarStrings(c.name_last),
           gender: oscarStrings(c.sex),
           date_of_birth: oscarStrings(c.date_of_birth && c.date_of_birth.replace(/\//g, '-')),
           location_current_village_code: checkValue(c.location_current),
@@ -186,7 +193,7 @@ post(
           //organization_name: oscarStrings(c.owned_by_agency.substring(7)), // add back in before go-live
           //Q:^^ replace with service_implementing_agency ??
           organization_id: oscarStrings(c.owned_by_agency_id), //Q: replace with service_implementing_agency ??
-          is_referred: isReferral,
+          is_referred: true,
           services: c.services_section
             .filter(s => s.service_subtype)
             .map(s => {
@@ -235,4 +242,33 @@ post(
       },
     })
   )
+);
+
+// Update links for non-referrals
+post(
+  '/api/v1/admin_auth/sign_in',
+  {
+    keepCookie: true,
+    body: {
+      email: state.configuration.username,
+      password: state.configuration.password,
+    },
+  },
+  post('/api/v1/organizations/clients/update_links/', {
+    headers: state => ({
+      'Content-Type': 'application/json',
+      uid: state.configuration.username,
+      client: state.data.__headers.client,
+      'access-token': state.data.__headers['access-token'],
+    }),
+    body: state => {
+      const payload = state.cases.nonReferrals.map(c => ({
+        external_id: state.oscarStrings(c.case_id),
+        external_id_display: state.oscarStrings(c.case_id_display),
+        global_id: state.oscarStrings(c.oscar_number),
+      }));
+      console.log("'Update links' with non-referrals:", payload);
+      return payload;
+    },
+  })
 );
