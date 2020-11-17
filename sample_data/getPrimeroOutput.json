@@ -20,38 +20,6 @@
       "case_id": "bc3eafab-b4b6-4fe3-9e5e-eb08f39b7d2e"
     },
     {
-      "owned_by": "agency-demo-user",
-      "owned_by_agency": "agency-demo",
-      "module_id": "primeromodule-cp",
-      "created_at": "2020/11/16 08:20:29 +0000",
-      "case_id_display": "0332023",
-      "oscar_number": "01ED6NGKR44G3R7G8HTK2E0BD4",
-      "oscar_short_id": "aqe-767",
-      "name_last": "ហ៊ុំ (hum)",
-      "name_first": "ចំរើន (Chamreun)",
-      "sex": "female",
-      "date_of_birth": "2012/01/19",
-      "age": 8,
-      "_id": "7d4b1afdc516606a92e57d4ed1a7ef56",
-      "case_id": "d9bb6bf9-8188-4836-8b02-8d4d70332023"
-    },
-    {
-      "owned_by": "agency-demo-user",
-      "owned_by_agency": "agency-demo",
-      "module_id": "primeromodule-cp",
-      "created_at": "2020/11/16 08:20:28 +0000",
-      "case_id_display": "68559f7",
-      "oscar_number": "01ED6NGM30G14YVYGXGFF3V8R6",
-      "oscar_short_id": "pcy-919",
-      "name_last": "កេត (Ket)",
-      "name_first": "ជេស៊ី (Jecy)",
-      "sex": "male",
-      "date_of_birth": "2010/06/09",
-      "age": 10,
-      "_id": "7d4b1afdc516606a92e57d4ed1a7f82b",
-      "case_id": "614decd4-2b0c-4a56-86df-08b3068559f7"
-    },
-    {
       "owned_by": "oscar-user",
       "owned_by_agency": "agency-unicef",
       "owned_by_phone": "111-222-3333",
@@ -94,21 +62,6 @@
       ],
       "_id": "7d4b1afdc516606a92e57d4ed1a80031",
       "case_id": "18de3e64-437e-4987-aeb8-f0ce8e22fae1"
-    },
-    {
-      "owned_by": "agency-demo-user",
-      "owned_by_agency": "agency-demo",
-      "module_id": "primeromodule-cp",
-      "created_at": "2020/11/11 15:19:11 +0000",
-      "case_id_display": "d73134c",
-      "oscar_number": "01EC27AJFXFP0SXQ7X48AMBQMF",
-      "oscar_short_id": "fqd-1195",
-      "name_last": "Testing",
-      "name_first": "New",
-      "sex": "female",
-      "age": 50,
-      "_id": "7d4b1afdc516606a92e57d4ed1a805e2",
-      "case_id": "d1bcc22b-e5d3-484f-ad0f-3f8a4d73134c"
     },
     {
       "owned_by": "primero",
