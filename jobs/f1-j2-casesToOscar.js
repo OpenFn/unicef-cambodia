@@ -254,7 +254,7 @@ post(
       password: state.configuration.password,
     },
   },
-  post('/api/v1/organizations/clients/update_links/', {
+  put('/api/v1/organizations/clients/update_links/', {
     headers: state => ({
       'Content-Type': 'application/json',
       uid: state.configuration.username,
@@ -262,11 +262,13 @@ post(
       'access-token': state.data.__headers['access-token'],
     }),
     body: state => {
-      const payload = state.cases.nonReferrals.map(c => ({
-        external_id: state.oscarStrings(c.case_id),
-        external_id_display: state.oscarStrings(c.case_id_display),
-        global_id: state.oscarStrings(c.oscar_number),
-      }));
+      const payload = {
+        data: state.cases.nonReferrals.map(c => ({
+          external_id: state.oscarStrings(c.case_id),
+          external_id_display: state.oscarStrings(c.case_id_display),
+          global_id: state.oscarStrings(c.oscar_number),
+        })),
+      };
       console.log("'Update links' with non-referrals:", payload);
       return payload;
     },
