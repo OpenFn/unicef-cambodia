@@ -265,7 +265,7 @@ alterState(state => {
           service_type: key,
           service_type_text: key,
           service_type_details_text: obj[key][0].service_type_details_text,
-          service_response_type: 'service_being_provided_by_oscar_partner_47618',//'referral_from_oscar', 
+          service_response_type: 'referral_from_oscar', //'service_being_provided_by_oscar_partner_47618', <-TO REMOVE?  
           oscar_case_worker_name: c.case_worker_name,
           oscar_referring_organization: `agency-${c.organization_name}`,
           oscar_case_worker_telephone: c.case_worker_mobile,
@@ -503,7 +503,7 @@ alterState(state => {
         services_section: 
         convert(c.services).map(s => ({
           ...s,
-          //service_referral_notes: c.reason_for_referral, //mapping notes to case-level now
+          service_referral_notes: c.reason_for_referral, //mapping notes to case-level as well
         })),
         transitions: convert(c.services).map(t => ({
           service_section_unique_id: t.unique_id,
