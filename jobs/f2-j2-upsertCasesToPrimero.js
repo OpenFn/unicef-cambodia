@@ -238,33 +238,25 @@ alterState(state => {
       return null;
     }
 
-    function reduceOscarServices(oscarServicesArray) {
-      const servicesObject = oscarServicesArray
-        .map(s => {
-          return {
-            ...s,
-            service_type: (serviceMap[s.name] && serviceMap[s.name].type) || 'Other',
-            service_subtype: (serviceMap[s.name] && serviceMap[s.name].subtype) || 'Other',
-          };
-        })
-        .reduce((result, currentValue) => {
-          // Group the array of services by service type, returning an object
-          // with a key for each service type, and an array of services for that
-          // type.
-          (result[currentValue['service_type']] = result[currentValue['service_type']] || []).push(
-            currentValue
-          );
-          return result;
-        }, {});
+    function byServiceType(outputObject, currentValue) {
+      // Group the array of services by service type, returning an object
+      // with a key for each service type, and an array of services for that
+      // type.
+      (outputObject[currentValue['service_type']] =
+        outputObject[currentValue['service_type']] || []).push(currentValue);
+      return outputObject;
+    }
 
-      const primeroServicesArray = Object.keys(servicesObject).map(key => {
+    function mapKeysToServices(object) {
+      return Object.keys(object).map(key => {
         // Map across all of the keys (or service types) in the servicesObject
         // to return an array of services, where each service is built from the
         // first service of that type for each type.
-        const oscarService = servicesObject[key][0];
+
+        const oscarService = object[key][0];
         return {
           unique_id: oscarService.uuid,
-          service_subtype: servicesObject[key].map(st => st.service_subtype),
+          service_subtype: object[key].map(st => st.service_subtype),
           service_type: key,
           service_type_text: key,
           service_type_details_text: serviceMap[oscarService.name] ? 'n/a' : s.name,
@@ -276,10 +268,35 @@ alterState(state => {
             : 'referral_from_oscar',
         };
       });
+    }
+
+    function classifyServices(arr) {
+      return arr.map(s => {
+        return {
+          ...s,
+          isReferral: s.enrollment_date ? true : false,
+          service_type: (serviceMap[s.name] && serviceMap[s.name].type) || 'Other',
+          service_subtype: (serviceMap[s.name] && serviceMap[s.name].subtype) || 'Other',
+        };
+      });
+    }
+
+    function reduceOscarServices(oscarServicesArray) {
+      const primeroServicesArray = mapKeysToServices(
+        classifyServices(oscarServicesArray)
+          .filter(x => !x.isReferral)
+          .reduce((obj, elem) => byServiceType(obj, elem), {})
+      );
+
+      const primeroReferralsArray = mapKeysToServices(
+        classifyServices(oscarServicesArray)
+          .filter(x => x.isReferral)
+          .reduce((obj, elem) => byServiceType(obj, elem), {})
+      );
 
       // Finally, return this new SMALLER array of primeroServices where Oscar's
       // initially services have been aggregated/reduced down by service_type.
-      return primeroServicesArray;
+      return primeroServicesArray.concat(primeroReferralsArray);
     }
 
     const now = new Date();
