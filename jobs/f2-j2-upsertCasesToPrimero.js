@@ -19,7 +19,7 @@ alterState(state => {
     },
     'Community social work': {
       subtype: 'social_work_case_work_community',
-      type: 'family_based_care',
+      type: 'social_work_case_work',
     },
     'Emergency foster care': {
       subtype: 'family_based_care_emergency_foster',
