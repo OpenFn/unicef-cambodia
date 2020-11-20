@@ -456,7 +456,9 @@ alterState(state => {
 
     const isUpdate = c.external_id;
 
-    const locationCode = c.location_current_village_code ? parseInt(c.location_current_village_code, 10).toString(): null;
+    const locationCode = c.location_current_village_code
+      ? parseInt(c.location_current_village_code, 10).toString()
+      : null;
 
     // Mappings for upserting cases in Primero (update if existing, insert if new)
     const primeroCase = {
@@ -497,10 +499,9 @@ alterState(state => {
         module_id: 'primeromodule-cp',
         registration_date: isUpdate ? null : now.toISOString().split('T')[0].replace(/-/g, '/'),
         referral_notes_oscar: c.reason_for_referral, //new services referral notes field
-        services_section: 
-        convert(c.services).map(s => ({
+        services_section: convert(c.services).map(s => ({
           ...s,
-          //service_referral_notes: c.reason_for_referral, //mapping notes to case-level 
+          //service_referral_notes: c.reason_for_referral, //mapping notes to case-level
         })),
         transitions: convert(c.services).map(t => ({
           service_section_unique_id: t.unique_id,
