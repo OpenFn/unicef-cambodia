@@ -243,12 +243,10 @@ alterState(state => {
         .map(s => {
           return {
             unique_id: s.uuid,
-            //service_implemented_day_time: convertDate(s.enrollment_date),
             service_subtype: (serviceMap[s.name] && serviceMap[s.name].subtype) || 'Other',
             service_type: (serviceMap[s.name] && serviceMap[s.name].type) || 'Other',
             service_type_text: (serviceMap[s.name] && serviceMap[s.name].type) || 'Other',
             service_type_details_text: serviceMap[s.name] ? 'n/a' : s.name,
-            service_response_type: s.enrollment_date==null ? 'referral_from_oscar' : 'service_being_provided_by_oscar_partner_47618', 
           };
         })
         .reduce((result, currentValue) => {
@@ -261,12 +259,10 @@ alterState(state => {
       const newArr = Object.keys(obj).map(key => {
         return {
           unique_id: obj[key][0].unique_id,
-          //service_implemented_day_time: obj[key][0].service_implemented_day_time, //remove
           service_subtype: obj[key].map(st => st.service_subtype),
           service_type: key,
           service_type_text: key,
           service_type_details_text: obj[key][0].service_type_details_text,
-          //service_response_type: obj[key][0].enrollment_date==null ? 'referral_from_oscar' : 'service_being_provided_by_oscar_partner_47618', 
           oscar_case_worker_name: c.case_worker_name,
           oscar_referring_organization: `agency-${c.organization_name}`,
           oscar_case_worker_telephone: c.case_worker_mobile,
@@ -504,7 +500,7 @@ alterState(state => {
         services_section: 
         convert(c.services).map(s => ({
           ...s,
-          service_referral_notes: c.reason_for_referral, //mapping notes to case-level as well
+          //service_referral_notes: c.reason_for_referral, //mapping notes to case-level 
         })),
         transitions: convert(c.services).map(t => ({
           service_section_unique_id: t.unique_id,
@@ -569,7 +565,7 @@ each(
               referral_notes_oscar: c.reason_for_referral,
               services_section: c.child.services_section.map(s => ({
                 unique_id: s.unique_id,
-                //service_implemented_day_time: s.service_implemented_day_time, //remove mapping
+                service_response_type: s.service_response_type,
                 oscar_case_worker_name: s.oscar_case_worker_name,
                 oscar_referring_organization: s.oscar_referring_organization,
                 oscar_case_worker_telephone: s.oscar_case_worker_telephone,
