@@ -238,38 +238,48 @@ alterState(state => {
       return null;
     }
 
-    function convert(arr) {
-      const obj = arr
+    function reduceOscarServices(oscarServicesArray) {
+      const servicesObject = oscarServicesArray
         .map(s => {
           return {
-            unique_id: s.uuid,
-            service_subtype: (serviceMap[s.name] && serviceMap[s.name].subtype) || 'Other',
+            ...s,
             service_type: (serviceMap[s.name] && serviceMap[s.name].type) || 'Other',
-            service_type_text: (serviceMap[s.name] && serviceMap[s.name].type) || 'Other',
-            service_type_details_text: serviceMap[s.name] ? 'n/a' : s.name,
+            service_subtype: (serviceMap[s.name] && serviceMap[s.name].subtype) || 'Other',
           };
         })
         .reduce((result, currentValue) => {
+          // Group the array of services by service type, returning an object
+          // with a key for each service type, and an array of services for that
+          // type.
           (result[currentValue['service_type']] = result[currentValue['service_type']] || []).push(
             currentValue
           );
           return result;
         }, {});
 
-      const newArr = Object.keys(obj).map(key => {
+      const primeroServicesArray = Object.keys(servicesObject).map(key => {
+        // Map across all of the keys (or service types) in the servicesObject
+        // to return an array of services, where each service is built from the
+        // first service of that type for each type.
+        const oscarService = servicesObject[key][0];
         return {
-          unique_id: obj[key][0].unique_id,
-          service_subtype: obj[key].map(st => st.service_subtype),
+          unique_id: oscarService.uuid,
+          service_subtype: servicesObject[key].map(st => st.service_subtype),
           service_type: key,
           service_type_text: key,
-          service_type_details_text: obj[key][0].service_type_details_text,
+          service_type_details_text: serviceMap[oscarService.name] ? 'n/a' : s.name,
           oscar_case_worker_name: c.case_worker_name,
           oscar_referring_organization: `agency-${c.organization_name}`,
           oscar_case_worker_telephone: c.case_worker_mobile,
+          service_response_type: oscarService.enrollment_date
+            ? 'service_being_provided_by_oscar_partner_47618 '
+            : 'referral_from_oscar',
         };
       });
 
-      return newArr;
+      // Finally, return this new SMALLER array of primeroServices where Oscar's
+      // initially services have been aggregated/reduced down by service_type.
+      return primeroServicesArray;
     }
 
     const now = new Date();
@@ -499,11 +509,8 @@ alterState(state => {
         module_id: 'primeromodule-cp',
         registration_date: isUpdate ? null : now.toISOString().split('T')[0].replace(/-/g, '/'),
         referral_notes_oscar: c.reason_for_referral, //new services referral notes field
-        services_section: convert(c.services).map(s => ({
-          ...s,
-          //service_referral_notes: c.reason_for_referral, //mapping notes to case-level
-        })),
-        transitions: convert(c.services).map(t => ({
+        services_section: reduceOscarServices(c.services),
+        transitions: reduceOscarServices(c.services).map(t => ({
           service_section_unique_id: t.unique_id,
           service: t.service_type,
           created_at: now.toISOString().split('T')[0].replace(/-/g, '/'),
