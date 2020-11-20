@@ -248,7 +248,7 @@ alterState(state => {
             service_type: (serviceMap[s.name] && serviceMap[s.name].type) || 'Other',
             service_type_text: (serviceMap[s.name] && serviceMap[s.name].type) || 'Other',
             service_type_details_text: serviceMap[s.name] ? 'n/a' : s.name,
-            service_response_type: enrollment_date==null ? 'referral_from_oscar' : 'service_being_provided_by_oscar_partner_47618', 
+            service_response_type: s.enrollment_date==null ? 'referral_from_oscar' : 'service_being_provided_by_oscar_partner_47618', 
           };
         })
         .reduce((result, currentValue) => {
