@@ -264,7 +264,7 @@ alterState(state => {
           oscar_referring_organization: `agency-${c.organization_name}`,
           oscar_case_worker_telephone: c.case_worker_mobile,
           service_response_type: oscarService.enrollment_date
-            ? 'service_being_provided_by_oscar_partner_47618 '
+            ? 'service_being_provided_by_oscar_partner_47618'
             : 'referral_from_oscar',
         };
       });
