@@ -265,7 +265,7 @@ alterState(state => {
           service_type: key,
           service_type_text: key,
           service_type_details_text: obj[key][0].service_type_details_text,
-          service_response_type: 'referral_from_oscar', //'service_being_provided_by_oscar_partner_47618', <-TO REMOVE?  
+          service_response_type: obj[key][0].enrollment_date==null ? 'referral_from_oscar' : 'service_being_provided_by_oscar_partner_47618', 
           oscar_case_worker_name: c.case_worker_name,
           oscar_referring_organization: `agency-${c.organization_name}`,
           oscar_case_worker_telephone: c.case_worker_mobile,
