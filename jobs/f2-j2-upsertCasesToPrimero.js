@@ -481,7 +481,7 @@ alterState(state => {
       }
     }
 
-    const isUpdate = c.external_id && c.is_referred==false;
+    const isUpdate = c.external_id && c.is_referred!==true;
 
     const locationCode = c.location_current_village_code
       ? parseInt(c.location_current_village_code, 10).toString()
