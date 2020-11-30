@@ -244,33 +244,39 @@ post(
   )
 );
 
-// Update links for non-referrals
-post(
-  '/api/v1/admin_auth/sign_in',
-  {
-    keepCookie: true,
-    body: {
-      email: state.configuration.username,
-      password: state.configuration.password,
-    },
-  },
-  put('/api/v1/organizations/clients/update_links/', {
-    headers: state => ({
-      'Content-Type': 'application/json',
-      uid: state.configuration.username,
-      client: state.data.__headers.client,
-      'access-token': state.data.__headers['access-token'],
-    }),
-    body: state => {
-      const payload = {
-        data: state.cases.nonReferrals.map(c => ({
-          external_id: state.oscarStrings(c.case_id),
-          external_id_display: state.oscarStrings(c.case_id_display),
-          global_id: state.oscarStrings(c.oscar_number),
-        })),
-      };
-      console.log("'Update links' with non-referrals:", payload);
-      return payload;
-    },
-  })
-);
+alterState(state => {
+  // Update links for non-referrals
+  if (state.cases.nonReferrals.length > 0)
+    return post(
+      '/api/v1/admin_auth/sign_in',
+      {
+        keepCookie: true,
+        body: {
+          email: state.configuration.username,
+          password: state.configuration.password,
+        },
+      },
+      put('/api/v1/organizations/clients/update_links/', {
+        headers: state => ({
+          'Content-Type': 'application/json',
+          uid: state.configuration.username,
+          client: state.data.__headers.client,
+          'access-token': state.data.__headers['access-token'],
+        }),
+        body: state => {
+          const payload = {
+            data: state.cases.nonReferrals.map(c => ({
+              external_id: state.oscarStrings(c.case_id),
+              external_id_display: state.oscarStrings(c.case_id_display),
+              global_id: state.oscarStrings(c.oscar_number),
+            })),
+          };
+          console.log("'Update links' with non-referrals:", payload);
+          return payload;
+        },
+      })
+    )(state);
+
+  console.log('No non-referral cases to update.');
+  return state;
+});
