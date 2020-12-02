@@ -518,7 +518,7 @@ alterState(state => {
         owned_by_text: isUpdate ? null : `${c.case_worker_name} ${c.case_worker_mobile}`,
         oscar_reason_for_exiting: c.reason_for_exiting,
         has_referral: c.is_referred,
-        risk_level: c.is_referred == true ? 'Medium' : null, //new risk level mapping for referrlas only
+        risk_level: c.is_referred == true ? 'Medium' : null, 
         consent_for_services: isUpdate || c.is_referred == false ? null : true,
         disclosure_other_orgs: isUpdate || c.is_referred == false ? null : true,
         interview_subject: isUpdate || c.is_referred == false ? null : 'other',
@@ -581,6 +581,7 @@ each(
               oscar_status: c.child.oscar_status,
               owned_by: c.child.owned_by,
               has_referral: c.child.has_referral,
+              risk_level: c.child.risk_level,
               consent_for_services: c.child.consent_for_services,
               disclosure_other_orgs: c.child.consent_for_services,
               interview_subject: c.child.interview_subject,
