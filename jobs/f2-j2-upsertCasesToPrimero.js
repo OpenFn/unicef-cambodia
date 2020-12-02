@@ -518,7 +518,7 @@ alterState(state => {
         owned_by_text: isUpdate ? null : `${c.case_worker_name} ${c.case_worker_mobile}`,
         oscar_reason_for_exiting: c.reason_for_exiting,
         has_referral: c.is_referred,
-        risk_level: c.is_referred == true ? 'Medium' : null, 
+        risk_level: c.is_referred == true ? 'medium' : null, 
         consent_for_services: isUpdate || c.is_referred == false ? null : true,
         disclosure_other_orgs: isUpdate || c.is_referred == false ? null : true,
         interview_subject: isUpdate || c.is_referred == false ? null : 'other',
