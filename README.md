@@ -30,11 +30,11 @@ _*Note that these APIs are newly implemented and were developed at the start of 
 ## (3) Data Flows
 To achieve a bi-directional systems sync, 4 OpenFn jobs have been implemented to sync case and referral data between systems.
 
-_**Flow 1: Primero cases --> OSCaR**_ ([Data flow diagram](https://lucid.app/invitations/accept/685f9d11-b32a-466c-8f82-514e30b1198a))
+_**Flow 1: Primero cases --> OSCaR**_ ([Data flow diagram](https://lucid.app/lucidchart/invitations/accept/f6751d0f-2e48-4978-a635-13b8a45d6b3e))
 1. [f1-j1-getPrimeroCases.js](https://github.com/OpenFn/unicef-cambodia/blob/master/jobs/f1-j1-getPrimeroCases.js) will fetch Primero case updates & referrals
 2. [f1-j2-casesToOscar.js](https://github.com/OpenFn/unicef-cambodia/blob/master/jobs/f1-j2-casesToOscar.js) will upload Primero data to OScaR
 
-_**Flow 2: OSCaR cases --> Primero**_ ([Data flow diagram](https://lucid.app/invitations/accept/6aba307e-9a89-421d-8b78-2b7e576e40b9))
+_**Flow 2: OSCaR cases --> Primero**_ ([Data flow diagram](https://lucid.app/lucidchart/invitations/accept/43b99cf0-7801-4ecc-882d-d404c0369a12))
 1. [f2-j1-getOscarCases.js](https://github.com/OpenFn/unicef-cambodia/blob/master/jobs/f2-j1-getOscarCases.js) will fetch OSCaR case updates & referrals
 2. [f2-j2-upsertCasesToPrimero.js](https://github.com/OpenFn/unicef-cambodia/blob/master/jobs/f2-j2-upsertCasesToPrimero.js) will upload OSCaR data to Primero
 
