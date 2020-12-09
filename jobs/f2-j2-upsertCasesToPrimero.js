@@ -527,7 +527,7 @@ alterState(state => {
         registration_date: isUpdate ? null : now.toISOString().split('T')[0].replace(/-/g, '/'),
         referral_notes_oscar: c.reason_for_referral, //new services referral notes field
         services_section: reduceOscarServices(c.services),
-        transitions: reduceOscarServices(c.services).map(t => ({
+        transitions: isUpdate || c.is_referred == false ? null : reduceOscarServices(c.services).map(t => ({
           service_section_unique_id: t.unique_id,
           service: t.service_type,
           created_at: now.toISOString().split('T')[0].replace(/-/g, '/'),
