@@ -481,7 +481,8 @@ alterState(state => {
       }
     }
 
-    const isUpdate = c.external_id && c.is_referred!==true;
+    //const isUpdate = c.external_id && c.is_referred!==true; //cannot contain is_referred, oscar will repeatedly send
+    const isUpdate = c.external_id; 
 
     const locationCode = c.location_current_village_code
       ? parseInt(c.location_current_village_code, 10).toString()
@@ -514,20 +515,20 @@ alterState(state => {
         oscar_status: isUpdate ? null : c.status,
         protection_status: !isUpdate && c.is_referred == true ? 'oscar_referral' : null,
         service_implementing_agency: `agency-${c.organization_name}`,
-        owned_by: isUpdate ? null : setUser(c),
-        owned_by_text: isUpdate ? null : `${c.case_worker_name} ${c.case_worker_mobile}`,
+        owned_by: isUpdate && c.is_referred!==true ? null : setUser(c),
+        owned_by_text: isUpdate && c.is_referred!==true ? null : `${c.case_worker_name} ${c.case_worker_mobile}`,
         oscar_reason_for_exiting: c.reason_for_exiting,
         has_referral: c.is_referred,
         risk_level: c.is_referred == true ? 'medium' : null, 
-        consent_for_services: isUpdate || c.is_referred == false ? null : true,
-        disclosure_other_orgs: isUpdate || c.is_referred == false ? null : true,
-        interview_subject: isUpdate || c.is_referred == false ? null : 'other',
+        consent_for_services: isUpdate || c.is_referred!==true ? null : true,
+        disclosure_other_orgs: isUpdate || c.is_referred!==true ? null : true,
+        interview_subject: isUpdate || c.is_referred!==true ? null : 'other',
         content_source_other: isUpdate ? null : 'OSCaR',
         module_id: 'primeromodule-cp',
         registration_date: isUpdate ? null : now.toISOString().split('T')[0].replace(/-/g, '/'),
         referral_notes_oscar: c.reason_for_referral, //new services referral notes field
         services_section: reduceOscarServices(c.services),
-        transitions: isUpdate || c.is_referred == false ? null : reduceOscarServices(c.services).map(t => ({
+        transitions: isUpdate || c.is_referred!==true ? null : reduceOscarServices(c.services).map(t => ({
           service_section_unique_id: t.unique_id,
           service: t.service_type,
           created_at: now.toISOString().split('T')[0].replace(/-/g, '/'),
