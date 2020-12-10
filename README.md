@@ -4,7 +4,7 @@ Repository to manage OpenFn jobs to integrate the open-source UNICEF [**Primero*
 
 ### Note! Commits to master will deploy automatically to OpenFn.org. 
 
-## (1) Functional Requirements
+## (1) Functional Requirements for Interoperability
 See [this document](https://docs.google.com/document/d/1zNyWXHhbJ0u_v5oeFSRGGoam2KdwHEYgSuSJ33qFai8/edit#heading=h.rmgmdzhp7hd5) for an overview of the Primero & OSCaR interoperability project and requirements. 
 
 Two integration flows have been implemented to facilitate a bi-directional sync between the Primero and OSCaR systems to share relevant case and referral data between systems. This is to support the following functional requirements.
@@ -27,7 +27,7 @@ _*Note that these APIs are newly implemented and were developed at the start of 
 **OpenFn language-packages** (API adaptors) implemented: 
 * [language-primero](https://github.com/OpenFn/language-primero)
 
-## (3) Data Flows
+## (3) Interoperability Workflows
 To achieve a bi-directional systems sync, 4 OpenFn jobs have been implemented to sync case and referral data between systems.
 
 _**Flow 1: Primero cases --> OSCaR**_ ([Data flow diagram](https://lucid.app/lucidchart/invitations/accept/f6751d0f-2e48-4978-a635-13b8a45d6b3e))
@@ -39,7 +39,7 @@ _**Flow 2: OSCaR cases --> Primero**_ ([Data flow diagram](https://lucid.app/luc
 2. [f2-j2-upsertCasesToPrimero.js](https://github.com/OpenFn/unicef-cambodia/blob/master/jobs/f2-j2-upsertCasesToPrimero.js) will upload OSCaR data to Primero
 
 
-## (4) Flow Triggers
+## (4) Interoperability Automation Triggers
 ### Trigger Type: Timer
 
 _Every hour_ OpenFn will run the 4 jobs to fetch new case information from the Primero and OSCaR systems. The flows may also be executed on-demand at any time by a designated OpenFn admin user by clicking the "Run" button on a job in OpenFn.org. 
@@ -68,7 +68,7 @@ Example Request:
 ```
  GET /api/v1/organizations/clients?since_date='2020-07-01 01:00:00'&referred_external=true
 ```
-### Integration Assumptions 
+### Solution Assumptions 
 1. **Data Sharing** - In order for data to be successfully exchanged as expected, users should follow the data entry protocols defined in the training sessions. For an overview of the data entry steps in both the OSCaR and Primero systems (see the below videos). If these data entry steps are _not_ followed and consent is _not_ provided in the Primero system, then these cases may not be eligble for case sharing and referrals between systems. 
    - OSCaR case referral process: 
    - Primero case referral process: 
@@ -81,8 +81,7 @@ Example Request:
     - Oscar Organization Name: `'{organization_name}'` (e.g., `cif`)
     - Primero Agency ID: `'agency-{organization_name}'` (e.g., `agency-cif`)
 
-## (5) Data Flow Mappings & Transformations
-
+## (5) Data Mappings for Information Exchange
 [See this table](https://docs.google.com/spreadsheets/d/1x-KUJgOhaZlZYzJ935q9QXhPM0yobjEEuN-IJgIvmwA/edit?usp=sharing) for the integration field mappings & data transformation rules implemented in the OpenFn jobs. This includes detailed mappings for **Services** and **Province Users**. 
 
 ## (6) Change Management (Considerations for Admins)
