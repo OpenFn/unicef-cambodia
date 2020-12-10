@@ -1,5 +1,5 @@
-# Cambodia Interoperability between Primero and OSCaR Systems
-Automated information exchange between the Primero and OSCaR systems has been implemented on OpenFn to enable interoperability between MoSVY (Primero users) and NGO case workers (OSCaR users) in Cambodia. This OpenFn solution was implemented in partnership with UNICEF Cambodia.nteroperability 
+# IO Solution between Primero and OSCaR Systems
+Automated information exchange between the Primero and OSCaR systems has been implemented on OpenFn to enable interoperability between MoSVY (Primero users) and NGO case workers (OSCaR users) in Cambodia. This OpenFn solution was implemented in partnership with UNICEF Cambodia. 
 
 ![cambodia-IO](/docs/cambodia-IO.png)
 
