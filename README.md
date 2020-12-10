@@ -85,34 +85,40 @@ Example Request:
 
 [See this table](https://docs.google.com/spreadsheets/d/1x-KUJgOhaZlZYzJ935q9QXhPM0yobjEEuN-IJgIvmwA/edit?usp=sharing) for the integration field mappings & data transformation rules implemented in the OpenFn jobs. This includes detailed mappings for **Services** and **Province Users**. 
 
-## (6) Change Management
+## (6) Change Management (Considerations for Admins)
 System administrators are responsible for identifying if changes may impact the OpenFn integration. 
 1. If login credentials are changed for either system, the relevant **Credential** must be updated in OpenFn.org. 
 2. If system changes are made to any of the **fields** referenced in the [field mappings](https://docs.google.com/spreadsheets/d/1x-KUJgOhaZlZYzJ935q9QXhPM0yobjEEuN-IJgIvmwA/edit?usp=sharing), the OpenFn jobs should be reviewed and tested to confirm no impact on the integration. 
-3. If the list of available **Province Users** or **Services** in either system changes, then the Services and Province User Map should be reviewed in the [mapping document](https://docs.google.com/spreadsheets/d/1x-KUJgOhaZlZYzJ935q9QXhPM0yobjEEuN-IJgIvmwA/edit?usp=sharing) to confirm no updates are required in the OpenFn jobs. 
-4. If **new Agencies/ Organizations are created** in either system, OSCaR and Primero teams will coordinate to manually register the new agencies in each system (this is _not_ an automated process). _Agency/Organization Ids should follow the below naming conventions, otherwise the OpenFn mappings may need to be updated_: 
+3. If the list of available **Agencies** or **Services** in either system changes, then the Administrator should review the [mapping document](https://docs.google.com/spreadsheets/d/1x-KUJgOhaZlZYzJ935q9QXhPM0yobjEEuN-IJgIvmwA/edit?usp=sharing) to confirm no updates are required in the OpenFn Interoperability automation. 
+4. If **new Agencies/ Organizations are created** in either system, OSCaR and Primero teams will coordinate to manually register the new agencies in each system (this is _not_ an automated process). Primero administrators will need to (1) add the new agency to the list of `Implementing Agencies` and create a new generic agency user (e.g., `agency-cif-user`). 
+_Agency/Organization Ids should follow the below naming conventions, otherwise the OpenFn mappings may need to be updated_: 
     - Oscar Organization Name: `'{organization_name}'` (e.g., `cif`)
     - Primero Agency ID: `'agency-{organization_name}'` (e.g., `agency-cif`)
 
 ## (7) Administration
 ### Provisioning, Hosting, & Maintenance
-This integration is hosted on [OpenFn.org](https://openfn.org/projects) with Primero SaaS. OpenFn will provide ongoing maintenance support. 
+This integration is hosted on [OpenFn.org](https://openfn.org/projects) with Primero SaaS. OpenFn will provide ongoing maintenance support to the MoSVY administrators managing OpenFn and Primero.  
 
 ### Support 
-Primero system administrators will be responsible for ongoing integration monitoring and management.
-- Primero System Administrators:
-- OSCaR System Administrators:
+Contact **support@openfn.org** with any questions or troubleshooting support. 
 
-Contact support@openfn.org with any questions or troubleshooting support. 
+**MoSVY Primero system administrators will be the primary contacts** responsible for ongoing integration monitoring and management: 
+srychandina@gmail.com
+sovansideth@gmail.com 
+
+#### Other Support Contacts
+**UNICEF:**
+mkeng@unicef.org 		
+pkhauv@unicef.org 
+
+**OSCaR:**
+sokly@childreninfamilies.org
+kiry@devezep.com
 
 ### Training Materials
-- System Administrators: [See here](https://docs.google.com/presentation/d/1ln55ye9qN7vR9GeCntRTXZC08EjlxccBUp7X9aMitSI/edit?usp=sharing) for the training deck presented during the July System Administrator training. This includes an overview of integration monitoring, error codes, and troubleshooting. 
+- System Administrators: [See the video recording](https://youtu.be/-5-Y9ZrK-aQ) and [presentation](https://docs.google.com/presentation/d/1aUprT1CwnEWtIax_PGxsPspXdR3mPy78rj6qt92dxeI/edit?usp=sharing) from the December 2020 System Administrators training. This includes an overview of integration monitoring, error codes, and troubleshooting. 
 
-
-## Checklist
-- [x] OpenFn Admin users & access levels confirmed? 
-- [x] OpenFn Admin training
-- [ ] Support POCs identified for each connected system? 
+ 
 
 
 
