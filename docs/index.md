@@ -38,11 +38,11 @@ _**Flow 2: OSCaR cases --> Primero**_ ([Data flow diagram](https://lucid.app/luc
 2. [f2-j2-upsertCasesToPrimero.js](https://github.com/OpenFn/unicef-cambodia/blob/master/jobs/f2-j2-upsertCasesToPrimero.js) will upload OSCaR data to Primero
 
 
-## (4) Sync Triggers
+## (4) Automated Sync Triggers
 ### Trigger Type: Timer
 
 _Every hour_ OpenFn will run the 4 jobs to fetch new case information from the Primero and OSCaR systems. The flows may also be executed on-demand at any time by a designated OpenFn admin user by clicking the "Run" button on a job in OpenFn.org. 
-![Run Job](../demo/run_job_now.png)
+![Run Job](./run_job_now.png)
 
 _**Flow 1: Primero cases --> OSCaR**_
 
