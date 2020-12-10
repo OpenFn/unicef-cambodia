@@ -16,7 +16,7 @@ _**Flow 2: OSCaR cases --> Primero**_
 * Syncing NGO cases to Primero for MoSVY case workers to view (to prevent duplicate work)
 
 ### Videos
-<figure class="primero-io-videos">
+<figure class="video-container">
   <iframe src="https://www.youtube.com/playlist?list=PLSnTMDfTYBLj0cLKYgYBAtLU0lyrSG7Zb" frameborder="0" allowfullscreen="true"> </iframe>
 </figure>
 
@@ -127,7 +127,7 @@ pkhauv@unicef.org
 
 **OSCaR:**
 sokly@childreninfamilies.org
-kiry@devezep.com
+kiry@devzep.com
 
 ### Training Materials
-- System Administrators: [See the video recording](https://youtu.be/-5-Y9ZrK-aQ) and [presentation](https://docs.google.com/presentation/d/1aUprT1CwnEWtIax_PGxsPspXdR3mPy78rj6qt92dxeI/edit?usp=sharing) from the December 2020 System Administrators training. This includes an overview of integration monitoring, error codes, and troubleshooting. 
+- [See the video recording](https://youtu.be/-5-Y9ZrK-aQ) and [presentation](https://docs.google.com/presentation/d/1aUprT1CwnEWtIax_PGxsPspXdR3mPy78rj6qt92dxeI/edit?usp=sharing) from the December 2020 System Administrators training. This includes an overview of integration monitoring, error codes, and troubleshooting. 
