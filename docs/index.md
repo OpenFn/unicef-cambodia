@@ -17,7 +17,7 @@ _**Flow 2: OSCaR cases --> Primero**_
 
 ### Videos
 <figure class="video-container">
-  <iframe src="https://www.youtube.com/playlist?list=PLSnTMDfTYBLj0cLKYgYBAtLU0lyrSG7Zb" frameborder="0" allowfullscreen="true"> </iframe>
+  <iframe src="https://youtu.be/8JEFSmSx2SY" frameborder="0" allowfullscreen="true"> </iframe>
 </figure>
 
 ## (2) Integration with System APIs
