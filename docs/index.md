@@ -45,7 +45,7 @@ _**Flow 2: OSCaR cases --> Primero**_ ([Data flow diagram](https://lucid.app/luc
 ## (4) Automation Triggers
 ### Trigger Type: Cron Timer
 
-_Every hour_ OpenFn will run the 4 jobs to fetch new case information from the Primero and OSCaR systems. The flows may also be executed on-demand at any time by a designated OpenFn admin user by clicking the "Run" button on a job in OpenFn.org. 
+Every hour at `00` minutes (cron: `00 * * * *`) OpenFn will run the 4 jobs to fetch new case information from the Primero and OSCaR systems. The flows may also be executed on-demand at any time by a designated OpenFn admin user by clicking the "Run" button on a job in OpenFn.org. 
 ![Run Job](./run_job_now.png)
 
 _**Flow 1: Primero cases --> OSCaR**_
