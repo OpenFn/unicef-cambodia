@@ -9,8 +9,8 @@ Documentation updates can be made in [`docs/index.md`](https://github.com/OpenFn
 
 ## Questions? 
 Contact support@openfn.org or the MoSVY Primero administrators: 
-srychandina@gmail.com
-sovansideth@gmail.com 
+- srychandina@gmail.com
+- sovansideth@gmail.com 
 
 
 
