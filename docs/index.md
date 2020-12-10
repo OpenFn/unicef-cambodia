@@ -3,31 +3,35 @@
 Automated information exchange between the Primero and OSCaR systems has been implemented on OpenFn to enable interoperability between MoSVY (Primero users) and NGO case workers (OSCaR users) in Cambodia. This OpenFn solution was implemented in partnership with UNICEF Cambodia. 
 
 
-## (1) Functional Requirements for Interoperability
-See [this document](https://docs.google.com/document/d/1zNyWXHhbJ0u_v5oeFSRGGoam2KdwHEYgSuSJ33qFai8/edit#heading=h.rmgmdzhp7hd5) for an overview of the Primero & OSCaR interoperability project and requirements. 
+## (1) Interoperability Solution Overview
+See [this user guide](https://docs.google.com/document/d/1zNyWXHhbJ0u_v5oeFSRGGoam2KdwHEYgSuSJ33qFai8/edit#heading=h.rmgmdzhp7hd5) for an overview of the Primero & OSCaR interoperability project and requirements. 
 
-Two integration flows have been implemented to facilitate a bi-directional sync between the Primero and OSCaR systems to share relevant case and referral data between systems. This is to support the following functional requirements.
+Two interoperability workflows have been implemented to facilitate a bi-directional sync between the Primero and OSCaR systems to share relevant case and referral data between systems. This is to support the following functional requirements.
 
 _**Flow 1: Primero cases --> OSCaR**_
-* User Story 1: Generating government referrals 
+* Sending MoSVY government referrals to NGO case workers
 
 _**Flow 2: OSCaR cases --> Primero**_
-* User Story 2: View OSCaR cases in Primero 
-* User Story 4: Sending OSCaR referrals to Primero
+* Sending NGO referrals to MoSVY case workers
+* Syncing NGO cases to Primero for MoSVY case workers to view (to prevent duplicate work)
 
+### Videos
+Paste links! 
 
-## (2) System APIs
+## (2) Integration with System APIs
+To automate the IO workflows, a bi-directional integration has been configured on the [OpenFn](openfn.org) platform to connect the Primero and OSCaR APIs. 
+
 **APIs*** implemented:
-* Primero: [API v1.1](https://docs.google.com/document/d/1jpaT2_UBBnc3PxPYlLMBEzNUkyfuxRZiksywG5MKM0Q/edit?usp=sharing)
+* Primero: [API v1.1](https://docs.google.com/document/d/1jpaT2_UBBnc3PxPYlLMBEzNUkyfuxRZiksywG5MKM0Q/edit?usp=sharing) 
 * OSCaR: [API v1.0.0](https://app.swaggerhub.com/apis/Ro51/OSCaRInterop/1.0.0#/info)
 
 _*Note that these APIs are newly implemented and were developed at the start of this integration implementation._
 
-**OpenFn language-packages** (API adaptors) implemented: 
-* [language-primero](https://github.com/OpenFn/language-primero)
+**OpenFn Adaptors** (API wrappers) implemented: 
+* [language-primero](https://github.com/OpenFn/language-primero) - This adaptor is version-locked on OpenFn.org as Cambodia has implemented `Primero v1.7` (and has not yet upgraded to `Primero v2`). 
 
 ## (3) Interoperability Workflows
-To achieve a bi-directional systems sync, 4 OpenFn jobs have been implemented to sync case and referral data between systems.
+To achieve a bi-directional systems sync, 4 OpenFn jobs have been implemented to automate the IO workflows
 
 _**Flow 1: Primero cases --> OSCaR**_ ([Data flow diagram](https://lucid.app/lucidchart/invitations/accept/f6751d0f-2e48-4978-a635-13b8a45d6b3e))
 1. [f1-j1-getPrimeroCases.js](https://github.com/OpenFn/unicef-cambodia/blob/master/jobs/f1-j1-getPrimeroCases.js) will fetch Primero case updates & referrals
@@ -38,8 +42,8 @@ _**Flow 2: OSCaR cases --> Primero**_ ([Data flow diagram](https://lucid.app/luc
 2. [f2-j2-upsertCasesToPrimero.js](https://github.com/OpenFn/unicef-cambodia/blob/master/jobs/f2-j2-upsertCasesToPrimero.js) will upload OSCaR data to Primero
 
 
-## (4) Automated Sync Triggers
-### Trigger Type: Timer
+## (4) Automation Triggers
+### Trigger Type: Cron Timer
 
 _Every hour_ OpenFn will run the 4 jobs to fetch new case information from the Primero and OSCaR systems. The flows may also be executed on-demand at any time by a designated OpenFn admin user by clicking the "Run" button on a job in OpenFn.org. 
 ![Run Job](./run_job_now.png)
@@ -67,21 +71,33 @@ Example Request:
 ```
  GET /api/v1/organizations/clients?since_date='2020-07-01 01:00:00'&referred_external=true
 ```
-### Solution Assumptions 
-1. **Data Sharing** - In order for data to be successfully exchanged as expected, users should follow the data entry protocols defined in the training sessions. For an overview of the data entry steps in both the OSCaR and Primero systems (see the below videos). If these data entry steps are _not_ followed and consent is _not_ provided in the Primero system, then these cases may not be eligble for case sharing and referrals between systems. 
-   - OSCaR case referral process: 
-   - Primero case referral process: 
-2. **Unique Identifiers** - OpenFn will perform `upsert()` (update if record exists, create if new) operations in both the Primero and OSCaR systems when syncing data. To ensure no duplicate cases are entered, OpenFn will use the below identifiers to check for existing cases. _We assume that these identifiers are unique_. 
+## (5) Data Sharing Protocols & Mappings
+### Data Sharing Agreements
+[See this folder]() for copies of the data sharing agreements between the MoSVY and Cambodia (OSCaR user) agencies. 
+
+[See this mapping table](https://docs.google.com/spreadsheets/d/1x-KUJgOhaZlZYzJ935q9QXhPM0yobjEEuN-IJgIvmwA/edit?usp=sharing) for the data element mappings implemented in the IO solution. This includes detailed integration mappings for **Services** and **Primero Users/Case Ownerss**. 
+
+### Data Entry Protocols
+In order for data to be successfully exchanged as expected, users should follow the data entry protocols defined in the training sessions. For an overview of the data entry steps in both the OSCaR and Primero systems (see the below videos). If these data entry steps are _not_ followed and consent is _not_ provided in the Primero system, then these cases may not be eligble for case sharing and referrals between systems. 
+
+See the videos for 
+
+## (6) Solution Assumptions 
+#### 1. Unique Identifiers
+OpenFn will perform `upsert()` (update if record exists, create if new) operations in both the Primero and OSCaR systems when syncing data. To ensure no duplicate cases are entered, OpenFn will use the below identifiers to check for existing cases. _We assume that these identifiers are unique_. 
    - OSCaR unique id: `global_id` (represented as `oscar_number` in Primero system)
    - Primero unique id: `case_id` (represented as `external_id` in OSCaR system)
-3. **Services** are mapped between systems as defined in the [Service Map](https://docs.google.com/spreadsheets/d/1x-KUJgOhaZlZYzJ935q9QXhPM0yobjEEuN-IJgIvmwA/edit#gid=1841308930). _If any services change, this map and OpenFn jobs must be updated._
-4. **Primero Case Owner Assignment** - When cases are synced with Primero, they will be automatically assigned to a Province user case owner by OpenFn (see `owned_by` field in mappings). The Province will be determined by the location code of the child provided by OSCaR. See [Province User Map] for the list of generic Primero Province users. 
-5. **Organization/ Agency names** - Agency IDs and Names are mapped between systems assuming specific naming conventions (see below). Any new organizations/agencies should be registered following the same naming conventions, otherwise the OpenFn jobs may need to be updated.  
+
+#### 3. Referral Services 
+Service types are mapped between systems as defined in the [Service Map](https://docs.google.com/spreadsheets/d/1x-KUJgOhaZlZYzJ935q9QXhPM0yobjEEuN-IJgIvmwA/edit#gid=1841308930). _If any services change, this map and OpenFn jobs must be updated._
+
+#### 4. Primero Case Owner Assignment**
+When cases are synced with Primero, they will be automatically assigned to a Province user case owner by OpenFn (see `owned_by` field in mappings). The Province will be determined by the location code of the child provided by OSCaR. See [Province User Map] for the list of generic Primero Province users. 
+
+#### 5. Organization/ Agency names
+Agency IDs and Names are mapped between systems assuming specific naming conventions (see below). Any new organizations/agencies should be registered following the same naming conventions, otherwise the OpenFn jobs may need to be updated.  
     - Oscar Organization Name: `'{organization_name}'` (e.g., `cif`)
     - Primero Agency ID: `'agency-{organization_name}'` (e.g., `agency-cif`)
-
-## (5) Data Mappings for Information Exchange
-[See this table](https://docs.google.com/spreadsheets/d/1x-KUJgOhaZlZYzJ935q9QXhPM0yobjEEuN-IJgIvmwA/edit?usp=sharing) for the integration field mappings & data transformation rules implemented in the OpenFn jobs. This includes detailed mappings for **Services** and **Province Users**. 
 
 ## (6) Change Management (Considerations for Admins)
 System administrators are responsible for identifying if changes may impact the OpenFn integration. 
