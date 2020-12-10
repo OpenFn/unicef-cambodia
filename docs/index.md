@@ -16,9 +16,7 @@ _**Flow 2: OSCaR cases --> Primero**_
 * Syncing NGO cases to Primero for MoSVY case workers to view (to prevent duplicate work)
 
 ### Videos
-<figure class="video-container">
-  <iframe src="https://youtu.be/8JEFSmSx2SY" frameborder="0" allowfullscreen="true"> </iframe>
-</figure>
+See these videos for the solution overview & demo of the interoperability workflows: https://www.youtube.com/playlist?list=PLSnTMDfTYBLj0cLKYgYBAtLU0lyrSG7Zb
 
 ## (2) Integration with System APIs
 To automate the IO workflows, a bi-directional integration has been configured on the [OpenFn](openfn.org) platform to connect the Primero and OSCaR APIs. 
