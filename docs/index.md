@@ -73,14 +73,12 @@ Example Request:
 ```
 ## (5) Data Sharing Protocols & Mappings
 ### Data Sharing Agreements
-[See this folder]() for copies of the data sharing agreements between the MoSVY and Cambodia (OSCaR user) agencies. 
+[See this folder](https://drive.google.com/drive/folders/1Wb_h0Dazt8socWRW7buR2IBNqW4Pft7_?usp=sharing) for copies of the data sharing agreements between the MoSVY and Cambodia (OSCaR user) agencies. 
 
 [See this mapping table](https://docs.google.com/spreadsheets/d/1x-KUJgOhaZlZYzJ935q9QXhPM0yobjEEuN-IJgIvmwA/edit?usp=sharing) for the data element mappings implemented in the IO solution. This includes detailed integration mappings for **Services** and **Primero Users/Case Ownerss**. 
 
 ### Data Entry Protocols
-In order for data to be successfully exchanged as expected, users should follow the data entry protocols defined in the training sessions. For an overview of the data entry steps in both the OSCaR and Primero systems (see the below videos). If these data entry steps are _not_ followed and consent is _not_ provided in the Primero system, then these cases may not be eligble for case sharing and referrals between systems. 
-
-See the videos for 
+In order for data to be successfully exchanged as expected, users should follow the data entry protocols defined in the training sessions. For an overview of the data entry steps in both the OSCaR and Primero systems (see the below videos). If these data entry steps are _not_ followed and consent is _not_ provided in the Primero system, then these cases may not be eligble for case sharing and referrals between systems. **See the videos (above) for guidance**. 
 
 ## (6) Solution Assumptions 
 #### 1. Unique Identifiers
