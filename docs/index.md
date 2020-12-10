@@ -99,7 +99,7 @@ Agency IDs and Names are mapped between systems assuming specific naming convent
     - Oscar Organization Name: `'{organization_name}'` (e.g., `cif`)
     - Primero Agency ID: `'agency-{organization_name}'` (e.g., `agency-cif`)
 
-## (6) Change Management (Considerations for Admins)
+## (7) Change Management (Considerations for Admins)
 System administrators are responsible for identifying if changes may impact the OpenFn integration. 
 1. If login credentials are changed for either system, the relevant **Credential** must be updated in OpenFn.org. 
 2. If system changes are made to any of the **fields** referenced in the [field mappings](https://docs.google.com/spreadsheets/d/1x-KUJgOhaZlZYzJ935q9QXhPM0yobjEEuN-IJgIvmwA/edit?usp=sharing), the OpenFn jobs should be reviewed and tested to confirm no impact on the integration. 
@@ -109,7 +109,7 @@ _Agency/Organization Ids should follow the below naming conventions, otherwise t
     - Oscar Organization Name: `'{organization_name}'` (e.g., `cif`)
     - Primero Agency ID: `'agency-{organization_name}'` (e.g., `agency-cif`)
 
-## (7) Administration
+## (8) Administration
 ### Provisioning, Hosting, & Maintenance
 This integration is hosted on [OpenFn.org](https://openfn.org/projects) with Primero SaaS. OpenFn will provide ongoing maintenance support to the MoSVY administrators managing OpenFn and Primero.  
 
