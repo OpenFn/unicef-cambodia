@@ -1,4 +1,4 @@
 alterState(state => {
-  console.log(`✓ Successfully authenticated with ${state.configuration.url}`)
+  console.log(`✓ Successfully authenticated with ${state.configuration.url}`);
   return state;
 });
