@@ -1,4 +1,4 @@
 alterState(state => {
-  console.log('Authentication test succeeded.');
-  return { ...state, data: {}, references: [] };
+  console.log(`✓ Successfully authenticated with ${state.configuration.url}`)
+  return state;
 });
