@@ -8,10 +8,7 @@ post(
     },
   },
   state => {
-    state.configuration = 'REDACTED'
-    console.log(JSON.stringify(state, null, 2));
-    state.body = {}
-    state.references = []
-    return state;
+    console.log(`✓ Successfully authenticated with ${state.configuration.baseUrl}`);
+    return { ...state, body: {}, references: [] };
   }
 );
