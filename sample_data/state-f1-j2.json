@@ -1,0 +1,120 @@
+{
+  "references": [
+    {}
+  ],
+  "data": [
+    {
+      "case_id_display": "1913226",
+      "sex": "female",
+      "date_of_birth": "2018/10/01",
+      "age": 2,
+      "transitions": [
+        {
+          "unique_id": "69af16df-f247-471a-a1fc-e65c61f9b0ac",
+          "type": "referral",
+          "to_user_local": "agency-demo-user",
+          "to_user_local_status": "in_progress",
+          "notes": "referral notes from primero",
+          "transitioned_by": "primero",
+          "service": "social_work_case_work",
+          "service_section_unique_id": "ad453d62-6b67-4018-b6c0-241995f8beda",
+          "is_remote": false,
+          "type_of_export": "primero",
+          "consent_overridden": false,
+          "consent_individual_transfer": false,
+          "created_at": "2020/11/10",
+          "id": "56997cf9-aca4-4466-92c1-ca67c2931585"
+        }
+      ],
+      "case_id": "7a542eed-16e0-4377-a75f-01f471913226",
+      "owned_by": "primero",
+      "owned_by_agency": "agency-unicef",
+      "owned_by_phone": "012345676867867876",
+      "module_id": "primeromodule-cp",
+      "name_last": "Dale",
+      "name_first": "Anne",
+      "location_current": "140501",
+      "interview_subject": "individual",
+      "services_section": [
+        {
+          "unique_id": "ad453d62-6b67-4018-b6c0-241995f8beda",
+          "service_response_type": "referral_to_oscar",
+          "service_type": "social_work_case_work",
+          "service_subtype": [
+            "social_work_case_work_generalist"
+          ],
+          "service_response_day_time": "2020/11/10 06:00:00 +0000",
+          "service_implementing_agency": "agency-demo",
+          "service_implementing_agency_individual": "agency-demo-user",
+          "service_referral_notes": "social work referral notes",
+          "service_status_referred": true,
+          "service_implemented": "not_implemented"
+        }
+      ],
+      "_id": "7d4b1afdc516606a92e57d4ed10a9383",
+      "created_at": "2020/11/10 06:02:16 +0000"
+    },
+    {
+      "owned_by": "mgrbtb",
+      "owned_by_agency": "agency-cwd",
+      "owned_by_phone": "",
+      "module_id": "primeromodule-cp",
+      "created_at": "2020/10/12 06:21:13 +0000",
+      "case_id_display": "f1439c3",
+      "oscar_number": "01EMDQ5S65D2NRAGGQFQW7JYAX",
+      "oscar_short_id": "ixyb-1326",
+      "oscar_status": "Active",
+      "name_last": "Test",
+      "name_first": "Rita",
+      "sex": "female",
+      "date_of_birth": "2019/08/27",
+      "age": 1,
+      "location_current": "2020202",
+      "interview_subject": "other",
+      "services_section": [
+        {
+          "unique_id": "cb5bea66-c7eb-49ca-8fa7-a7d0ef0c889f",
+          "service_response_type": "referral_from_oscar",
+          "service_type": "family_support",
+          "service_subtype": [
+            "family_support_family_support"
+          ],
+          "service_type_text": "family_support",
+          "service_referral_notes": "test reason",
+          "service_implemented": "implemented",
+          "service_implemented_day_time": "2020/10/12 00:00:00 +0000",
+          "service_type_details_text": "n/a",
+          "oscar_case_worker_name": "Admin ",
+          "oscar_referring_organization": "agency-demo"
+        }
+      ],
+      "_id": "86f29a47a3cb96f5aa9b9002e7738446",
+      "case_id": "3da8fc02-1e7d-4f12-b32f-19599f1439c3",
+      "protection_status": "oscar_referral"
+    },
+    {
+      "owned_by": "agency-demo-user",
+      "owned_by_agency": "agency-demo",
+      "module_id": "primeromodule-cp",
+      "created_at": "2020/11/16 08:20:30 +0000",
+      "case_id_display": "39b7d2e",
+      "oscar_number": "01ED6NGKY1NVK3VDWXKR0S2XX5",
+      "oscar_short_id": "iqm-893",
+      "name_last": "Ith",
+      "name_first": "kunthea",
+      "sex": "male",
+      "date_of_birth": "2020/09/01",
+      "age": 0,
+      "_id": "7d4b1afdc516606a92e57d4ed1a7e781",
+      "case_id": "bc3eafab-b4b6-4fe3-9e5e-eb08f39b7d2e"
+    }
+  ],
+  "configuration": {
+    "baseUrl": "https://start.oscarhq.com",
+    "username": "api...",
+    "password": "SEE-LP"
+  },
+  "lastCreated": "21-10-2020",
+  "lastUpdated": "15-10-2020 10:36",
+  "lastCaseCreated": "23-10-2020"
+}
