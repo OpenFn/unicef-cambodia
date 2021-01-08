@@ -190,20 +190,17 @@ post(
           external_case_worker_id: oscarStrings(c.owned_by_id),
           external_case_worker_mobile: c.owned_by_phone || '000000000',
           organization_name: state => {
-            // 'demo', // hardcoding to one of the orgs in Oscar staging system for testing
-            //organization_name: oscarStrings(c.owned_by_agency.substring(7)), // add back in before go-live
-            //Q:^^ replace with service_implementing_agency ??
             if (c.services_section.some(s => s.service_response_type === 'referral_from_oscar')) {
-              return c.services_section[0].oscar_referring_organization; // WHICH ONE??
-              // TODO: strip 'agency-' from the front of the string.
+              // NOTE: The "business" stipulates that all "oscar_referring_organization"
+              // values will be the SAME for an array including any "referral_from_oscar"
+              // items, and requires that we merely select the first item.
+              return c.services_section[0].oscar_referring_organization.substring(7);
             } else if (
               c.services_section.some(s => s.service_response_type === 'referral_to_oscar')
-              // TODO: strip 'agency-' from the front of the string.
             ) {
-              return c.services_section[0].service_implementing_agency; // WHICH ONE??
+              return c.services_section[0].service_implementing_agency.substring(7);
             } else {
-              return c.owned_by_agency;
-              // TODO: strip 'agency-' from the front of the string.
+              return c.owned_by_agency.substring(7);
             }
           },
           organization_id: oscarStrings(c.owned_by_agency_id), //Q: replace with service_implementing_agency ??
