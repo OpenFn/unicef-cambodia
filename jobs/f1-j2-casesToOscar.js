@@ -4,8 +4,8 @@ alterState(state => {
   // ===========================================================================
   // NOTE: As of September 25, 2020, Primero has changed the structure of this
   // payload for a subset of cases, depending on whether or not data exists in
-  // the services array. Below, we create an empty array, if it's been removed,
-  // to ensure that all payloads adhere to the integration contract.
+  // the services array. Below, we create an empty array if it's been removed to
+  // ensure that all payloads adhere to the integration contract.
   state.data = state.data.map(c => ({
     ...c,
     services_section: c.services_section || [],
