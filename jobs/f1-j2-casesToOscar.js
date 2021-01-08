@@ -4,8 +4,8 @@ alterState(state => {
   // ===========================================================================
   // NOTE: As of September 25, 2020, Primero has changed the structure of this
   // payload for a subset of cases, depending on whether or not data exists in
-  // the services array. Below, we create an empty array, if it's been removed,
-  // to ensure that all payloads adhere to the integration contract.
+  // the services array. Below, we create an empty array if it's been removed to
+  // ensure that all payloads adhere to the integration contract.
   state.data = state.data.map(c => ({
     ...c,
     services_section: c.services_section || [],
@@ -28,6 +28,19 @@ alterState(state => {
     } else {
       console.log('Converting key to an empty string for OSCAR.');
       return '';
+    }
+  };
+
+  state.setOrganization = c => {
+    if (c.services_section.some(s => s.service_response_type === 'referral_from_oscar')) {
+      // NOTE: The "business" stipulates that all "oscar_referring_organization"
+      // values will be the SAME for an array including any "referral_from_oscar"
+      // items, and requires that we merely select the first item.
+      return c.services_section[0].oscar_referring_organization.substring(7);
+    } else if (c.services_section.some(s => s.service_response_type === 'referral_to_oscar')) {
+      return c.services_section[0].service_implementing_agency.substring(7);
+    } else {
+      return c.owned_by_agency.substring(7);
     }
   };
 
@@ -66,7 +79,7 @@ post(
         };
       },
       body: state => {
-        const { oscarStrings } = state;
+        const { oscarStrings, setOrganization } = state;
 
         function checkValue(data) {
           if (data !== 'NaN' && data) {
@@ -189,9 +202,7 @@ post(
           external_case_worker_name: oscarStrings(c.owned_by),
           external_case_worker_id: oscarStrings(c.owned_by_id),
           external_case_worker_mobile: c.owned_by_phone || '000000000',
-          organization_name: 'demo', // hardcoding to one of the orgs in Oscar staging system for testing
-          //organization_name: oscarStrings(c.owned_by_agency.substring(7)), // add back in before go-live
-          //Q:^^ replace with service_implementing_agency ??
+          organization_name: setOrganization(c),
           organization_id: oscarStrings(c.owned_by_agency_id), //Q: replace with service_implementing_agency ??
           is_referred: true,
           services: c.services_section
@@ -208,10 +219,12 @@ post(
           transaction_id: c.transition_id,
           // transaction_id: oscarStrings(c.transition_id),
         };
+
         console.warn(
           'FULL LOGS FOR TESTING ONLY!!!: ',
           JSON.stringify({ organization: oscar }, null, 2)
         );
+
         // NOTE: Logs for enhanced audit trail.
         console.log(
           'Case data to be posted to Oscar: ',
