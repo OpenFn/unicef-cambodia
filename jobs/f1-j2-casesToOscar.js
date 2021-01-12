@@ -36,10 +36,13 @@ alterState(state => {
       // NOTE: The "business" stipulates that all "oscar_referring_organization"
       // values will be the SAME for an array including any "referral_from_oscar"
       // items, and requires that we merely select the first item.
+      console.log(c.services_section[0].oscar_referring_organization);
       return c.services_section[0].oscar_referring_organization.substring(7);
     } else if (c.services_section.some(s => s.service_response_type === 'referral_to_oscar')) {
+      console.log(c.services_section[0].service_implementing_agency);
       return c.services_section[0].service_implementing_agency.substring(7);
     } else {
+      console.log(c.owned_by_agency);
       return c.owned_by_agency.substring(7);
     }
   };
