@@ -37,14 +37,14 @@ alterState(state => {
       // values will be the SAME for an array including any "referral_from_oscar"
       // items, and requires that we merely select the first item.
       console.log(
-        'Response type "referral_from_oscar" detected, The "oscar_referring_organization" is',
-        c.services_section[0].oscar_referring_organization
+        'Response type "referral_from_oscar" detected, The "oscar_referring_organization" values for these services are',
+        c.services_section.map(s => s.oscar_referring_organization)
       );
       return c.services_section[0].oscar_referring_organization.substring(7);
     } else if (c.services_section.some(s => s.service_response_type === 'referral_to_oscar')) {
       console.log(
-        'Response type "referral_to_oscar" detected, The "service_implementing_agency" is',
-        c.services_section[0].service_implementing_agency
+        'Response type "referral_to_oscar" detected, The "service_implementing_agency" values for these services are',
+        c.services_section.map(s => s.service_implementing_agency)
       );
       return c.services_section[0].service_implementing_agency.substring(7);
     } else {
