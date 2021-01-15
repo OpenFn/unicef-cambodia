@@ -309,13 +309,11 @@ alterState(state => {
           oscar_short_id: c.slug,
           address_current_village_code: c.address_current_village_code,
           external_case_worker_id: c.external_case_worker_id,
-          external_case_worker_name: c.external_case_worker_name,
           external_id: c.external_id,
           external_id_display: c.external_id_display,
           global_id: c.global_id,
           is_referred: c.is_referred,
           location_current_village_code: c.location_current_village_code,
-          mosvy_number: c.mosvy_number,
           organization_id: c.organization_id,
           organization_name: c.organization_name,
           services: c.services.map(s => ({ uuid: s.uuid, enrollment_date: s.enrollment_date })),
@@ -564,18 +562,15 @@ each(
       // NOTE: This is extremely VERBOSE but more secure, given that we don't
       // know exactly what will be provided by the API.
       console.log(
-        'Data provided to Primero `upsertCase`: ',
+        'Data provided to Primero for upload `upsertCase`: ',
         JSON.stringify(
           {
             remote: c.remote,
             oscar_number: c.oscar_number,
             case_id: c.case_id,
             child: {
-              date_of_birth: c.child.date_of_birth,
-              age: c.child.age,
               case_id: c.child.case_id,
               oscar_number: c.child.oscar_number,
-              mosvy_number: c.child.mosvy_number,
               oscar_short_id: c.child.oscar_short_id,
               location_current: c.child.location_current,
               address_current: c.child.address_current,
@@ -585,17 +580,11 @@ each(
               risk_level: c.child.risk_level,
               consent_for_services: c.child.consent_for_services,
               disclosure_other_orgs: c.child.consent_for_services,
-              interview_subject: c.child.interview_subject,
-              content_source_other: c.child.content_source_other,
               module_id: c.child.module_id,
-              registration_date: c.child.registration_date,
-              referral_notes_oscar: c.reason_for_referral,
               services_section: c.child.services_section.map(s => ({
                 unique_id: s.unique_id,
                 service_response_type: s.service_response_type,
-                oscar_case_worker_name: s.oscar_case_worker_name,
                 oscar_referring_organization: s.oscar_referring_organization,
-                oscar_case_worker_telephone: s.oscar_case_worker_telephone,
               })),
               transitions: c.child.services_section.map(t => ({
                 service_section_unique_id: t.unique_id,
