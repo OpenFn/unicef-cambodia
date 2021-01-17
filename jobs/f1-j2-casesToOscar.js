@@ -231,11 +231,6 @@ post(
           // transaction_id: oscarStrings(c.transition_id),
         };
 
-        console.warn(
-          'FULL LOGS FOR TESTING ONLY!!!: ',
-          JSON.stringify({ organization: oscar }, null, 2)
-        );
-
         // NOTE: Logs for enhanced audit trail.
         console.log(
           'Case data to be posted to Oscar: ',
