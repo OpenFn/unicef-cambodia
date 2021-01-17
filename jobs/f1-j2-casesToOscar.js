@@ -239,6 +239,7 @@ post(
               organization: {
                 external_id: oscar.external_id,
                 external_id_display: oscar.external_id_display,
+                oscar_id: oscar.oscar_short_id, 
                 global_id: oscar.global_id,
                 mosvy_number: oscar.mosvy_number,
                 location_current_village_code: oscar.location_current_village_code,
