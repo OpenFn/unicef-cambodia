@@ -24,8 +24,7 @@ getCases(
         }.01-01-4020 00:00`,
       },
       service_response_types: 'list||referral_to_oscar', // only cases with referral services
-      record_state: true, //only fetch active cases
-      child_status: 'open' //only fetch open cases
+      record_state: 'list||true' //only fetch active cases
     },
     per: 1000,
   },
