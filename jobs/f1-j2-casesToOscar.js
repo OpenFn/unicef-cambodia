@@ -16,7 +16,7 @@ alterState(state => {
   state.cases = { referrals: [], nonReferrals: [] };
 
   state.data.forEach(c =>
-    c.services_section.map(s => s.service_response_type).includes('referral_to_oscar') && !c.oscar_number
+    c.services_section.map(s => s.service_response_type).includes('referral_to_oscar') 
       ? state.cases.referrals.push(c)
       : state.cases.nonReferrals.push(c)
   );
