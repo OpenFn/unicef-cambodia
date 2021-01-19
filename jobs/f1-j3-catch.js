@@ -1,7 +1,7 @@
-// Job 2 failed
-// Posting initial cursor back to inbox for reprocessing.
+console.log('Sending cases to Oscar failed.')
+console.log('Posting initial cursor back to inbox to initate another Primero fetch.')
 post(
-  'blah', // inbox uuid
+  state.configuration.inboxId, // inbox uuid
   {
     body: state => state.initialState,
   },
