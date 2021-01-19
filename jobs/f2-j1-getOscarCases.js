@@ -1,15 +1,29 @@
+// If the job was executed from a message in the inbox with a specific cursor,
+// use that. If not, use the cursor from the previous final state.
+alterState(state => {
+  if (state.data.initialState) {
+    const { lastQueryDate } = state.data.initialState;
+    return { ...state, lastQueryDate };
+  }
+  return state;
+});
+
 // Clear data from previous runs.
 alterState(state => {
+  const { lastQueryDate, thisQueryDate } = state;
   state.data = {};
   state.references = [];
-  console.log(`lastQueryDate (from the previous run): ${state.lastQueryDate}`);
+  console.log(`lastQueryDate (from the previous run): ${lastQueryDate}`);
 
   const now = new Date().toISOString().replace('T', ' ').slice(0, 10);
   state.thisQueryDate = `${now} 00:00:00`;
   console.log(
-    `Current datetime, rounded to 00:00:00, to be used to update lastQueryDate after this query: ${state.thisQueryDate}`
+    `Current datetime, rounded to 00:00:00, to be used to update lastQueryDate after this query: ${thisQueryDate}`
   );
-  return state;
+
+  const initialState = { lastQueryDate, thisQueryDate };
+
+  return { ...state, initialState };
 });
 
 // GET new OSCaR cases

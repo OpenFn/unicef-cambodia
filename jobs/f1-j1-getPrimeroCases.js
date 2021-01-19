@@ -1,10 +1,23 @@
+// If the job was executed from a message in the inbox with a specific cursor,
+// use that. If not, use the cursor from the previous final state.
+alterState(state => {
+  if (state.data.initialState) {
+    const { lastCaseCreated, lastUpdated, lastCreated } = state.data.initialState;
+    return { ...state, lastCaseCreated, lastUpdated, lastCreated };
+  }
+  return state;
+});
+
 // Clear data from previous runs.
 alterState(state => {
-  console.log('The last case creation before this run is: ' + state.lastCaseCreated);
-  console.log('The last transition update before this run is: ' + state.lastUpdated);
-  console.log('The last transition creation before this run is: ' + state.lastCreated);
+  const { lastCaseCreated, lastUpdated, lastCreated } = state;
+  console.log('The last case creation before this run is:', lastCaseCreated);
+  console.log('The last transition update before this run is:', lastUpdated);
+  console.log('The last transition creation before this run is:', lastCreated);
 
-  return { ...state, data: {}, references: [] };
+  const initialState = { lastCaseCreated, lastUpdated, lastCreated };
+
+  return { ...state, data: {}, references: [], initialState };
 });
 
 // GET Primero cases with oscar referrals
@@ -24,7 +37,7 @@ getCases(
         }.01-01-4020 00:00`,
       },
       service_response_types: 'list||referral_to_oscar', // only cases with referral services
-      record_state: 'list||true' //only fetch active cases
+      record_state: 'list||true', //only fetch active cases
     },
     per: 1000,
   },
@@ -53,7 +66,7 @@ getCases(
         }.01-01-4020 00:00`,
       },
       oscar_number: 'range||*.*', // all oscar cases that might not have referrals
-      record_state: 'list||true'
+      record_state: 'list||true',
     },
     per: 1000,
   },
