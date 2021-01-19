@@ -53,6 +53,7 @@ getCases(
         }.01-01-4020 00:00`,
       },
       oscar_number: 'range||*.*', // all oscar cases that might not have referrals
+      record_state: 'list||true'
     },
     per: 1000,
   },
