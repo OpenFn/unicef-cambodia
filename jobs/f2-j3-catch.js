@@ -1,5 +1,10 @@
 console.log('Sending cases to Primero failed.')
-console.log('Posting initial cursor back to inbox to initiate another Oscar fetch.')
+console.log(
+  'Posting initial cursor back to inbox ',
+  state.configuration.inboxId,
+  ' to initiate another Oscar fetch.'
+)
+
 post(
   state.configuration.inboxId, // inbox uuid
   {
