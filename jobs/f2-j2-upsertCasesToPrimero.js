@@ -11,7 +11,14 @@ alterState(state => {
       const normalizedServicesArray = c.services || [];
       return { ...c, services: normalizedServicesArray };
     })
-    .filter(c => c.organization_name !== 'demo'); // remove 'demo' cases
+    .filter(c => { 
+      // remove 'demo' cases
+      if (c.organization_name == 'demo') {
+        console.log(`Dropping demo case: ${c.global_id}`)
+        return false;
+      }
+      return true;
+    });
   // ===========================================================================
 
   const serviceMap = {
