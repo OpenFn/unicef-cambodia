@@ -6,7 +6,7 @@ console.log(
 )
 
 post(
-  `https://openfn.org/inbox/${state.configuration.inboxId}`, // inbox uuid
+  `https://openfn.org/inbox/${state.configuration.inboxId}?failure=f1-j2-upsert-to-OSCaR"`, // inbox uuid
   {
     body: state => state.initialState,
   },
