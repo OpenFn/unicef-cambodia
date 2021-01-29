@@ -6,10 +6,12 @@ alterState(state => {
   // payload for a subset of cases, depending on whether or not data exists in
   // the services array. Below, we create an empty array (if it's been removed
   // to ensure that all payloads adhere to the integration contract.
-  state.data.data = state.data.data.map(c => {
-    const normalizedServicesArray = c.services || [];
-    return { ...c, services: normalizedServicesArray };
-  });
+  state.data.data = state.data.data
+    .map(c => {
+      const normalizedServicesArray = c.services || [];
+      return { ...c, services: normalizedServicesArray };
+    })
+    .filter(c => c.organization_name !== 'demo'); // remove 'demo' cases
   // ===========================================================================
 
   const serviceMap = {
