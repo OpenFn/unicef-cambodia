@@ -6,7 +6,7 @@ console.log(
 )
 
 post(
-  state.configuration.inboxId, // inbox uuid
+  `https://openfn.org/inbox/${state.configuration.inboxId}?failure=f2-j2-upsert-to-Primero"`, // inbox uuid
   {
     body: state => state.initialState,
   },
