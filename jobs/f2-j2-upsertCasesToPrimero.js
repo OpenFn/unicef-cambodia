@@ -11,10 +11,10 @@ alterState(state => {
       const normalizedServicesArray = c.services || [];
       return { ...c, services: normalizedServicesArray };
     })
-    .filter(c => { 
+    .filter(c => {
       // remove 'demo' cases
       if (c.organization_name == 'demo') {
-        console.log(`Dropping demo case: ${c.global_id}`)
+        console.log(`Dropping demo case: ${c.global_id}`);
         return false;
       }
       return true;
@@ -350,9 +350,13 @@ alterState(state => {
     }
 
     function calcAge(str) {
+      if (!str) return 0;
       var today = new Date();
       var birthDate = new Date(str);
       var age = today.getFullYear() - birthDate.getFullYear();
+
+      if (age > 30 || age < 1) return 0;
+
       var m = today.getMonth() - birthDate.getMonth();
       if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
         age--;
@@ -373,30 +377,30 @@ alterState(state => {
 
     function setProvinceUser(c) {
       const provinceUserMap = {
-        '12': 'mgrpnh',
+        12: 'mgrpnh',
         '08': 'mgrkdl',
-        '17': 'mgrsrp',
+        17: 'mgrsrp',
         '02': 'mgrbtb',
-        '18': 'mgrshv',
-        '22': 'mgrstg',
-        '16': 'mgrrtk',
-        '11': 'mgrmdk',
-        '10': 'mgrkrt',
-        '25': 'mgrtkm',
+        18: 'mgrshv',
+        22: 'mgrstg',
+        16: 'mgrrtk',
+        11: 'mgrmdk',
+        10: 'mgrkrt',
+        25: 'mgrtkm',
         '03': 'mgrkcm',
-        '22': 'mgromc',
-        '13': 'mgrpvh',
+        22: 'mgromc',
+        13: 'mgrpvh',
         '06': 'mgrktm',
         '01': 'mgrbmc',
-        '24': 'mgrpln',
-        '15': 'mgrpst',
-        '23': 'mgrkep',
-        '21': 'mgrtakeo',
+        24: 'mgrpln',
+        15: 'mgrpst',
+        23: 'mgrkep',
+        21: 'mgrtakeo',
         '09': 'mgrkkg',
         '07': 'mgrkpt',
         '05': 'mgrksp',
-        '20': 'mgrsvg',
-        '14': 'mgrpvg',
+        20: 'mgrsvg',
+        14: 'mgrpvg',
         '04': 'mgrkch',
       };
 
@@ -489,7 +493,7 @@ alterState(state => {
     }
 
     //const isUpdate = c.external_id && c.is_referred!==true; //cannot contain is_referred, oscar will repeatedly send
-    const isUpdate = c.external_id; 
+    const isUpdate = c.external_id;
 
     const locationCode = c.location_current_village_code
       ? parseInt(c.location_current_village_code, 10).toString()
@@ -522,25 +526,31 @@ alterState(state => {
         oscar_status: isUpdate ? null : c.status,
         protection_status: !isUpdate && c.is_referred == true ? 'oscar_referral' : null,
         service_implementing_agency: `agency-${c.organization_name}`,
-        owned_by: isUpdate && c.is_referred!==true ? null : setUser(c),
-        owned_by_text: isUpdate && c.is_referred!==true ? null : `${c.case_worker_name} ${c.case_worker_mobile}`,
+        owned_by: isUpdate && c.is_referred !== true ? null : setUser(c),
+        owned_by_text:
+          isUpdate && c.is_referred !== true
+            ? null
+            : `${c.case_worker_name} ${c.case_worker_mobile}`,
         oscar_reason_for_exiting: c.reason_for_exiting,
         has_referral: c.is_referred,
-        risk_level: c.is_referred == true ? 'medium' : null, 
-        consent_for_services: isUpdate || c.is_referred!==true ? null : true,
-        disclosure_other_orgs: isUpdate || c.is_referred!==true ? null : true,
-        interview_subject: isUpdate || c.is_referred!==true ? null : 'other',
+        risk_level: c.is_referred == true ? 'medium' : null,
+        consent_for_services: isUpdate || c.is_referred !== true ? null : true,
+        disclosure_other_orgs: isUpdate || c.is_referred !== true ? null : true,
+        interview_subject: isUpdate || c.is_referred !== true ? null : 'other',
         content_source_other: isUpdate ? null : 'OSCaR',
         module_id: 'primeromodule-cp',
         registration_date: isUpdate ? null : now.toISOString().split('T')[0].replace(/-/g, '/'),
         referral_notes_oscar: c.reason_for_referral, //new services referral notes field
         services_section: reduceOscarServices(c.services),
-        transitions: isUpdate || c.is_referred!==true ? null : reduceOscarServices(c.services).map(t => ({
-          service_section_unique_id: t.unique_id,
-          service: t.service_type,
-          created_at: now.toISOString().split('T')[0].replace(/-/g, '/'),
-          type: 'referral',
-        })),
+        transitions:
+          isUpdate || c.is_referred !== true
+            ? null
+            : reduceOscarServices(c.services).map(t => ({
+                service_section_unique_id: t.unique_id,
+                service: t.service_type,
+                created_at: now.toISOString().split('T')[0].replace(/-/g, '/'),
+                type: 'referral',
+              })),
       },
     };
 
