@@ -1,7 +1,7 @@
 // If the job was executed from a message in the inbox with a specific cursor,
 // use that. If not, use the cursor from the previous final state.
 alterState(state => {
-  if (state.data.initialState) {
+  if (state.data && state.data.initialState) {
     const { lastQueryDate } = state.data.initialState;
     return { ...state, lastQueryDate };
   }
