@@ -1,0 +1,52 @@
+{[
+    {
+        "id": "ee03c7e4-46bd-40ed-9312-01ce08515f1a",
+        "enabled": true,
+        "age": 9,
+        "sex": "female",
+        "status": "open",
+        "case_id": "5f6130b0-bfa7-4544-a3c8-897f54d3b877",
+        "owned_by": "openfn_cp_user",
+        "short_id": "4d3b877",
+        "workflow": "referral_to_oscar",
+        "module_id": "primeromodule-cp",
+        "name_last": "Diallo",
+        "created_at": "2021-11-09T10:20:12.384Z",
+        "created_by": "openfn_cp_user",
+        "name_first": "Aicha",
+        "mosvy_number": "9808827",
+        "record_state": true,
+        "date_of_birth": "2012-01-01",
+        "reopened_logs": [],
+        "case_id_display": "4d3b877",
+        "last_updated_at": "2021-11-09T10:38:34.074Z",
+        "owned_by_groups": [
+            "usergroup-training"
+        ],
+        "services_section": [
+            {
+                "unique_id": "020d0e8a-c948-451e-948e-3c5462a7cb56",
+                "service_type": "social_work_case_work",
+                "service_subtype": [
+                    "social_work_case_work_community"
+                ],
+                "service_implemented": "not_implemented",
+                "service_response_type": "referral_to_oscar",
+                "service_response_day_time": "2021-11-09T10:20:42.000Z",
+                "service_implementing_agency": "agency-demo"
+            }
+        ],
+        "interview_subject": "individual",
+        "registration_date": "2021-11-09",
+        "owned_by_agency_id": "agency-unicef",
+        "case_status_reopened": false,
+        "consent_for_services": true,
+        "created_organization": "agency-unicef",
+        "associated_user_names": [
+            "openfn_cp_user"
+        ],
+        "disclosure_other_orgs": true,
+        "record_in_scope": true,
+        "alert_count": 0
+    }
+]}
