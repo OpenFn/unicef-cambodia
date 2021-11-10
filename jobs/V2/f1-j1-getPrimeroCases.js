@@ -1,7 +1,7 @@
 // If the job was executed from a message in the inbox with a specific cursor,
 // use that. If not, use the cursor from the previous final state.
-alterState(state => {
-  if (state.data.initialState) {
+fn(state => {
+  if (state.data && state.data.initialState) {
     const { lastCaseCreated, lastUpdated, lastCreated } = state.data.initialState;
     return { ...state, lastCaseCreated, lastUpdated, lastCreated };
   }
@@ -9,7 +9,7 @@ alterState(state => {
 });
 
 // Clear data from previous runs.
-alterState(state => {
+fn(state => {
   const { lastCaseCreated, lastUpdated, lastCreated } = state;
   console.log('The last case creation before this run is:', lastCaseCreated);
   console.log('The last transition update before this run is:', lastUpdated);
@@ -27,11 +27,11 @@ getCases(
   {
     remote: true,
     scope: {
-       //TODO: transitions_created_at does not exist in Primero V2... let's use case.last_updated_at instead for date cursor
-       // Two case date fields we must check for updates
+      //TODO: transitions_created_at does not exist in Primero V2... let's use case.last_updated_at instead for date cursor
+      // Two case date fields we must check for updates
       or: {
         // Two case date fields we must check for updates
-        transitions_created_at: `or_op||date_range||${
+        last_updated_at: `or_op||date_range||${
           state.lastCreated || '05-01-2021' // TEST CURSOR
         }.01-01-4020`,
         transitions_changed_at: `or_op||date_range||${
@@ -80,9 +80,11 @@ getCases(
     delete state.oscarRefs;
 
     function parseDates(str) {
-      const [y, m, dtz] = str.split('/');
-      const [d, t, z] = dtz.split(' ');
-      return { y, m, d, t, z };
+      const date = str.split('T')[0];
+      const time = str.split('T')[1];
+      const [y, m, d] = date.split('-');
+      const [hr, min, sec] = time.split(':');
+      return { y, m, d, hr, min, sec };
     }
 
     // Get latest case creation from all cases. ================================
@@ -121,8 +123,7 @@ getCases(
 
     if (lastUpdate) {
       console.log(`Found cases w/ updates, updating 'last updated case' date using ${lastUpdate}.`);
-      var { y, m, d, t } = parseDates(lastUpdate);
-      var [hr, min, sec] = t.split(':');
+      var { y, m, d, hr, min } = parseDates(lastUpdate);
       state.lastUpdated = `${d}-${m}-${y} ${hr}:${min}`;
     }
     // =========================================================================
