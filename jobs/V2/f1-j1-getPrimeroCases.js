@@ -27,6 +27,8 @@ getCases(
   {
     remote: true,
     scope: {
+       //TODO: transitions_created_at does not exist in Primero V2... let's use case.last_updated_at instead for date cursor
+       // Two case date fields we must check for updates
       or: {
         // Two case date fields we must check for updates
         transitions_created_at: `or_op||date_range||${
