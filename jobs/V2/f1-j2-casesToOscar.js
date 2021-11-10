@@ -202,6 +202,7 @@ post(
           external_id: oscarStrings(c.case_id),
           external_id_display: oscarStrings(c.case_id_display),
           global_id: oscarStrings(c.oscar_number),
+          level_of_risk: 'medium',
           mosvy_number: oscarStrings(c.mosvy_number),
           given_name: oscarStrings(c.name_first),
           family_name: oscarStrings(c.name_last),
@@ -213,8 +214,10 @@ post(
           external_case_worker_name: oscarStrings(c.owned_by),
           external_case_worker_id: oscarStrings(c.owned_by_id),
           external_case_worker_mobile: c.owned_by_phone || '000000000',
-          organization_name: setOrganization(c),
-          organization_id: oscarStrings(c.owned_by_agency_id), //Q: replace with service_implementing_agency ??
+          organization_name: 'demo', //NOTE: For staging testing only...replaced line below. 
+          organization_id: 'demo',
+          //organization_name: setOrganization(c),
+          //organization_id: oscarStrings(c.owned_by_agency_id), 
           is_referred: true,
           services: c.services_section
             .filter(s => s.service_subtype)
