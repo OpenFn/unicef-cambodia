@@ -34,9 +34,10 @@ getCases(
         last_updated_at: `or_op||date_range||${
           state.lastCreated || '05-01-2021' // TEST CURSOR
         }.01-01-4020`,
-        transitions_changed_at: `or_op||date_range||${
-          state.lastUpdated || '15-12-2020 00:00' // TEST CURSOR
-        }.01-01-4020 00:00`,
+//         Removing old filter
+//         transitions_changed_at: `or_op||date_range||${
+//           state.lastUpdated || '15-12-2020 00:00' // TEST CURSOR
+//         }.01-01-4020 00:00`,
       },
       service_response_types: 'list||referral_to_oscar', // only cases with referral services
       record_state: 'list||true', //only fetch active cases
@@ -63,9 +64,13 @@ getCases(
         created_at: `or_op||date_range||${
           state.lastCaseCreated || '05-01-2021' // TEST CURSOR
         }.01-01-4020`,
-        transitions_changed_at: `or_op||date_range||${
-          state.lastUpdated || '15-12-2020 00:00' // TEST CURSOR
-        }.01-01-4020 00:00`,
+        last_updated_at: `or_op||date_range||${
+          state.lastCreated || '05-01-2021' // TEST CURSOR
+        }.01-01-4020`,
+//         Removing old filter
+//         transitions_changed_at: `or_op||date_range||${
+//           state.lastUpdated || '15-12-2020 00:00' // TEST CURSOR
+//         }.01-01-4020 00:00`,
       },
       oscar_number: 'range||*.*', // all oscar cases that might not have referrals
       record_state: 'list||true',
