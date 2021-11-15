@@ -214,8 +214,8 @@ post(
           external_case_worker_name: oscarStrings(c.owned_by),
           external_case_worker_id: oscarStrings(c.owned_by_id),
           external_case_worker_mobile: c.owned_by_phone || '000000000',
-          organization_name: 'demo', //NOTE: For staging testing only...replaced line below. 
-          organization_id: 'demo',
+          organization_name: 'cif', //NOTE: For staging testing only...replaced line below. 
+          organization_id: 'cif',
           //organization_name: setOrganization(c),
           //organization_id: oscarStrings(c.owned_by_agency_id), 
           is_referred: true,
@@ -249,8 +249,8 @@ post(
                 address_current_village_code: oscar.address_current_village_code,
                 external_case_worker_id: oscar.external_case_worker_id,
                 external_case_worker_mobile: oscar.external_case_worker_mobile,
-                organization_name: oscar.organization_name,
-                organization_id: oscar.organization_id,
+                organization_name:'cif',
+                organization_id: 'cif',
                 is_referred: oscar.is_referred,
                 services: oscar.services && oscar.services.map(s => ({ uuid: s.uuid })),
               },
