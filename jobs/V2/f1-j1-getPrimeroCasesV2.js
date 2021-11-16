@@ -154,7 +154,7 @@ fn(state => {
       c =>
         c.services_section &&
         c.services_section.length > 0 &&
-        state.services_section.some(s => s.service_response_type === 'referral_to_oscar')
+        c.services_section.some(s => s.service_response_type === 'referral_to_oscar')
     ),
     data: {},
   };
