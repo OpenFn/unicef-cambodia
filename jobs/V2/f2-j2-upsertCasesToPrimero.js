@@ -285,7 +285,8 @@ fn(state => {
           ...service,
           isReferral: service.enrollment_date ? true : false,
           service_type: (serviceMap[service.name] && serviceMap[service.name].type) || 'Other',
-          service_subtype: (serviceMap[service.name] && serviceMap[service.name].subtype) || 'Other',
+          service_subtype:
+            (serviceMap[service.name] && serviceMap[service.name].subtype) || 'Other',
         };
       });
     }
@@ -325,7 +326,10 @@ fn(state => {
           location_current_village_code: c.location_current_village_code,
           organization_id: c.organization_id,
           organization_name: c.organization_name,
-          services: c.services.map(service => ({ uuid: service.uuid, enrollment_date: service.enrollment_date })),
+          services: c.services.map(service => ({
+            uuid: service.uuid,
+            enrollment_date: service.enrollment_date,
+          })),
           status: c.status,
         },
         null,
@@ -510,48 +514,46 @@ fn(state => {
       case_id: primeroId(c),
       unique_identifier: primeroId(c),
       // =======================================================================
-     /*  child: {
-        // primero_field: oscar_field,
-        case_id: c.external_id, // externalId for upsert (will fail if multiple found)
-        oscar_number: c.global_id,
-        oscar_short_id: c.slug,
-        mosvy_number: c.mosvy_number,
-        name_first: isUpdate ? null : createName(c.given_name, c.local_given_name),
-        name_last: isUpdate ? null : createName(c.family_name, c.local_family_name),
-        sex: isUpdate ? null : genderTransform(c.gender),
-        date_of_birth: isUpdate ? null : c.date_of_birth,
-        age: isUpdate ? null : calcAge(c.date_of_birth),
-        location_current: isUpdate ? null : locationCode,
-        address_current: isUpdate ? null : c.address_current_village_code,
-        oscar_status: isUpdate ? null : c.status,
-        protection_status: !isUpdate && c.is_referred == true ? 'oscar_referral' : null,
-        service_implementing_agency: `agency-${c.organization_name}`,
-        owned_by: isUpdate && c.is_referred !== true ? null : setUser(c),
-        owned_by_text:
-          isUpdate && c.is_referred !== true
-            ? null
-            : `${c.case_worker_name} ${c.case_worker_mobile}`,
-        oscar_reason_for_exiting: c.reason_for_exiting,
-        has_referral: c.is_referred,
-        risk_level: c.is_referred == true ? 'medium' : null,
-        consent_for_services: isUpdate || c.is_referred !== true ? null : true,
-        disclosure_other_orgs: isUpdate || c.is_referred !== true ? null : true,
-        interview_subject: isUpdate || c.is_referred !== true ? null : 'other',
-        content_source_other: isUpdate ? null : 'OSCaR',
-        module_id: 'primeromodule-cp',
-        registration_date: isUpdate ? null : now.toISOString().split('T')[0].replace(/-/g, '/'),
-        referral_notes_oscar: c.reason_for_referral, //new services referral notes field
-        services_section: reduceOscarServices(c.services),
-        transitions:
-          isUpdate || c.is_referred !== true
-            ? null
-            : reduceOscarServices(c.services).map(t => ({
-                service_section_unique_id: t.unique_id,
-                service: t.service_type,
-                created_at: now.toISOString().split('T')[0].replace(/-/g, '/'),
-                type: 'referral',
-              })),
-      }, */
+      // FIELDS PREVIOUSLY IN CHILD{}
+      // primero_field: oscar_field,
+      case_id: c.external_id, // externalId for upsert (will fail if multiple found)
+      // oscar_number: c.global_id,
+      oscar_short_id: c.slug,
+      mosvy_number: c.mosvy_number,
+      name_first: isUpdate ? null : createName(c.given_name, c.local_given_name),
+      name_last: isUpdate ? null : createName(c.family_name, c.local_family_name),
+      sex: isUpdate ? null : genderTransform(c.gender),
+      date_of_birth: isUpdate ? null : c.date_of_birth,
+      age: isUpdate ? null : calcAge(c.date_of_birth),
+      location_current: isUpdate ? null : locationCode,
+      address_current: isUpdate ? null : c.address_current_village_code,
+      oscar_status: isUpdate ? null : c.status,
+      protection_status: !isUpdate && c.is_referred == true ? 'oscar_referral' : null,
+      service_implementing_agency: `agency-${c.organization_name}`,
+      owned_by: isUpdate && c.is_referred !== true ? null : setUser(c),
+      owned_by_text:
+        isUpdate && c.is_referred !== true ? null : `${c.case_worker_name} ${c.case_worker_mobile}`,
+      oscar_reason_for_exiting: c.reason_for_exiting,
+      has_referral: c.is_referred,
+      risk_level: c.is_referred == true ? 'medium' : null,
+      consent_for_services: isUpdate || c.is_referred !== true ? null : true,
+      disclosure_other_orgs: isUpdate || c.is_referred !== true ? null : true,
+      interview_subject: isUpdate || c.is_referred !== true ? null : 'other',
+      content_source_other: isUpdate ? null : 'OSCaR',
+      module_id: 'primeromodule-cp',
+      registration_date: isUpdate ? null : now.toISOString().split('T')[0].replace(/-/g, '/'),
+      referral_notes_oscar: c.reason_for_referral, //new services referral notes field
+      services_section: reduceOscarServices(c.services),
+      transitions:
+        isUpdate || c.is_referred !== true
+          ? null
+          : reduceOscarServices(c.services).map(t => ({
+              service_section_unique_id: t.unique_id,
+              service: t.service_type,
+              created_at: now.toISOString().split('T')[0].replace(/-/g, '/'),
+              type: 'referral',
+            })),
+      //END FIELDS PREVIOUSLY IN CHILD{}
     };
 
     // Note: Sometimes OSCAR sends `null`, sometimes they send `''` (empty
@@ -587,30 +589,30 @@ each(
             remote: c.remote,
             oscar_number: c.oscar_number,
             case_id: c.case_id,
-            /* child: {
-              case_id: c.child.case_id,
-              oscar_number: c.child.oscar_number,
-              oscar_short_id: c.child.oscar_short_id,
-              location_current: c.child.location_current,
-              address_current: c.child.address_current,
-              oscar_status: c.child.oscar_status,
-              owned_by: c.child.owned_by,
-              has_referral: c.child.has_referral,
-              risk_level: c.child.risk_level,
-              consent_for_services: c.child.consent_for_services,
-              disclosure_other_orgs: c.child.consent_for_services,
-              module_id: c.child.module_id,
-              services_section: c.child.services_section.map(service => ({
-                unique_id: service.unique_id,
-                service_response_type: service.service_response_type,
-                oscar_referring_organization: service.oscar_referring_organization,
-              })),
-              transitions: c.child.services_section.map(t => ({
-                service_section_unique_id: t.unique_id,
-                created_at: t.created_at,
-                type: t.type,
-              })),
-            }, */
+            // FIELDS PREVIOUSLY IN CHILD{}
+            case_id: c.child.case_id,
+            oscar_number: c.child.oscar_number,
+            oscar_short_id: c.child.oscar_short_id,
+            location_current: c.child.location_current,
+            address_current: c.child.address_current,
+            oscar_status: c.child.oscar_status,
+            owned_by: c.child.owned_by,
+            has_referral: c.child.has_referral,
+            risk_level: c.child.risk_level,
+            consent_for_services: c.child.consent_for_services,
+            disclosure_other_orgs: c.child.consent_for_services,
+            module_id: c.child.module_id,
+            services_section: c.child.services_section.map(service => ({
+              unique_id: service.unique_id,
+              service_response_type: service.service_response_type,
+              oscar_referring_organization: service.oscar_referring_organization,
+            })),
+            transitions: c.child.services_section.map(t => ({
+              service_section_unique_id: t.unique_id,
+              created_at: t.created_at,
+              type: t.type,
+            })),
+            //END FIELDS PREVIOUSLY IN CHILD{}
           },
           null,
           2
