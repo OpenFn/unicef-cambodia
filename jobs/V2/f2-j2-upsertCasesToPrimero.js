@@ -1,6 +1,6 @@
 // Oscar cases ---> Primero
 // User Story 2: 'View Oscar cases in Primero' AND User Story 4: 'Sending referrals to Primero'
-alterState(state => {
+fn(state => {
   // ===========================================================================
   // NOTE: As of September 25, 2020, Oscar has changed the structure of this
   // payload for a subset of cases, depending on whether or not data exists in
@@ -268,7 +268,7 @@ alterState(state => {
           service_subtype: object[key].map(st => st.service_subtype),
           service_type: key,
           service_type_text: key,
-          service_type_details_text: serviceMap[oscarService.name] ? 'n/a' : s.name,
+          service_type_details_text: serviceMap[oscarService.name] ? 'n/a' : oscarService.name,
           oscar_case_worker_name: c.case_worker_name,
           oscar_referring_organization: `agency-${c.organization_name}`,
           oscar_case_worker_telephone: c.case_worker_mobile,
@@ -280,12 +280,12 @@ alterState(state => {
     }
 
     function classifyServices(arr) {
-      return arr.map(s => {
+      return arr.map(service => {
         return {
-          ...s,
-          isReferral: s.enrollment_date ? true : false,
-          service_type: (serviceMap[s.name] && serviceMap[s.name].type) || 'Other',
-          service_subtype: (serviceMap[s.name] && serviceMap[s.name].subtype) || 'Other',
+          ...service,
+          isReferral: service.enrollment_date ? true : false,
+          service_type: (serviceMap[service.name] && serviceMap[service.name].type) || 'Other',
+          service_subtype: (serviceMap[service.name] && serviceMap[service.name].subtype) || 'Other',
         };
       });
     }
@@ -325,7 +325,7 @@ alterState(state => {
           location_current_village_code: c.location_current_village_code,
           organization_id: c.organization_id,
           organization_name: c.organization_name,
-          services: c.services.map(s => ({ uuid: s.uuid, enrollment_date: s.enrollment_date })),
+          services: c.services.map(service => ({ uuid: service.uuid, enrollment_date: service.enrollment_date })),
           status: c.status,
         },
         null,
@@ -600,10 +600,10 @@ each(
               consent_for_services: c.child.consent_for_services,
               disclosure_other_orgs: c.child.consent_for_services,
               module_id: c.child.module_id,
-              services_section: c.child.services_section.map(s => ({
-                unique_id: s.unique_id,
-                service_response_type: s.service_response_type,
-                oscar_referring_organization: s.oscar_referring_organization,
+              services_section: c.child.services_section.map(service => ({
+                unique_id: service.unique_id,
+                service_response_type: service.service_response_type,
+                oscar_referring_organization: service.oscar_referring_organization,
               })),
               transitions: c.child.services_section.map(t => ({
                 service_section_unique_id: t.unique_id,
