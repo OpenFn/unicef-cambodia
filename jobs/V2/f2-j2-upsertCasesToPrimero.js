@@ -510,7 +510,7 @@ fn(state => {
       case_id: primeroId(c),
       unique_identifier: primeroId(c),
       // =======================================================================
-      child: {
+     /*  child: {
         // primero_field: oscar_field,
         case_id: c.external_id, // externalId for upsert (will fail if multiple found)
         oscar_number: c.global_id,
@@ -551,7 +551,7 @@ fn(state => {
                 created_at: now.toISOString().split('T')[0].replace(/-/g, '/'),
                 type: 'referral',
               })),
-      },
+      }, */
     };
 
     // Note: Sometimes OSCAR sends `null`, sometimes they send `''` (empty
