@@ -587,7 +587,7 @@ each(
             remote: c.remote,
             oscar_number: c.oscar_number,
             case_id: c.case_id,
-            child: {
+            /* child: {
               case_id: c.child.case_id,
               oscar_number: c.child.oscar_number,
               oscar_short_id: c.child.oscar_short_id,
@@ -610,7 +610,7 @@ each(
                 created_at: t.created_at,
                 type: t.type,
               })),
-            },
+            }, */
           },
           null,
           2
