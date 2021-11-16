@@ -8,6 +8,13 @@ fn(state => {
   return state;
 });
 
+fn(state => {
+  console.log('Last sync end date:', state.lastRunDateTime);
+  const manualCursor = '2021-10-14T15:10:00.587Z';
+  const cursor = state.lastRunDateTime || manualCursor;
+  return { ...state, referralIds: [], cursor };
+});
+
 // Clear data from previous runs.
 fn(state => {
   const { lastCaseCreated, lastUpdated, lastCreated } = state;
@@ -34,10 +41,10 @@ getCases(
         last_updated_at: `or_op||date_range||${
           state.lastCreated || '05-01-2021' // TEST CURSOR
         }.01-01-4020`,
-//         Removing old filter
-//         transitions_changed_at: `or_op||date_range||${
-//           state.lastUpdated || '15-12-2020 00:00' // TEST CURSOR
-//         }.01-01-4020 00:00`,
+        //         Removing old filter
+        //         transitions_changed_at: `or_op||date_range||${
+        //           state.lastUpdated || '15-12-2020 00:00' // TEST CURSOR
+        //         }.01-01-4020 00:00`,
       },
       service_response_types: 'list||referral_to_oscar', // only cases with referral services
       record_state: 'list||true', //only fetch active cases
@@ -67,10 +74,10 @@ getCases(
         last_updated_at: `or_op||date_range||${
           state.lastCreated || '05-01-2021' // TEST CURSOR
         }.01-01-4020`,
-//         Removing old filter
-//         transitions_changed_at: `or_op||date_range||${
-//           state.lastUpdated || '15-12-2020 00:00' // TEST CURSOR
-//         }.01-01-4020 00:00`,
+        //         Removing old filter
+        //         transitions_changed_at: `or_op||date_range||${
+        //           state.lastUpdated || '15-12-2020 00:00' // TEST CURSOR
+        //         }.01-01-4020 00:00`,
       },
       oscar_number: 'range||*.*', // all oscar cases that might not have referrals
       record_state: 'list||true',
@@ -139,3 +146,53 @@ getCases(
     return state;
   }
 );
+
+fn(state => {
+  return {
+    ...state,
+    cases: state.data.filter(
+      c =>
+        c.services_section &&
+        c.services_section.length > 0 &&
+        state.services_section.some(s => s.service_response_type === 'referral_to_oscar')
+    ),
+    data: {},
+  };
+});
+
+// Get referral details for each referral_to_oscar case.
+each(
+  '$.cases[*]',
+  getReferrals({ externalId: 'case_id', id: dataValue('case_id') }, state => {
+    // STEP 3: filter referrals where 'created_at_date' >= lastRUnDateTime || manualCursor
+    state.data
+      .filter(r => new Date(r.created_at) >= new Date(state.cursor))
+      .map(r => {
+        state.referralIds.push(r.service_record_id);
+      });
+    return state;
+  })
+);
+
+fn(state => ({
+  ...state,
+  data: state.cases.map(c => ({
+    ...c,
+    services_section: c.services_section
+      .filter(s => state.referralIds.includes(s.unique_id))
+      .filter(s => s.service_response_type === 'referral_to_oscar'),
+  })),
+}));
+
+// After job completes successfully, update cursor
+fn(state => {
+  let lastRunDateTime = state.data
+    .map(c => c.last_updated_at)
+    .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+
+  lastRunDateTime =
+    new Date(lastRunDateTime) > new Date() ? lastRunDateTime : new Date().toISOString();
+
+  console.log('Next sync start date:', lastRunDateTime);
+  return { ...state, cases: [], references: [], lastRunDateTime };
+});
