@@ -56,6 +56,7 @@ post(
       },
     },
     state => {
+      console.log('data', state.data);
       console.log(
         `Oscar API responded with cases with global_ids: ${JSON.stringify(
           state.data.data ? state.data.data.map(c => c.global_id) : ''
