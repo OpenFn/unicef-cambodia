@@ -505,7 +505,7 @@ fn(state => {
 
     // Mappings for upserting cases in Primero (update if existing, insert if new)
     const primeroCase = {
-      remote: true,
+      //remote: true,
       oscar_number: c.global_id,
       // NOTE ==================================================================
       // `unique_identifier` below duplicates `case_id` but has been requested
