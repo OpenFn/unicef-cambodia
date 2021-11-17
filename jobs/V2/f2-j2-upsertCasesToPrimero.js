@@ -543,16 +543,16 @@ fn(state => {
       module_id: 'primeromodule-cp',
       registration_date: isUpdate ? null : now.toISOString().split('T')[0].replace(/-/g, '/'),
       referral_notes_oscar: c.reason_for_referral, //new services referral notes field
-      services_section: reduceOscarServices(c.services),
-      transitions:
-        isUpdate || c.is_referred !== true
-          ? null
-          : reduceOscarServices(c.services).map(t => ({
-              service_section_unique_id: t.unique_id,
-              service: t.service_type,
-              created_at: now.toISOString().split('T')[0].replace(/-/g, '/'),
-              type: 'referral',
-            })),
+      // services_section: reduceOscarServices(c.services),
+      // transitions:
+      //   isUpdate || c.is_referred !== true
+      //     ? null
+      //     : reduceOscarServices(c.services).map(t => ({
+      //         service_section_unique_id: t.unique_id,
+      //         service: t.service_type,
+      //         created_at: now.toISOString().split('T')[0].replace(/-/g, '/'),
+      //         type: 'referral',
+      //       })),
       //END FIELDS PREVIOUSLY IN CHILD{}
     };
 
