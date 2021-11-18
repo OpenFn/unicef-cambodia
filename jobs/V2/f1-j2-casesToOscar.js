@@ -16,7 +16,7 @@ alterState(state => {
   state.cases = { referrals: [], nonReferrals: [] };
 
   state.data.forEach(c =>
-    c.services_section.map(s => s.service_response_type).includes('referral_to_oscar') 
+    c.services_section.map(s => s.service_response_type).includes('referral_to_oscar')
       ? state.cases.referrals.push(c)
       : state.cases.nonReferrals.push(c)
   );
@@ -214,10 +214,10 @@ post(
           external_case_worker_name: oscarStrings(c.owned_by),
           external_case_worker_id: oscarStrings(c.owned_by_id),
           external_case_worker_mobile: c.owned_by_phone || '000000000',
-          organization_name: 'cif', //NOTE: For staging testing only...replaced line below. 
+          organization_name: 'cif', //NOTE: For staging testing only...replaced line below.
           organization_id: 'cif',
           //organization_name: setOrganization(c),
-          //organization_id: oscarStrings(c.owned_by_agency_id), 
+          //organization_id: oscarStrings(c.owned_by_agency_id),
           is_referred: true,
           services: c.services_section
             .filter(s => s.service_subtype)
@@ -235,6 +235,30 @@ post(
         };
 
         // NOTE: Logs for enhanced audit trail.
+        // console.log(
+        //   'Case data to be posted to Oscar: ',
+        //   JSON.stringify(
+        //     {
+        //       organization: {
+        //         external_id: oscar.external_id,
+        //         external_id_display: oscar.external_id_display,
+        //         oscar_id: oscar.oscar_short_id,
+        //         global_id: oscar.global_id,
+        //         mosvy_number: oscar.mosvy_number,
+        //         location_current_village_code: oscar.location_current_village_code,
+        //         address_current_village_code: oscar.address_current_village_code,
+        //         external_case_worker_id: oscar.external_case_worker_id,
+        //         external_case_worker_mobile: oscar.external_case_worker_mobile,
+        //         organization_name:'cif',
+        //         organization_id: 'cif',
+        //         is_referred: oscar.is_referred,
+        //         services: oscar.services && oscar.services.map(s => ({ uuid: s.uuid })),
+        //       },
+        //     },
+        //     null,
+        //     2
+        //   )
+        // );
         console.log(
           'Case data to be posted to Oscar: ',
           JSON.stringify(
@@ -242,17 +266,25 @@ post(
               organization: {
                 external_id: oscar.external_id,
                 external_id_display: oscar.external_id_display,
-                oscar_id: oscar.oscar_short_id, 
                 global_id: oscar.global_id,
+                level_of_risk: 'medium',
+                oscar_id: oscar.oscar_short_id,
                 mosvy_number: oscar.mosvy_number,
+                given_name: oscar.given_name,
+                family_name: oscar.family_name,
+                gender: oscar.gender,
+                date_of_birth: oscar.date_of_birth,
                 location_current_village_code: oscar.location_current_village_code,
                 address_current_village_code: oscar.address_current_village_code,
+                reason_for_referral: oscar.reason_for_referral,
+                external_case_worker_name: oscar.external_case_worker_name,
                 external_case_worker_id: oscar.external_case_worker_id,
                 external_case_worker_mobile: oscar.external_case_worker_mobile,
-                organization_name:'cif',
+                organization_name: 'cif',
                 organization_id: 'cif',
                 is_referred: oscar.is_referred,
                 services: oscar.services && oscar.services.map(s => ({ uuid: s.uuid })),
+                transaction_id: oscar.transaction_id,
               },
             },
             null,
