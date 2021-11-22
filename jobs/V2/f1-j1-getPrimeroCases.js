@@ -121,3 +121,16 @@ fn(state => {
     }
   )(state);
 });
+
+// After job completes successfully, update cursor
+fn(state => {
+  let lastRunDateTime = state.data
+    .map(c => c.last_updated_at)
+    .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+
+  lastRunDateTime =
+    new Date(lastRunDateTime) > new Date() ? lastRunDateTime : new Date().toISOString();
+
+  console.log('Next sync start date:', lastRunDateTime);
+  return { ...state, data: {}, references: [], lastRunDateTime };
+});
