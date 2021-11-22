@@ -6,6 +6,7 @@ alterState(state => {
   // payload for a subset of cases, depending on whether or not data exists in
   // the services array. Below, we create an empty array if it's been removed to
   // ensure that all payloads adhere to the integration contract.
+  console.log('data', state.data);
   state.data = state.data.map(c => ({
     ...c,
     services_section: c.services_section || [],
