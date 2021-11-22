@@ -132,5 +132,5 @@ fn(state => {
     new Date(lastRunDateTime) > new Date() ? lastRunDateTime : new Date().toISOString();
 
   console.log('Next sync start date:', lastRunDateTime);
-  return { ...state, data: {}, references: [], lastRunDateTime };
+  return { ...state, references: [], lastRunDateTime };
 });
