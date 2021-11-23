@@ -543,7 +543,7 @@ fn(state => {
       module_id: 'primeromodule-cp',
       //registration_date: isUpdate ? null : now.toISOString().split('T')[0].replace(/-/g, '/'),
       referral_notes_oscar: c.reason_for_referral, //new services referral notes field
-      services_section: isUpdate || c.is_referred !== true
+      services_section: (isUpdate || c.is_referred !== true || c.services.length < 0)
           ? null
           : reduceOscarServices(c.services)
       // transitions:
