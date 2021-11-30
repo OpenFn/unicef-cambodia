@@ -543,9 +543,10 @@ fn(state => {
       module_id: 'primeromodule-cp',
       //registration_date: isUpdate ? null : now.toISOString().split('T')[0].replace(/-/g, '/'),
       referral_notes_oscar: c.reason_for_referral, //new services referral notes field
-      services_section: (isUpdate || c.is_referred !== true || c.services.length < 0)
+      services_section:
+        isUpdate || c.is_referred !== true || c.services.length < 0
           ? null
-          : reduceOscarServices(c.services)
+          : reduceOscarServices(c.services),
       // transitions:
       //   isUpdate || c.is_referred !== true
       //     ? null
@@ -579,7 +580,8 @@ each(
   '$.cases[*]',
   upsertCase({
     // Upsert Primero cases based on matching 'oscar_number' OR 'case_id'
-    externalIds: ['oscar_number', 'case_id'],
+    externalIds: state => (state.data.case_id ? ['case_id'] : ['oscar_number']),
+    // externalIds: ['oscar_number', 'case_id'],
     data: state => {
       const c = state.data;
       // NOTE: This is extremely VERBOSE but more secure, given that we don't
