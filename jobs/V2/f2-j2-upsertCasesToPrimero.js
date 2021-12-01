@@ -317,7 +317,7 @@ fn(state => {
       `Data provided by Oscar (ON: ${c.global_id} / extId: ${c.external_id}) : ${JSON.stringify(
         {
           oscar_short_id: c.slug,
-          address_current_village_code: c.address_current_village_code,
+          //address_current_village_code: c.address_current_village_code,
           external_case_worker_id: c.external_case_worker_id,
           external_id: c.external_id,
           external_id_display: c.external_id_display,
@@ -536,8 +536,8 @@ fn(state => {
       oscar_reason_for_exiting: c.reason_for_exiting,
       //has_referral: c.is_referred,
       risk_level: c.is_referred == true ? 'medium' : null,
-      consent_for_services: isUpdate || c.is_referred !== true ? null : true,
-      disclosure_other_orgs: isUpdate || c.is_referred !== true ? null : true,
+      //consent_for_services: isUpdate || c.is_referred !== true ? null : true,
+      //disclosure_other_orgs: isUpdate || c.is_referred !== true ? null : true,
       interview_subject: isUpdate || c.is_referred !== true ? null : 'other',
       //content_source_other: isUpdate ? null : 'OSCaR',
       module_id: 'primeromodule-cp',
