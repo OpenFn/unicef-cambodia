@@ -313,27 +313,34 @@ fn(state => {
 
     // NOTE: These logs are extremely VERBOSE but more secure, given that we don't know
     // exactly what will be provided by the API.
+    // console.log(
+    //   `Data provided by Oscar (ON: ${c.global_id} / extId: ${c.external_id}) : ${JSON.stringify(
+    //     {
+    //       oscar_short_id: c.slug,
+    //       //address_current_village_code: c.address_current_village_code,
+    //       external_case_worker_id: c.external_case_worker_id,
+    //       external_id: c.external_id,
+    //       external_id_display: c.external_id_display,
+    //       global_id: c.global_id,
+    //       is_referred: c.is_referred,
+    //       location_current_village_code: c.location_current_village_code,
+    //       organization_id: c.organization_id,
+    //       organization_name: c.organization_name,
+    //       services: c.services.map(service => ({
+    //         uuid: service.uuid,
+    //         enrollment_date: service.enrollment_date,
+    //       })),
+    //       status: c.status,
+    //     },
+    //     null,
+    //     2
+    //   )}`
+    // );
     console.log(
       `Data provided by Oscar (ON: ${c.global_id} / extId: ${c.external_id}) : ${JSON.stringify(
-        {
-          oscar_short_id: c.slug,
-          //address_current_village_code: c.address_current_village_code,
-          external_case_worker_id: c.external_case_worker_id,
-          external_id: c.external_id,
-          external_id_display: c.external_id_display,
-          global_id: c.global_id,
-          is_referred: c.is_referred,
-          location_current_village_code: c.location_current_village_code,
-          organization_id: c.organization_id,
-          organization_name: c.organization_name,
-          services: c.services.map(service => ({
-            uuid: service.uuid,
-            enrollment_date: service.enrollment_date,
-          })),
-          status: c.status,
-        },
+        c,
         null,
-        2
+        4
       )}`
     );
 
@@ -586,48 +593,49 @@ each(
       const c = state.data;
       // NOTE: This is extremely VERBOSE but more secure, given that we don't
       // know exactly what will be provided by the API.
-      console.log(
-        'Data provided to Primero for upload `upsertCase`: ',
-        JSON.stringify(
-          {
-            remote: c.remote,
-            oscar_number: c.oscar_number,
-            case_id: c.case_id,
-            unique_identifier: c.unique_identifier,
-            // FIELDS PREVIOUSLY IN CHILD{}
-            case_id: c.case_id,
-            oscar_number: c.oscar_number,
-            oscar_short_id: c.oscar_short_id,
-            mosvy_number: c.mosvy_number,
-            name_first: c.name_first,
-            name_last: c.name_last,
-            sex: c.sex,
-            date_of_birth: c.date_of_birth,
-            age: c.age,
-            location_current: c.location_current,
-            //address_current: c.address_current,
-            oscar_status: c.oscar_status,
-            protection_status: c.protection_status,
-            service_implementing_agency: c.service_implementing_agency,
-            owned_by: c.owned_by,
-            owned_by_text: c.owned_by_text,
-            oscar_reason_for_exiting: c.oscar_reason_for_exiting,
-            has_referral: c.has_referral,
-            risk_level: c.risk_level,
-            consent_for_services: c.consent_for_services,
-            disclosure_other_orgs: c.consent_for_services,
-            interview_subject: c.interview_subject,
-            content_source_other: c.content_source_other,
-            module_id: c.module_id,
-            registration_date: c.registration_date,
-            referral_notes_oscar: c.referral_notes_oscar,
-            services_section: c.services_section,
-            //END FIELDS PREVIOUSLY IN CHILD{}
-          },
-          null,
-          2
-        )
-      );
+      // console.log(
+      //   'Data provided to Primero for upload `upsertCase`: ',
+      //   JSON.stringify(
+      //     {
+      //       remote: c.remote,
+      //       oscar_number: c.oscar_number,
+      //       case_id: c.case_id,
+      //       unique_identifier: c.unique_identifier,
+      //       // FIELDS PREVIOUSLY IN CHILD{}
+      //       case_id: c.case_id,
+      //       oscar_number: c.oscar_number,
+      //       oscar_short_id: c.oscar_short_id,
+      //       mosvy_number: c.mosvy_number,
+      //       name_first: c.name_first,
+      //       name_last: c.name_last,
+      //       sex: c.sex,
+      //       date_of_birth: c.date_of_birth,
+      //       age: c.age,
+      //       location_current: c.location_current,
+      //       //address_current: c.address_current,
+      //       oscar_status: c.oscar_status,
+      //       protection_status: c.protection_status,
+      //       service_implementing_agency: c.service_implementing_agency,
+      //       owned_by: c.owned_by,
+      //       owned_by_text: c.owned_by_text,
+      //       oscar_reason_for_exiting: c.oscar_reason_for_exiting,
+      //       has_referral: c.has_referral,
+      //       risk_level: c.risk_level,
+      //       consent_for_services: c.consent_for_services,
+      //       disclosure_other_orgs: c.consent_for_services,
+      //       interview_subject: c.interview_subject,
+      //       content_source_other: c.content_source_other,
+      //       module_id: c.module_id,
+      //       registration_date: c.registration_date,
+      //       referral_notes_oscar: c.referral_notes_oscar,
+      //       services_section: c.services_section,
+      //       //END FIELDS PREVIOUSLY IN CHILD{}
+      //     },
+      //     null,
+      //     2
+      //   )
+      // );
+      console.log('Data provided to Primero for upload `upsertCase`: ', JSON.stringify(c, null, 4));
       return state.data;
     },
   })
