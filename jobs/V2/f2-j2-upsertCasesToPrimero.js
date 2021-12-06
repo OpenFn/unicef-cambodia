@@ -553,10 +553,6 @@ fn(state => {
       module_id: 'primeromodule-cp',
       //registration_date: isUpdate ? null : now.toISOString().split('T')[0].replace(/-/g, '/'),
       referral_notes_oscar: c.reason_for_referral, //new services referral notes field
-      // TODO: Question from Taylor: -------------------------------------------
-      // primero services: [1, 2, 3]
-      // oscar services in this payload: [4, 5]
-      // if we send [4,5] to primero, will it OVERWRITE [1,2,3]?
       services_section: reduceOscarServices(c.services),
       // -----------------------------------------------------------------------
       // transitions:
