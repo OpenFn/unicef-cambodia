@@ -165,37 +165,38 @@ post(
           c.transitions.length > 0 &&
           c.transitions.sort((a, b) => (a.created_at < b.created_at ? 1 : -1))[0].notes;
 
-        console.log(
-          `Data provided by Primero: ${JSON.stringify(
-            {
-              _id: c._id,
-              case_id: c.case_id,
-              case_id_display: c.case_id_display,
-              created_at: c.created_at,
-              location_current: c.location_current,
-              module_id: c.module_id,
-              owned_by: c.owned_by,
-              owned_by_agency: c.owned_by_agency,
-              owned_by_phone: c.owned_by_phone,
-              services_section: c.services_section.map(s => ({
-                oscar_referring_organization: s.oscar_referring_organization,
-                service_implementing_agency: s.service_implementing_agency,
-                service_status_referred: s.service_status_referred,
-                unique_id: s.unique_id,
-              })),
-              transitions: c.services_section.map(t => ({
-                created_at: t.created_at,
-                id: t.id,
-                service_section_unique_id: t.service_section_unique_id,
-                transitioned_by: t.transitioned_by,
-                type_of_export: t.type_of_export,
-                unique_id: t.unique_id,
-              })),
-            },
-            null,
-            2
-          )}`
-        );
+        // console.log(
+        //   `Data provided by Primero: ${JSON.stringify(
+        //     {
+        //       _id: c._id,
+        //       case_id: c.case_id,
+        //       case_id_display: c.case_id_display,
+        //       created_at: c.created_at,
+        //       location_current: c.location_current,
+        //       module_id: c.module_id,
+        //       owned_by: c.owned_by,
+        //       owned_by_agency: c.owned_by_agency,
+        //       owned_by_phone: c.owned_by_phone,
+        //       services_section: c.services_section.map(s => ({
+        //         oscar_referring_organization: s.oscar_referring_organization,
+        //         service_implementing_agency: s.service_implementing_agency,
+        //         service_status_referred: s.service_status_referred,
+        //         unique_id: s.unique_id,
+        //       })),
+        //       transitions: c.services_section.map(t => ({
+        //         created_at: t.created_at,
+        //         id: t.id,
+        //         service_section_unique_id: t.service_section_unique_id,
+        //         transitioned_by: t.transitioned_by,
+        //         type_of_export: t.type_of_export,
+        //         unique_id: t.unique_id,
+        //       })),
+        //     },
+        //     null,
+        //     2
+        //   )}`
+        // );
+        console.log(`Data provided by Primero:${JSON.stringify(c, null, 4)}`);
 
         // Mappings for posting cases to Oscar
         const oscar = {
@@ -260,38 +261,39 @@ post(
         //     2
         //   )
         // );
-        console.log(
-          'Case data to be posted to Oscar: ',
-          JSON.stringify(
-            {
-              organization: {
-                external_id: oscar.external_id,
-                external_id_display: oscar.external_id_display,
-                global_id: oscar.global_id,
-                level_of_risk: c.risk_level,
-                oscar_id: oscar.oscar_short_id,
-                mosvy_number: oscar.mosvy_number,
-                given_name: oscar.given_name,
-                family_name: oscar.family_name,
-                gender: oscar.gender,
-                date_of_birth: oscar.date_of_birth,
-                location_current_village_code: oscar.location_current_village_code,
-                address_current_village_code: oscar.address_current_village_code,
-                reason_for_referral: oscar.reason_for_referral,
-                external_case_worker_name: oscar.external_case_worker_name,
-                external_case_worker_id: oscar.external_case_worker_id,
-                external_case_worker_mobile: oscar.external_case_worker_mobile,
-                organization_name: 'cif',
-                organization_id: 'cif',
-                is_referred: oscar.is_referred,
-                services: oscar.services && oscar.services.map(s => ({ uuid: s.uuid })),
-                transaction_id: oscar.transaction_id,
-              },
-            },
-            null,
-            2
-          )
-        );
+        // console.log(
+        //   'Case data to be posted to Oscar: ',
+        //   JSON.stringify(
+        //     {
+        //       organization: {
+        //         external_id: oscar.external_id,
+        //         external_id_display: oscar.external_id_display,
+        //         global_id: oscar.global_id,
+        //         level_of_risk: c.risk_level,
+        //         oscar_id: oscar.oscar_short_id,
+        //         mosvy_number: oscar.mosvy_number,
+        //         given_name: oscar.given_name,
+        //         family_name: oscar.family_name,
+        //         gender: oscar.gender,
+        //         date_of_birth: oscar.date_of_birth,
+        //         location_current_village_code: oscar.location_current_village_code,
+        //         address_current_village_code: oscar.address_current_village_code,
+        //         reason_for_referral: oscar.reason_for_referral,
+        //         external_case_worker_name: oscar.external_case_worker_name,
+        //         external_case_worker_id: oscar.external_case_worker_id,
+        //         external_case_worker_mobile: oscar.external_case_worker_mobile,
+        //         organization_name: 'cif',
+        //         organization_id: 'cif',
+        //         is_referred: oscar.is_referred,
+        //         services: oscar.services && oscar.services.map(s => ({ uuid: s.uuid })),
+        //         transaction_id: oscar.transaction_id,
+        //       },
+        //     },
+        //     null,
+        //     2
+        //   )
+        // );
+        console.log('Case data to be posted to Oscar: ', JSON.stringify(oscar, null, 4));
 
         return { organization: oscar };
       },
