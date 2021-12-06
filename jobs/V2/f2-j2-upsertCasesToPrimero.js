@@ -269,7 +269,9 @@ fn(state => {
           service_type: key,
           service_type_text: key,
           service_type_details_text: serviceMap[oscarService.name] ? 'n/a' : oscarService.name,
-          service_response_day_time: oscarService.enrollment_date ? `${oscarService.enrollment_date}T00:00:00.000Z` : oscarService.enrollment_date,
+          service_response_day_time: oscarService.enrollment_date
+            ? `${oscarService.enrollment_date}T00:00:00.000Z`
+            : oscarService.enrollment_date,
           oscar_case_worker_name: c.case_worker_name,
           oscar_referring_organization: `agency-${c.organization_name}`,
           oscar_case_worker_telephone: c.case_worker_mobile,
@@ -551,10 +553,14 @@ fn(state => {
       module_id: 'primeromodule-cp',
       //registration_date: isUpdate ? null : now.toISOString().split('T')[0].replace(/-/g, '/'),
       referral_notes_oscar: c.reason_for_referral, //new services referral notes field
-      services_section:
-        isUpdate || c.is_referred !== true || c.services.length < 0
-          ? null
-          : reduceOscarServices(c.services),
+      // TODO: Question from Taylor: -------------------------------------------
+      // primero services: [1, 2, 3]
+      // oscar services in this payload: [4, 5]
+      // if we send [4,5] to primero, will it OVERWRITE [1,2,3]?
+      services_section: reduceOscarServices(c.services),
+      // -----------------------------------------------------------------------
+
+
       // transitions:
       //   isUpdate || c.is_referred !== true
       //     ? null
