@@ -559,8 +559,6 @@ fn(state => {
       // if we send [4,5] to primero, will it OVERWRITE [1,2,3]?
       services_section: reduceOscarServices(c.services),
       // -----------------------------------------------------------------------
-
-
       // transitions:
       //   isUpdate || c.is_referred !== true
       //     ? null
