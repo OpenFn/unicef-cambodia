@@ -269,7 +269,7 @@ fn(state => {
           service_type: key,
           service_type_text: key,
           service_type_details_text: serviceMap[oscarService.name] ? 'n/a' : oscarService.name,
-          service_implemented_day_time: oscarService.enrollment_date,
+          service_response_day_time: oscarService.enrollment_date,
           oscar_case_worker_name: c.case_worker_name,
           oscar_referring_organization: `agency-${c.organization_name}`,
           oscar_case_worker_telephone: c.case_worker_mobile,
