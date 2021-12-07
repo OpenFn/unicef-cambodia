@@ -545,7 +545,7 @@ fn(state => {
       //  isUpdate && c.is_referred !== true ? null : `${c.case_worker_name} ${c.case_worker_mobile}`,
       oscar_reason_for_exiting: c.reason_for_exiting,
       //has_referral: c.is_referred,
-      risk_level: c.is_referred == true ? 'medium' : null,
+      risk_level: c.is_referred == true ? c.level_of_risk : null,
       //consent_for_services: isUpdate || c.is_referred !== true ? null : true,
       //disclosure_other_orgs: isUpdate || c.is_referred !== true ? null : true,
       interview_subject: isUpdate || c.is_referred !== true ? null : 'other',
