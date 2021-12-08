@@ -109,7 +109,16 @@ _Agency/Organization Ids should follow the below naming conventions, otherwise t
     - Oscar Organization Name: `'{organization_name}'` (e.g., `cif`)
     - Primero Agency ID: `'agency-{organization_name}'` (e.g., `agency-cif`)
 
-## (8) Administration
+## (8) 2021 Primero V2 Upgrade 
+OpenFn updated the IO Solution between the Primero and OSCaR systems to work with Primero V2 and added changes to sync Oscar 2nd referrals and map `risk level`. See links to the updated documentation below: 
+
+- [V2 mapping specifications](https://docs.google.com/spreadsheets/d/1Zg9KGkHbh0ptjpj4YX9qFkojz9ydJ9aVT_UtkvE7Wu8/edit#gid=112592766)
+- [V2 data flow diagrams](https://drive.google.com/file/d/14_Nk0xML9k_0mmtI__fNGASm-brXfn-7/view?usp=sharing)
+- [V2 Testing slides](https://docs.google.com/presentation/d/19Fs5kTlF5EV117F9TRVXVWqQPLw5jTxn9hapmCjXOt8/edit#slide=id)
+- [V2 Training deck](https://docs.google.com/presentation/u/2/d/1Q1kAIAwa1atXuQi2aIYoISVItJHntYk-gOsK3V_dg3w/edit#slide=id.ga81cdd0b96_0_480)
+
+
+## (9) Administration
 ### Provisioning, Hosting, & Maintenance
 This integration is hosted on [OpenFn.org](https://openfn.org/projects) with Primero SaaS. OpenFn will provide ongoing maintenance support to the MoSVY administrators managing OpenFn and Primero.  
 
@@ -132,3 +141,6 @@ kiry@devzep.com
 ### Training Materials
 - Administrators: [See the video recording](https://youtu.be/-5-Y9ZrK-aQ) and [presentation](https://docs.google.com/presentation/d/1aUprT1CwnEWtIax_PGxsPspXdR3mPy78rj6qt92dxeI/edit?usp=sharing) from the December 2020 System Administrators training. This includes an overview of integration monitoring, error codes, and troubleshooting. 
 - Case Workers: [See the training recording](https://youtu.be/9kSiY3Ld2bE) and the [IO User Guide](https://docs.google.com/document/d/1c2irTpsZaOIEGzQaP1_O6XaREobJPdxV914hoDPJ9Dg/edit?usp=sharing). 
+
+
+
