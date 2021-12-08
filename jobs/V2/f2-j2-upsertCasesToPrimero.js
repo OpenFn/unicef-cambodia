@@ -512,7 +512,7 @@ fn(state => {
     const locationCode = c.location_current_village_code
       ? parseInt(c.location_current_village_code, 10).toString()
       : null;
-    console.log("LEVEL OF RISK" + c.level_of_risk)
+    
     // Mappings for upserting cases in Primero (update if existing, insert if new)
     const primeroCase = {
       //remote: true,
