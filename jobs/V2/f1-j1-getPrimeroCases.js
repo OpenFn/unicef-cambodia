@@ -10,7 +10,7 @@ fn(state => {
 
 fn(state => {
   console.log('Last sync end date:', state.lastRunDateTime);
-  const manualCursor = '2021-11-21T15:10:00.587Z';
+  const manualCursor = '2021-12-08T00:00:00.000Z';
   const cursor = state.lastRunDateTime || manualCursor;
   return { ...state, referralIds: [], cursor };
 });
@@ -35,6 +35,7 @@ fn(state => {
     {
       remote: true,
       last_updated_at: `${state.cursor}..`,
+      service_response_types: 'list||referral_to_oscar', //testing
     },
     state => {
       console.log(
@@ -55,6 +56,7 @@ fn(state => {
     {
       remote: true,
       last_updated_at: `${state.cursor}..`,
+      oscar_number: 'range||*.*', //testing
     },
     state => {
       console.log(`Other cases: ${JSON.stringify(state.data.map(x => x.case_id_display))}`);
