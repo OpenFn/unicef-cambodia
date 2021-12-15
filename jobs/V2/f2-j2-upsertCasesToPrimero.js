@@ -536,22 +536,22 @@ fn(state => {
       date_of_birth: isUpdate ? null : c.date_of_birth,
       age: isUpdate ? null : calcAge(c.date_of_birth),
       location_current: isUpdate ? null : locationCode,
-      //address_current: isUpdate ? null : c.address_current_village_code,
+      address_current: isUpdate ? null : c.address_current_village_code,
       oscar_status: isUpdate ? null : c.status,
       protection_status: !isUpdate && c.is_referred == true ? 'oscar_referral' : null,
       //service_implementing_agency: `agency-${c.organization_name}`,
       owned_by: isUpdate && c.is_referred !== true ? null : setUser(c),
-      //owned_by_text:
-      //  isUpdate && c.is_referred !== true ? null : `${c.case_worker_name} ${c.case_worker_mobile}`,
+      owned_by_text:
+        isUpdate && c.is_referred !== true ? null : `${c.case_worker_name} ${c.case_worker_mobile}`,
       oscar_reason_for_exiting: c.reason_for_exiting,
       //has_referral: c.is_referred,
       risk_level: c.is_referred == true ? c.level_of_risk : null,
-      //consent_for_services: isUpdate || c.is_referred !== true ? null : true,
-      //disclosure_other_orgs: isUpdate || c.is_referred !== true ? null : true,
+      consent_for_services: isUpdate || c.is_referred !== true ? null : true,
+      disclosure_other_orgs: isUpdate || c.is_referred !== true ? null : true,
       interview_subject: isUpdate || c.is_referred !== true ? null : 'other',
       //content_source_other: isUpdate ? null : 'OSCaR',
       module_id: 'primeromodule-cp',
-      //registration_date: isUpdate ? null : now.toISOString().split('T')[0].replace(/-/g, '/'),
+      registration_date: isUpdate ? null : now.toISOString().split('T')[0].replace(/-/g, '/'),
       referral_notes_oscar: c.reason_for_referral, //new services referral notes field
       services_section: reduceOscarServices(c.services),
       // -----------------------------------------------------------------------
