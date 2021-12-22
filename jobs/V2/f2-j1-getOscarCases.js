@@ -58,10 +58,8 @@ post(
     state => {
       console.log(
         `Oscar API responded with cases: ${JSON.stringify(
-          state.data.data 
-        ),
-        null,
-        4}`
+          state.data.data, null, 2
+        )}`
       );
       /*console.log(
         `Oscar API responded with cases with global_ids: ${JSON.stringify(
