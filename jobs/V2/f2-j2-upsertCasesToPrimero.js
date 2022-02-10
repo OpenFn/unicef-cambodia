@@ -269,7 +269,7 @@ fn(state => {
           service_type: key,
           service_type_text: key,
           service_type_details_text: serviceMap[oscarService.name] ? 'n/a' : oscarService.name,
-          implementing_agency: c.organization_name,
+          //implementing_agency: c.organization_name,
           service_response_day_time: oscarService.enrollment_date
             ? `${oscarService.enrollment_date}T00:00:00.000Z`
             : oscarService.enrollment_date,
@@ -543,13 +543,13 @@ fn(state => {
       protection_status: !isUpdate && c.is_referred == true ? 'oscar_referral' : null,
       //service_implementing_agency: `agency-${c.organization_name}`,
       owned_by: isUpdate && c.is_referred !== true ? null : setUser(c),
-      owned_by_text:
-        isUpdate && c.is_referred !== true ? null : `${c.case_worker_name} ${c.case_worker_mobile}`,
+      // owned_by_text:
+      //   isUpdate && c.is_referred !== true ? null : `${c.case_worker_name} ${c.case_worker_mobile}`,
       oscar_reason_for_exiting: c.reason_for_exiting,
       //has_referral: c.is_referred,
       risk_level: c.is_referred == true ? c.level_of_risk : null,
-      consent_for_services: isUpdate || c.is_referred !== true ? null : true,
-      disclosure_other_orgs: isUpdate || c.is_referred !== true ? null : true,
+      //consent_for_services: isUpdate || c.is_referred !== true ? null : true,
+      //disclosure_other_orgs: isUpdate || c.is_referred !== true ? null : true,
       interview_subject: isUpdate || c.is_referred !== true ? null : 'other',
       //content_source_other: isUpdate ? null : 'OSCaR',
       module_id: 'primeromodule-cp',
