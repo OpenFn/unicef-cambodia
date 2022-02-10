@@ -523,7 +523,7 @@ fn(state => {
       // by Primero as a workaround for certain uuid/external_id duplicate
       // issues in v1 of their public API. This will likely change soon.
       case_id: primeroId(c),
-      //unique_identifier: primeroId(c),
+      unique_identifier: primeroId(c),
       // =======================================================================
       // FIELDS PREVIOUSLY IN CHILD{}
       // primero_field: oscar_field,
