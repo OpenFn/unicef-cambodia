@@ -543,8 +543,8 @@ fn(state => {
       protection_status: !isUpdate && c.is_referred == true ? 'oscar_referral' : null,
       //service_implementing_agency: `agency-${c.organization_name}`,
       owned_by: isUpdate && c.is_referred !== true ? null : setUser(c),
-      owned_by_text:
-        isUpdate && c.is_referred !== true ? null : `${c.case_worker_name} ${c.case_worker_mobile}`,
+      // owned_by_text:
+      //   isUpdate && c.is_referred !== true ? null : `${c.case_worker_name} ${c.case_worker_mobile}`, commenting out per Ajit's feedback
       oscar_reason_for_exiting: c.reason_for_exiting,
       //has_referral: c.is_referred,
       risk_level: c.is_referred == true ? c.level_of_risk : null,
