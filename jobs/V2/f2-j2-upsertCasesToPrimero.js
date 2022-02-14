@@ -291,6 +291,7 @@ fn(state => {
           service_type: (serviceMap[service.name] && serviceMap[service.name].type) || 'Other',
           service_subtype:
             (serviceMap[service.name] && serviceMap[service.name].subtype) || 'Other',
+          referral_status: c.is_referred === false ? c.status : undefined,
         };
       });
     }
@@ -513,7 +514,7 @@ fn(state => {
     const locationCode = c.location_current_village_code
       ? parseInt(c.location_current_village_code, 10).toString()
       : null;
-    
+
     // Mappings for upserting cases in Primero (update if existing, insert if new)
     const primeroCase = {
       //remote: true,
