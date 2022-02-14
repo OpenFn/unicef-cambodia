@@ -303,6 +303,11 @@ post(
 
 alterState(state => {
   // Update links for non-referrals
+  const statusMap = {
+    Accepted: 'accepted_270501',
+    Exited: 'rejected_412652',
+  };
+
   if (state.cases.nonReferrals.length > 0)
     return post(
       '/api/v1/admin_auth/sign_in',
@@ -326,6 +331,8 @@ alterState(state => {
               external_id: state.oscarStrings(c.case_id),
               external_id_display: state.oscarStrings(c.case_id_display),
               global_id: state.oscarStrings(c.oscar_number),
+              referral_status_5fe9c1a: statusMap[c.referral_status],
+              is_referred: false,
             })),
           };
           console.log("'Update links' with non-referrals:", payload);
