@@ -21,6 +21,11 @@ fn(state => {
     });
   // ===========================================================================
 
+  const statusMap = {
+    Accepted: 'accepted_270501',
+    Exited: 'rejected_412652',
+  };
+
   const serviceMap = {
     'Generalist social work / case work': {
       subtype: 'social_work_case_work_generalist',
@@ -291,7 +296,8 @@ fn(state => {
           service_type: (serviceMap[service.name] && serviceMap[service.name].type) || 'Other',
           service_subtype:
             (serviceMap[service.name] && serviceMap[service.name].subtype) || 'Other',
-          referral_status: c.is_referred === false ? c.status : undefined,
+          referral_status_5fe9c1a:
+            c.is_referred === false ? statusMap[c.referral_status] : undefined,
         };
       });
     }
