@@ -649,3 +649,37 @@ each(
     },
   })
 );
+
+// 1) Referral update:
+each(
+  '$.cases[*]',
+  fn(state => {
+    const statusMap = {
+      Accepted: 'accepted_270501',
+      Exited: 'rejected_412652',
+    };
+    const { services_section, external_id } = state.data;
+    const Ids = services_section.map(s => s.uuid);
+    return getReferrals({ externalId: 'case_id', id: external_id }, state => {
+      console.log(state.data.length, 'referrals found for case_id: ', case_id);
+
+      const referrals = state.data;
+      const matchingReferral = referrals.find(referral => Ids.includes(referral.service_record_id));
+
+      const data = {
+        status: statusMap[matchingReferral.referral_status],
+        id: matchingReferral.id,
+        type: 'Referral',
+        record_id: matchingReferral.record_id,
+        record_type: 'case',
+      };
+
+      return updateReferrals({
+        externalId: 'record_id',
+        id: matchingReferral.record_id,
+        referral_id: matchingReferral.id,
+        data,
+      })(state);
+    })(state);
+  })
+);
