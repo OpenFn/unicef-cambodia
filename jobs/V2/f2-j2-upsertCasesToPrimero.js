@@ -23,6 +23,7 @@ fn(state => {
 
   const statusMap = {
     Accepted: 'accepted_270501',
+    Active: 'accepted_270501',
     Exited: 'rejected_412652',
   };
 
