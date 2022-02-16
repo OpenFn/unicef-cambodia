@@ -299,7 +299,7 @@ fn(state => {
             (serviceMap[service.name] && serviceMap[service.name].subtype) || 'Other',
           //referral_status: statusMap[c.referral_status] || undefined  
           referral_status_5fe9c1a:
-            c.source === "Primero" ? statusMap[c.referral_status] : undefined,
+            c.source === 'Primero' ? statusMap[c.referral_status] : undefined,
         };
       });
     }
