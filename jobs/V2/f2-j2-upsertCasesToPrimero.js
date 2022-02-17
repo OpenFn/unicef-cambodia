@@ -275,7 +275,7 @@ fn(state => {
           service_type: key,
           service_type_text: key,
           service_type_details_text: serviceMap[oscarService.name] ? 'n/a' : oscarService.name,
-          //implementing_agency: `agency-${c.organization_name}`,
+          service_implementing_agency: `agency-${c.organization_name}`,
           service_response_day_time: oscarService.enrollment_date
             ? `${oscarService.enrollment_date}T00:00:00.000Z`
             : oscarService.enrollment_date,
@@ -299,7 +299,7 @@ fn(state => {
             (serviceMap[service.name] && serviceMap[service.name].subtype) || 'Other',
           //referral_status: statusMap[c.referral_status] || undefined
           referral_status_5fe9c1a:
-            c.source === 'Primero' && service.enrollment_date === null
+            c.resource === 'Primero' && service.enrollment_date === null
               ? statusMap[c.referral_status]
               : undefined,
         };
@@ -663,7 +663,7 @@ each(
       Exited: 'rejected_412652',
     };
 
-    const { services_section, external_id, source } = state.data;
+    const { services_section, external_id, resource } = state.data;
     const Ids = services_section.filter(s => s.enrollment_date === null).map(s => s.uuid); // array of all 'uuids'
 
     return getReferrals({ externalId: 'case_id', id: external_id }, state => {
@@ -673,7 +673,7 @@ each(
       const matchingReferral = referrals.find(referral => Ids.includes(referral.service_record_id));
 
       const data = {
-        status: source === 'Primero' ? statusMap[matchingReferral.referral_status] : undefined,
+        status: resource === 'Primero' ? statusMap[matchingReferral.referral_status] : undefined,
         id: matchingReferral.id,
         type: 'Referral',
         record_id: matchingReferral.record_id,
