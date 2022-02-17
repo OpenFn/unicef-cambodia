@@ -336,7 +336,7 @@ alterState(state => {
               is_referred: false,
             })),
           };
-          console.log(state.data);
+          console.log(state.cases.nonReferrals);
           console.log("'Update links' with non-referrals:", payload);
           return payload;
         },
