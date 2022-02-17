@@ -332,11 +332,10 @@ alterState(state => {
               external_id: state.oscarStrings(c.case_id),
               external_id_display: state.oscarStrings(c.case_id_display),
               global_id: state.oscarStrings(c.oscar_number),
-              status: statusMap[c.oscar_status],
+              status: statusMap[c.referral_status_5fe9c1a],
               is_referred: false,
             })),
           };
-          console.log(state.cases.nonReferrals.oscar_status);
           console.log("'Update links' with non-referrals:", payload);
           return payload;
         },
