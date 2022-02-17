@@ -300,7 +300,7 @@ fn(state => {
           //referral_status: statusMap[c.referral_status] || undefined
           referral_status_5fe9c1a:
             c.resource === 'primero' && service.enrollment_date === null
-              ? statusMap[c.referral_status]
+              ? statusMap[c.status]
               : undefined,
         };
       });
@@ -682,7 +682,7 @@ getReferrals(
       const matchingReferral = referrals.find(referral => Ids.includes(referral.service_record_id));
 
       const data = {
-        status: resource === 'primero' ? statusMap[matchingReferral.referral_status] : undefined,
+        status: resource === 'primero' ? statusMap[matchingReferral.status] : undefined,
         id: matchingReferral.id,
         type: 'Referral',
         record_id: matchingReferral.record_id,
