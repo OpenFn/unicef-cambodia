@@ -332,7 +332,7 @@ alterState(state => {
               external_id: state.oscarStrings(c.case_id),
               external_id_display: state.oscarStrings(c.case_id_display),
               global_id: state.oscarStrings(c.oscar_number),
-              status: statusMap[c.referral_status_5fe9c1a],
+              status: statusMap[c.oscar_status],
               is_referred: false,
             })),
           };
