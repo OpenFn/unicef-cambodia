@@ -654,8 +654,24 @@ each(
   })
 );
 
+
+fn(state => ({
+  ...state,
+  remote: true,
+  case_id: 'b6723284-d555-4950-ad0d-32c3eeb4e053',
+}));
+
+getCases(
+  {
+    case_id: state => state.case_id,
+  },
+  state => {
+    console.log('fetching data', state.data);
+    return state;
+  }
+);
 // 1) Referral update:
-each(
+/*each(
   '$.cases[*]',
   fn(state => {
     const statusMap = {
@@ -688,4 +704,4 @@ each(
       })(state);
     })(state);
   })
-);
+);*/
