@@ -305,8 +305,8 @@ post(
 alterState(state => {
   // Update links for non-referrals
   const statusMap = {
-    Accepted: 'accepted_270501',
-    Exited: 'rejected_412652',
+    accepted_270501: 'Accepted',
+    rejected_412652: 'Exited',
   };
 
   if (state.cases.nonReferrals.length > 0)
