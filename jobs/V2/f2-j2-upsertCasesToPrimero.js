@@ -1,34 +1,7 @@
-// Oscar cases ---> Primero
-// User Story 2: 'View Oscar cases in Primero' AND User Story 4: 'Sending referrals to Primero'
 fn(state => {
-  // ===========================================================================
-  // NOTE: As of September 25, 2020, Oscar has changed the structure of this
-  // payload for a subset of cases, depending on whether or not data exists in
-  // the services array. Below, we create an empty array (if it's been removed
-  // to ensure that all payloads adhere to the integration contract.
-  state.data.data = state.data.data
-    .map(c => {
-      const normalizedServicesArray = c.services || [];
-      return { ...c, services: normalizedServicesArray };
-    })
-    .filter(c => {
-      // remove 'demo' cases
-      if (c.organization_name == 'demo') {
-        console.log(`Dropping demo case: ${c.global_id}`);
-        return false;
-      }
-      return true;
-    });
-  // ===========================================================================
-
   // Saving original cases =========
   state.originalCases = state.data.data;
   // ===============================
-  const statusMap = {
-    Accepted: 'accepted_270501',
-    Active: 'accepted_270501',
-    Exited: 'rejected_412652',
-  };
 
   const serviceMap = {
     'Generalist social work / case work': {
@@ -230,6 +203,128 @@ fn(state => {
     'Other Service': { subtype: 'other_other_service', type: 'other' },
   };
 
+  return { ...state, serviceMap };
+});
+
+// Oscar cases ---> Primero
+// User Story 2: 'View Oscar cases in Primero' AND User Story 4: 'Sending referrals to Primero'=
+// 1. For each case where resource === 'primero'
+fn(state => {
+  // console.log('cases', state.cases);
+  const filteredCases = state.originalCases.filter(c => c.resource === 'primero');
+
+  const statusArray = ['accepted_270501', 'rejected_412652'];
+  const statusMap = {
+    Accepted: 'accepted_270501',
+    Active: 'accepted_270501',
+    Exited: 'rejected_412652',
+  };
+
+  const oscarReferral = [];
+  filteredCases.forEach(c => {
+    oscarReferral.push(
+      ...c.services.filter(service => service.enrollment_date === null).map(service => service.name)
+    );
+  });
+  const mappedOscarReferral = oscarReferral.map(r => state.serviceMap[r].type);
+  console.log('oscarReferral: ', mappedOscarReferral);
+  // return state;
+  return each(
+    filteredCases,
+    fn(state => {
+      const { external_id, referral_status } = state.data;
+      const case_id = external_id;
+
+      return getCases({ remote: true, case_id: external_id }, state => {
+        // console.log('found', state.data.length);
+        const { services_section } = state.data[0];
+        // console.log('services', services_section);
+        const referralsToOscar = (services_section || []).filter(
+          serv =>
+            serv.service_response_type === 'referral_to_oscar' &&
+            (serv.referral_status_5fe9c1a === undefined ||
+              !statusArray.includes(serv.referral_status_5fe9c1a))
+        );
+
+        // 4. Finding matching service
+        const matchingService = referralsToOscar.filter(ref =>
+          mappedOscarReferral.includes(ref.service_type)
+        );
+        if (matchingService.length > 1) {
+          throw new Error('Multiple services found. Aborting upsert.');
+        }
+        // 5. saving 'service_record_id'
+        console.log('matching service', matchingService);
+        if (matchingService.length === 0) {
+          console.log('no matching service found');
+          return state;
+        }
+        const service_record_id = matchingService[0].unique_id;
+        state.service_record_id = service_record_id;
+
+        // 6. Get referrals from 'case_id'
+        return getReferrals({ externalId: 'case_id', id: case_id }, state => {
+          const referrals = state.data;
+          if (referrals.length === 0) {
+            throw new Error('No referrals found.');
+          }
+
+          const matchingReferral = referrals.find(
+            ref => ref.service_record_id === service_record_id
+          );
+
+          console.log('matching referral', matchingReferral);
+          if (!matchingReferral) {
+            console.log('No matching referral found. Aborting upsert.');
+            return state;
+          }
+
+          const data = {
+            status: statusMap[referral_status],
+            id: matchingReferral.id,
+            type: 'Referral',
+            record_id: matchingReferral.record_id,
+            record_type: 'case',
+          };
+          return updateReferrals({
+            externalId: 'record_id',
+            id: matchingReferral.record_id,
+            referral_id: matchingReferral.id,
+            data,
+          })(state);
+        })(state);
+      })(state);
+    })
+  )(state);
+});
+
+fn(state => {
+  // ===========================================================================
+  // NOTE: As of September 25, 2020, Oscar has changed the structure of this
+  // payload for a subset of cases, depending on whether or not data exists in
+  // the services array. Below, we create an empty array (if it's been removed
+  // to ensure that all payloads adhere to the integration contract.
+  state.data.data = state.originalCases
+    .map(c => {
+      const normalizedServicesArray = c.services || [];
+      return { ...c, services: normalizedServicesArray };
+    })
+    .filter(c => {
+      // remove 'demo' cases
+      if (c.organization_name == 'demo') {
+        console.log(`Dropping demo case: ${c.global_id}`);
+        return false;
+      }
+      return true;
+    });
+  // ===========================================================================
+
+  const statusMap = {
+    Accepted: 'accepted_270501',
+    Active: 'accepted_270501',
+    Exited: 'rejected_412652',
+  };
+
   state.cases = state.data.data.map(c => {
     function convertDate(str) {
       if (str) {
@@ -273,11 +368,13 @@ fn(state => {
 
         const oscarService = object[key][0];
         return {
-          unique_id: oscarService.uuid,
+          unique_id: oscarService.uuid, // UUID DOES NOT EXIST
           service_subtype: object[key].map(st => st.service_subtype),
           service_type: key,
           service_type_text: key,
-          service_type_details_text: serviceMap[oscarService.name] ? 'n/a' : oscarService.name,
+          service_type_details_text: state.serviceMap[oscarService.name]
+            ? 'n/a'
+            : oscarService.name,
           service_implementing_agency: `agency-${c.organization_name}`,
           service_response_day_time: oscarService.enrollment_date
             ? `${oscarService.enrollment_date}T00:00:00.000Z`
@@ -297,13 +394,16 @@ fn(state => {
         return {
           ...service,
           isReferral: service.enrollment_date ? true : false,
-          service_type: (serviceMap[service.name] && serviceMap[service.name].type) || 'Other',
+          service_type:
+            (state.serviceMap[service.name] && state.serviceMap[service.name].type) || 'Other',
           service_subtype:
-            (serviceMap[service.name] && serviceMap[service.name].subtype) || 'Other',
+            (state.serviceMap[service.name] && state.serviceMap[service.name].subtype) || 'Other',
           //referral_status: statusMap[c.referral_status] || undefined
           referral_status_5fe9c1a:
-            c.resource === 'primero' && service.enrollment_date === null
-              ? statusMap[c.status]
+            state.service_record_id === service.unique_id
+              ? c.resource === 'primero' && service.enrollment_date === null
+                ? statusMap[c.status]
+                : undefined
               : undefined,
         };
       });
@@ -596,183 +696,63 @@ fn(state => {
   });
 
   // This removes all cases set to `false`;
-  return { ...state, cases: state.cases.filter(c => c), serviceMap };
+  return { ...state, cases: state.cases.filter(c => c) };
 });
 
-each(
-  '$.cases[*]',
-  upsertCase({
-    // Upsert Primero cases based on matching 'oscar_number' OR 'case_id'
-    externalIds: state => (state.data.case_id ? ['case_id'] : ['oscar_number']),
-    // externalIds: ['oscar_number', 'case_id'],
-    data: state => {
-      const c = state.data;
-      // NOTE: This is extremely VERBOSE but more secure, given that we don't
-      // know exactly what will be provided by the API.
-      // console.log(
-      //   'Data provided to Primero for upload `upsertCase`: ',
-      //   JSON.stringify(
-      //     {
-      //       remote: c.remote,
-      //       oscar_number: c.oscar_number,
-      //       case_id: c.case_id,
-      //       unique_identifier: c.unique_identifier,
-      //       // FIELDS PREVIOUSLY IN CHILD{}
-      //       case_id: c.case_id,
-      //       oscar_number: c.oscar_number,
-      //       oscar_short_id: c.oscar_short_id,
-      //       mosvy_number: c.mosvy_number,
-      //       name_first: c.name_first,
-      //       name_last: c.name_last,
-      //       sex: c.sex,
-      //       date_of_birth: c.date_of_birth,
-      //       age: c.age,
-      //       location_current: c.location_current,
-      //       //address_current: c.address_current,
-      //       oscar_status: c.oscar_status,
-      //       protection_status: c.protection_status,
-      //       service_implementing_agency: c.service_implementing_agency,
-      //       owned_by: c.owned_by,
-      //       owned_by_text: c.owned_by_text,
-      //       oscar_reason_for_exiting: c.oscar_reason_for_exiting,
-      //       has_referral: c.has_referral,
-      //       risk_level: c.risk_level,
-      //       consent_for_services: c.consent_for_services,
-      //       disclosure_other_orgs: c.consent_for_services,
-      //       interview_subject: c.interview_subject,
-      //       content_source_other: c.content_source_other,
-      //       module_id: c.module_id,
-      //       registration_date: c.registration_date,
-      //       referral_notes_oscar: c.referral_notes_oscar,
-      //       services_section: c.services_section,
-      //       //END FIELDS PREVIOUSLY IN CHILD{}
-      //     },
-      //     null,
-      //     2
-      //   )
-      // );
-      console.log('Data provided to Primero for upload `upsertCase`: ', JSON.stringify(c, null, 4));
-      return state.data;
-    },
-  })
-);
-
-// 1) Referral update:
-/*each(
-  '$.cases[*]',
-  fn(state => {
-    const statusMap = {
-      Accepted: 'accepted_270501',
-      Exited: 'rejected_412652',
-    };
-
-    const { services_section, external_id, resource } = state.data;
-    const Ids = services_section.filter(s => s.enrollment_date === null).map(s => s.uuid); // array of all 'uuids'
-
-    return getReferrals({ externalId: 'case_id', id: external_id }, state => {
-      console.log(state.data.length, 'referrals found for case_id: ', case_id);
-
-      const referrals = state.data;
-      const matchingReferral = referrals.find(referral => Ids.includes(referral.service_record_id));
-
-      const data = {
-        status: resource === 'primero' ? statusMap[matchingReferral.status] : undefined,
-        id: matchingReferral.id,
-        type: 'Referral',
-        record_id: matchingReferral.record_id,
-        record_type: 'case',
-      };
-
-      return updateReferrals({
-        externalId: 'record_id',
-        id: matchingReferral.record_id,
-        referral_id: matchingReferral.id,
-        data,
-      })(state);
-    })(state);
-  })
-);*/
-
-// 1. For each case where resource === 'primero'
-fn(state => {
-  // console.log('cases', state.cases);
-  const filteredCases = state.originalCases.filter(c => c.resource === 'primero');
-
-  const statusArray = ['accepted_270501', 'rejected_412652'];
-  const statusMap = {
-    Accepted: 'accepted_270501',
-    Active: 'accepted_270501',
-    Exited: 'rejected_412652',
-  };
-
-  const oscarReferral = [];
-  filteredCases.forEach(c => {
-    oscarReferral.push(
-      ...c.services.filter(service => service.enrollment_date === null).map(service => service.name)
-    );
-  });
-  const mappedOscarReferral = oscarReferral.map(r => state.serviceMap[r].type);
-  console.log('oscarReferral: ', mappedOscarReferral);
-  // return state;
-  return each(
-    filteredCases,
-    fn(state => {
-      const { external_id, referral_status } = state.data;
-      const case_id = external_id;
-
-      return getCases({ remote: true, case_id: external_id }, state => {
-        // console.log('found', state.data.length);
-        const { services_section } = state.data[0];
-        // console.log('services', services_section);
-        const referralsToOscar = (services_section || []).filter(
-          serv =>
-            serv.service_response_type === 'referral_to_oscar' &&
-            (serv.referral_status_5fe9c1a === undefined ||
-              !statusArray.includes(serv.referral_status_5fe9c1a))
-        );
-
-        // 4. Finding matching service
-        const matchingService = referralsToOscar.filter(ref =>
-          mappedOscarReferral.includes(ref.service_type)
-        );
-        if (matchingService.length > 1) {
-          throw new Error('Multiple services found. Aborting upsert.');
-        }
-        // 5. saving 'service_record_id'
-        const service_record_id = matchingService[0].unique_id;
-
-        // 6. Get referrals from 'case_id'
-        return getReferrals({ externalId: 'case_id', id: case_id }, state => {
-          const referrals = state.data;
-          if (referrals.length === 0) {
-            throw new Error('No referrals found.');
-          }
-
-          const matchingReferral = referrals.find(
-            ref => ref.service_record_id === service_record_id
-          );
-
-          console.log('matching referral', matchingReferral);
-          if (!matchingReferral) {
-            console.log('No matching referral found. Aborting upsert.');
-            return state;
-          }
-
-          const data = {
-            status: statusMap[referral_status],
-            id: matchingReferral.id,
-            type: 'Referral',
-            record_id: matchingReferral.record_id,
-            record_type: 'case',
-          };
-          return updateReferrals({
-            externalId: 'record_id',
-            id: matchingReferral.record_id,
-            referral_id: matchingReferral.id,
-            data,
-          })(state);
-        })(state);
-      })(state);
-    })
-  )(state);
-});
+// each(
+//   '$.cases[*]',
+//   upsertCase({
+//     // Upsert Primero cases based on matching 'oscar_number' OR 'case_id'
+//     externalIds: state => (state.data.case_id ? ['case_id'] : ['oscar_number']),
+//     // externalIds: ['oscar_number', 'case_id'],
+//     data: state => {
+//       const c = state.data;
+//       // NOTE: This is extremely VERBOSE but more secure, given that we don't
+//       // know exactly what will be provided by the API.
+//       // console.log(
+//       //   'Data provided to Primero for upload `upsertCase`: ',
+//       //   JSON.stringify(
+//       //     {
+//       //       remote: c.remote,
+//       //       oscar_number: c.oscar_number,
+//       //       case_id: c.case_id,
+//       //       unique_identifier: c.unique_identifier,
+//       //       // FIELDS PREVIOUSLY IN CHILD{}
+//       //       case_id: c.case_id,
+//       //       oscar_number: c.oscar_number,
+//       //       oscar_short_id: c.oscar_short_id,
+//       //       mosvy_number: c.mosvy_number,
+//       //       name_first: c.name_first,
+//       //       name_last: c.name_last,
+//       //       sex: c.sex,
+//       //       date_of_birth: c.date_of_birth,
+//       //       age: c.age,
+//       //       location_current: c.location_current,
+//       //       //address_current: c.address_current,
+//       //       oscar_status: c.oscar_status,
+//       //       protection_status: c.protection_status,
+//       //       service_implementing_agency: c.service_implementing_agency,
+//       //       owned_by: c.owned_by,
+//       //       owned_by_text: c.owned_by_text,
+//       //       oscar_reason_for_exiting: c.oscar_reason_for_exiting,
+//       //       has_referral: c.has_referral,
+//       //       risk_level: c.risk_level,
+//       //       consent_for_services: c.consent_for_services,
+//       //       disclosure_other_orgs: c.consent_for_services,
+//       //       interview_subject: c.interview_subject,
+//       //       content_source_other: c.content_source_other,
+//       //       module_id: c.module_id,
+//       //       registration_date: c.registration_date,
+//       //       referral_notes_oscar: c.referral_notes_oscar,
+//       //       services_section: c.services_section,
+//       //       //END FIELDS PREVIOUSLY IN CHILD{}
+//       //     },
+//       //     null,
+//       //     2
+//       //   )
+//       // );
+//       console.log('Data provided to Primero for upload `upsertCase`: ', JSON.stringify(c, null, 4));
+//       return state.data;
+//     },
+//   })
+// );
