@@ -21,6 +21,9 @@ fn(state => {
     });
   // ===========================================================================
 
+  // Saving original cases =========
+  state.originalCases = state.data.data;
+  // ===============================
   const statusMap = {
     Accepted: 'accepted_270501',
     Active: 'accepted_270501',
@@ -593,7 +596,7 @@ fn(state => {
   });
 
   // This removes all cases set to `false`;
-  return { ...state, cases: state.cases.filter(c => c) };
+  return { ...state, cases: state.cases.filter(c => c), serviceMap };
 });
 
 each(
@@ -654,15 +657,6 @@ each(
   })
 );
 
-
-getReferrals(
-  { externalId: 'case_id', id: 'b6723284-d555-4950-ad0d-32c3eeb4e053' },
-
-  state => {
-    console.log('referrals', state.data);
-    return state;
-  }
-);
 // 1) Referral update:
 /*each(
   '$.cases[*]',
@@ -698,3 +692,87 @@ getReferrals(
     })(state);
   })
 );*/
+
+// 1. For each case where resource === 'primero'
+fn(state => {
+  // console.log('cases', state.cases);
+  const filteredCases = state.originalCases.filter(c => c.resource === 'primero');
+
+  const statusArray = ['accepted_270501', 'rejected_412652'];
+  const statusMap = {
+    Accepted: 'accepted_270501',
+    Active: 'accepted_270501',
+    Exited: 'rejected_412652',
+  };
+
+  const oscarReferral = [];
+  filteredCases.forEach(c => {
+    oscarReferral.push(
+      ...c.services.filter(service => service.enrollment_date === null).map(service => service.name)
+    );
+  });
+  const mappedOscarReferral = oscarReferral.map(r => state.serviceMap[r].type);
+  console.log('oscarReferral: ', mappedOscarReferral);
+  // return state;
+  return each(
+    filteredCases,
+    fn(state => {
+      const { external_id, referral_status } = state.data;
+      const case_id = external_id;
+
+      return getCases({ remote: true, case_id: external_id }, state => {
+        // console.log('found', state.data.length);
+        const { services_section } = state.data[0];
+        // console.log('services', services_section);
+        const referralsToOscar = (services_section || []).filter(
+          serv =>
+            serv.service_response_type === 'referral_to_oscar' &&
+            (serv.referral_status_5fe9c1a === undefined ||
+              !statusArray.includes(serv.referral_status_5fe9c1a))
+        );
+
+        // 4. Finding matching service
+        const matchingService = referralsToOscar.filter(ref =>
+          mappedOscarReferral.includes(ref.service_type)
+        );
+        if (matchingService.length > 1) {
+          throw new Error('Multiple services found. Aborting upsert.');
+        }
+        // 5. saving 'service_record_id'
+        const service_record_id = matchingService[0].unique_id;
+
+        // 6. Get referrals from 'case_id'
+        return getReferrals({ externalId: 'case_id', id: case_id }, state => {
+          const referrals = state.data;
+          if (referrals.length === 0) {
+            throw new Error('No referrals found.');
+          }
+
+          const matchingReferral = referrals.find(
+            ref => ref.service_record_id === service_record_id
+          );
+
+          console.log('matching referral', matchingReferral);
+          if (!matchingReferral) {
+            console.log('No matching referral found. Aborting upsert.');
+            return state;
+          }
+
+          const data = {
+            status: statusMap[referral_status],
+            id: matchingReferral.id,
+            type: 'Referral',
+            record_id: matchingReferral.record_id,
+            record_type: 'case',
+          };
+          return updateReferrals({
+            externalId: 'record_id',
+            id: matchingReferral.record_id,
+            referral_id: matchingReferral.id,
+            data,
+          })(state);
+        })(state);
+      })(state);
+    })
+  )(state);
+});
