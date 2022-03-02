@@ -17,7 +17,8 @@ alterState(state => {
   state.cases = { referrals: [], nonReferrals: [] };
 
   state.data.forEach(c =>
-    c.services_section.map(s => s.service_response_type).includes('referral_to_oscar')
+    c.services_section.map(s => s.service_response_type).includes('referral_to_oscar') ||
+    c.services_section.map(s => s.service_response_type).includes('referral_from_oscar')
       ? state.cases.referrals.push(c)
       : state.cases.nonReferrals.push(c)
   );
@@ -96,6 +97,11 @@ post(
       },
       body: state => {
         const { oscarStrings, setOrganization } = state;
+
+        const statusMap = {
+          accepted_270501: 'Accepted',
+          rejected_412652: 'Exited',
+        };
 
         function checkValue(data) {
           if (data !== 'NaN' && data) {
@@ -229,6 +235,10 @@ post(
                 return {
                   uuid: oscarStrings(s.unique_id),
                   name: serviceMap[st] || 'Other',
+                  referral_status:
+                    s.service_response_type === 'referral_from_oscar'
+                      ? statusMap[s.referral_status_5fe9c1a]
+                      : undefined,
                 };
               });
             })
