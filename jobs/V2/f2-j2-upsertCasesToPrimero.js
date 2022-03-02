@@ -237,7 +237,7 @@ fn(state => {
 
       return getCases({ remote: true, case_id: external_id }, state => {
         // console.log('found', state.data.length);
-        const { services_section } = state.data[0];
+        const { services_section } = state.data[0] || { services_section: null };
         // console.log('services', services_section);
         const referralsToOscar = (services_section || []).filter(
           serv =>
