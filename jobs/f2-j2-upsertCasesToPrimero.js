@@ -1,6 +1,6 @@
 // Oscar cases ---> Primero
 // User Story 2: 'View Oscar cases in Primero' AND User Story 4: 'Sending referrals to Primero'
-alterState(state => {
+fn(state => {
   // ===========================================================================
   // NOTE: As of September 25, 2020, Oscar has changed the structure of this
   // payload for a subset of cases, depending on whether or not data exists in
@@ -261,7 +261,6 @@ alterState(state => {
         // Map across all of the keys (or service types) in the servicesObject
         // to return an array of services, where each service is built from the
         // first service of that type for each type.
-
         const oscarService = object[key][0];
         return {
           unique_id: oscarService.uuid,
