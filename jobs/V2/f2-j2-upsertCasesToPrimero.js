@@ -286,10 +286,10 @@ fn(state => {
             record_type: 'case',
           };
           return updateReferrals({
+            ...data,
             externalId: 'record_id',
             id: matchingReferral.record_id,
-            referral_id: matchingReferral.id,
-            ...data,
+            referral_id: matchingReferral.id
           })(state);
         })(state);
       })(state);
