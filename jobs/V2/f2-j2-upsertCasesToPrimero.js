@@ -289,7 +289,7 @@ fn(state => {
             externalId: 'record_id',
             id: matchingReferral.record_id,
             referral_id: matchingReferral.id,
-            data,
+            ...data,
           })(state);
         })(state);
       })(state);
