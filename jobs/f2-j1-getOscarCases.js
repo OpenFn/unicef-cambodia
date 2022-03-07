@@ -9,7 +9,7 @@ alterState(state => {
 });
 
 // Clear data from previous runs.
-alterState(state => {
+alterState(state => { //Primero Adaptor V1 does NOT support fn(..)
   const { lastQueryDate, thisQueryDate } = state;
   state.data = {};
   state.references = [];
