@@ -226,15 +226,15 @@ fn(state => {
       ...c.services.filter(service => service.enrollment_date === null).map(service => service.name)
     );
   });
+
   const mappedOscarReferral = oscarReferral.map(r => state.serviceMap[r].type);
   console.log('oscarReferral: ', mappedOscarReferral);
   // return state;
   return each(
     filteredCases,
     fn(state => {
-      const { external_id, referral_status } = state.data;
+      const { external_id, referral_status, status } = state.data;
       const case_id = external_id;
-
       return getCases({ remote: true, case_id: external_id }, state => {
         // console.log('found', state.data.length);
         const { services_section = null } = state.data[0] || {};
@@ -279,7 +279,7 @@ fn(state => {
           }
 
           const data = {
-            status: statusMap[referral_status],
+            status: statusMap[referral_status || status],
             id: matchingReferral.id,
             type: 'Referral',
             record_id: matchingReferral.record_id,
