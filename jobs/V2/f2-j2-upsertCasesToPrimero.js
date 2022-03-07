@@ -213,11 +213,11 @@ fn(state => {
   // console.log('cases', state.cases);
   const filteredCases = state.originalCases.filter(c => c.resource === 'primero');
 
-  const statusArray = ['accepted_270501', 'rejected_412652'];
+  const statusArray = ['accepted', 'rejected'];
   const statusMap = {
-    Accepted: 'accepted_270501',
-    Active: 'accepted_270501',
-    Exited: 'rejected_412652',
+    Accepted: 'accepted',
+    Active: 'accepted',
+    Exited: 'rejected',
   };
 
   const oscarReferral = [];
