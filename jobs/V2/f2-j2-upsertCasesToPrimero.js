@@ -289,7 +289,7 @@ fn(state => {
             externalId: 'record_id',
             id: matchingReferral.record_id,
             referral_id: matchingReferral.id,
-            data
+            data,
           })(state);
         })(state);
       })(state);
@@ -367,7 +367,7 @@ fn(state => {
 
         const oscarService = object[key][0];
         return {
-          unique_id: oscarService.uuid, // UUID DOES NOT EXIST
+          unique_id: state.service_record_id || oscarService.uuid, // UUID DOES NOT EXIST
           service_subtype: object[key].map(st => st.service_subtype),
           service_type: key,
           service_type_text: key,
@@ -383,6 +383,8 @@ fn(state => {
           oscar_case_worker_telephone: c.case_worker_mobile,
           service_response_type: oscarService.enrollment_date
             ? 'service_being_provided_by_oscar_partner_47618'
+            : oscarService.enrollment_date === null && c.resource === 'primero'
+            ? 'referral_to_oscar'
             : 'referral_from_oscar',
         };
       });
