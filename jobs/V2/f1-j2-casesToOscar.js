@@ -7,11 +7,13 @@ alterState(state => {
   // the services array. Below, we create an empty array if it's been removed to
   // ensure that all payloads adhere to the integration contract.
   console.log('data', state.data);
+
   state.data = state.data.map(c => ({
     ...c,
     services_section: c.services_section || [],
     transitions: c.transitions || [],
   }));
+
   // ===========================================================================
 
   state.cases = { referrals: [], nonReferrals: [] };
@@ -204,6 +206,7 @@ post(
         // );
         console.log(`Data provided by Primero:${JSON.stringify(c, null, 4)}`);
 
+        const referral_status = c.oscar_status ? oscarStrings(c.oscar_status) : undefined;
         // Mappings for posting cases to Oscar
         const oscar = {
           // oscar_field, primero_field,
@@ -225,6 +228,7 @@ post(
           organization_name: 'cif', //NOTE: For staging testing only...replaced line below.
           organization_id: 'cif',
           source: 'Primero',
+          referral_status,
           //organization_name: setOrganization(c),
           //organization_id: oscarStrings(c.owned_by_agency_id),
           is_referred: true,
@@ -235,10 +239,6 @@ post(
                 return {
                   uuid: oscarStrings(s.unique_id),
                   name: serviceMap[st] || 'Other',
-                  referral_status:
-                    s.service_response_type === 'referral_from_oscar'
-                      ? statusMap[s.referral_status_5fe9c1a]
-                      : undefined,
                 };
               });
             })
