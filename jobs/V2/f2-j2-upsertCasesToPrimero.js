@@ -214,10 +214,10 @@ fn(state => {
   const filteredCases = state.originalCases.filter(c => c.resource === 'primero');
 
   const statusArray = ['accepted_270501', 'rejected_412652'];
-  const statusMap = {
-    Accepted: 'accepted_270501',
-    Active: 'accepted_270501',
-    Exited: 'rejected_412652',
+  const primeroStatusMap = {
+    Accepted: 'accepted',
+    Active: 'accepted',
+    Exited: 'rejected',
   };
 
   const oscarReferral = [];
@@ -235,7 +235,7 @@ fn(state => {
     fn(state => {
       const { external_id, referral_status, status } = state.data;
       const case_id = external_id;
-      return getCases({ remote: true, case_id: external_id }, state => {
+      return getCases({ remote: true, case_id }, state => {
         // console.log('found', state.data.length);
         const { services_section = null } = state.data[0] || {};
         const referralsToOscar = (services_section || []).filter(
@@ -244,6 +244,8 @@ fn(state => {
             (serv.referral_status_5fe9c1a === undefined ||
               !statusArray.includes(serv.referral_status_5fe9c1a))
         );
+
+        console.log({ referralsToOscar });
 
         // 4. Finding matching service
         const matchingService = referralsToOscar.filter(ref =>
@@ -275,11 +277,11 @@ fn(state => {
           console.log('matching referral', matchingReferral);
           if (!matchingReferral) {
             console.log('No matching referral found. Aborting upsert.');
-            return state;
+            return { ...state, service_record_id };
           }
 
           const data = {
-            status: statusMap[referral_status || status],
+            status: primeroStatusMap[referral_status || status],
             id: matchingReferral.id,
             type: 'Referral',
             record_id: matchingReferral.record_id,
@@ -366,6 +368,8 @@ fn(state => {
         // first service of that type for each type.
 
         const oscarService = object[key][0];
+
+        console.log({ oscarService });
         return {
           unique_id: oscarService.uuid, // UUID DOES NOT EXIST
           service_subtype: object[key].map(st => st.service_subtype),

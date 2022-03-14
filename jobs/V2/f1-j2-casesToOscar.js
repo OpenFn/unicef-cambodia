@@ -206,7 +206,16 @@ post(
         // );
         console.log(`Data provided by Primero:${JSON.stringify(c, null, 4)}`);
 
-        const referral_status = c.oscar_status ? oscarStrings(c.oscar_status) : undefined;
+        const hasAnyReferralFromOscarServices = c.services_section.find(
+          // If any services in the services_section are "referral_from_oscar" then
+          // we must set this WHOLE CASE's referral status to "ACCEPTED/REJECTED".
+          s => s.service_response_type === 'referral_from_oscar'
+        );
+
+        const referral_status = hasAnyReferralFromOscarServices
+          ? statusMap[oscarStrings(c.oscar_status)]
+          : undefined;
+
         // Mappings for posting cases to Oscar
         const oscar = {
           // oscar_field, primero_field,
@@ -314,10 +323,6 @@ post(
 
 alterState(state => {
   // Update links for non-referrals
-  const statusMap = {
-    accepted_270501: 'Accepted',
-    rejected_412652: 'Exited',
-  };
 
   if (state.cases.nonReferrals.length > 0)
     return post(
@@ -342,7 +347,6 @@ alterState(state => {
               external_id: state.oscarStrings(c.case_id),
               external_id_display: state.oscarStrings(c.case_id_display),
               global_id: state.oscarStrings(c.oscar_number),
-              status: statusMap[c.services_section[0].referral_status_5fe9c1a],
               is_referred: false,
             })),
           };
