@@ -9,7 +9,7 @@ alterState(state => {
 });
 
 // Clear data from previous runs.
-alterState(state => {
+alterState(state => { //Primero Adaptor V1 does NOT support fn(..)
   const { lastQueryDate, thisQueryDate } = state;
   state.data = {};
   state.references = [];
@@ -51,7 +51,7 @@ post(
       }),
       query: {
         // NOTE: since_date must be rounded to 00:00:00 to work with Oscar API.
-        since_date: state.lastQueryDate || '2021-10-01 00:00:00',
+        since_date: state.lastQueryDate || '2022-03-02 00:00:00',
         //referred_external: true, //old query parameter - to remove to pull ALL cases, not just referrals
       },
     },
