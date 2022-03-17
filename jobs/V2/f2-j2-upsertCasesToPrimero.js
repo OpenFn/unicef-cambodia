@@ -257,6 +257,7 @@ fn(state => {
         console.log('matching service', matchingService);
         if (matchingService.length === 0) {
           console.log('no matching service found');
+          delete state.service_record_id;
           return state;
         }
         const service_record_id = matchingService[0].unique_id;
