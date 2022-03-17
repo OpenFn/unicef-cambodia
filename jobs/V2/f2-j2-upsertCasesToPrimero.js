@@ -1,7 +1,8 @@
 fn(state => {
-  // Saving original cases =========
+  // Saving original cases, creating Case:Service ID map =======================
   state.originalCases = state.data.data;
-  // ===============================
+  state.serviceRecordIds = {};
+  // ===========================================================================
 
   const serviceMap = {
     'Generalist social work / case work': {
@@ -210,7 +211,6 @@ fn(state => {
 // User Story 2: 'View Oscar cases in Primero' AND User Story 4: 'Sending referrals to Primero'=
 // 1. For each case where resource === 'primero'
 fn(state => {
-  // console.log('cases', state.cases);
   const filteredCases = state.originalCases.filter(c => c.resource === 'primero');
   const statusArray = ['accepted_270501', 'rejected_412652'];
   const primeroStatusMap = {
@@ -219,23 +219,22 @@ fn(state => {
     Exited: 'rejected',
   };
 
-  const oscarReferral = [];
+  const oscarReferrals = [];
+
   filteredCases.forEach(c => {
-    oscarReferral.push(
+    oscarReferrals.push(
       ...c.services.filter(service => service.enrollment_date === null).map(service => service.name)
     );
   });
 
-  const mappedOscarReferral = oscarReferral.map(r => state.serviceMap[r].type);
-  console.log('oscarReferral: ', mappedOscarReferral);
-  // return state;
+  const mappedOscarReferrals = oscarReferrals.map(r => state.serviceMap[r].type);
+
   return each(
     filteredCases,
     fn(state => {
       const { external_id, referral_status, status } = state.data;
       const case_id = external_id;
       return getCases({ remote: true, case_id }, state => {
-        // console.log('found', state.data.length);
         const { services_section = null } = state.data[0] || {};
         const referralsToOscar = (services_section || []).filter(
           serv =>
@@ -244,24 +243,24 @@ fn(state => {
               !statusArray.includes(serv.referral_status_5fe9c1a))
         );
 
-        console.log({ referralsToOscar });
-
         // 4. Finding matching service
         const matchingService = referralsToOscar.filter(ref =>
-          mappedOscarReferral.includes(ref.service_type)
+          mappedOscarReferrals.includes(ref.service_type)
         );
-        if (matchingService.length > 1) {
-          throw new Error('Multiple services found. Aborting upsert.');
-        }
+
+        // TODO: @Aicha, restore this "if/throw" and remove this TODO once you're done testing.
+        // Abort if multiple referrals are found.
+        // if (matchingService.length > 1)
+        //   throw new Error('Multiple services found. Aborting upsert.');
+
+        // Skip entirely if no referrals are found.
+        if (matchingService.length === 0) return state;
+
         // 5. saving 'service_record_id'
-        console.log('matching service', matchingService);
-        if (matchingService.length === 0) {
-          console.log('no matching service found');
-          delete state.service_record_id;
-          return state;
-        }
         const service_record_id = matchingService[0].unique_id;
-        state.service_record_id = service_record_id;
+        console.log(`Case ${case_id} has matching service ${service_record_id}.`);
+        state.serviceRecordIds[case_id] = service_record_id;
+        console.log(`Assigned to Case:Service ID map.`);
 
         // 6. Get referrals from 'case_id'
         return getReferrals({ externalId: 'case_id', id: case_id }, state => {
@@ -274,10 +273,10 @@ fn(state => {
             ref => ref.service_record_id === service_record_id
           );
 
-          console.log('matching referral', matchingReferral);
           if (!matchingReferral) {
             console.log('No matching referral found. Aborting upsert.');
-            return { ...state, service_record_id };
+            state.serviceRecordIds[case_id] = service_record_id;
+            return state;
           }
 
           const data = {
@@ -297,6 +296,11 @@ fn(state => {
       })(state);
     })
   )(state);
+});
+
+fn(state => {
+  console.log('Referrals updated. Case:Service ID map =', state.serviceRecordIds);
+  return state;
 });
 
 fn(state => {
@@ -361,7 +365,7 @@ fn(state => {
       return outputObject;
     }
 
-    function mapKeysToServices(object) {
+    function mapKeysToServices(object, caseId) {
       return Object.keys(object).map(key => {
         // Map across all of the keys (or service types) in the servicesObject
         // to return an array of services, where each service is built from the
@@ -369,9 +373,8 @@ fn(state => {
 
         const oscarService = object[key][0];
 
-        console.log({ oscarService });
         return {
-          unique_id: state.service_record_id || oscarService.uuid, // UUID DOES NOT EXIST
+          unique_id: state.serviceRecordIds[caseId] || oscarService.uuid, // UUID DOES NOT EXIST
           service_subtype: object[key].map(st => st.service_subtype),
           service_type: key,
           service_type_text: key,
@@ -394,7 +397,7 @@ fn(state => {
       });
     }
 
-    function classifyServices(arr) {
+    function classifyServices(arr, caseId) {
       return arr.map(service => {
         return {
           ...service,
@@ -403,9 +406,9 @@ fn(state => {
             (state.serviceMap[service.name] && state.serviceMap[service.name].type) || 'Other',
           service_subtype:
             (state.serviceMap[service.name] && state.serviceMap[service.name].subtype) || 'Other',
-          //referral_status: statusMap[c.referral_status] || undefined
+          // referral_status: statusMap[c.referral_status] || undefined
           referral_status_5fe9c1a:
-            state.service_record_id === service.unique_id
+            state.serviceRecordIds[caseId] === service.unique_id
               ? c.resource === 'primero' && service.enrollment_date === null
                 ? statusMap[c.status]
                 : undefined
@@ -414,17 +417,19 @@ fn(state => {
       });
     }
 
-    function reduceOscarServices(oscarServicesArray) {
+    function reduceOscarServices(oscarServicesArray, caseId) {
       const primeroServicesArray = mapKeysToServices(
-        classifyServices(oscarServicesArray)
+        classifyServices(oscarServicesArray, caseId)
           .filter(x => !x.isReferral)
-          .reduce((obj, elem) => byServiceType(obj, elem), {})
+          .reduce((obj, elem) => byServiceType(obj, elem), {}),
+        caseId
       );
 
       const primeroReferralsArray = mapKeysToServices(
-        classifyServices(oscarServicesArray)
+        classifyServices(oscarServicesArray, caseId)
           .filter(x => x.isReferral)
-          .reduce((obj, elem) => byServiceType(obj, elem), {})
+          .reduce((obj, elem) => byServiceType(obj, elem), {}),
+        caseId
       );
 
       // Finally, return this new SMALLER array of primeroServices where Oscar's
@@ -673,7 +678,7 @@ fn(state => {
       module_id: 'primeromodule-cp',
       //registration_date: isUpdate ? null : now.toISOString().split('T')[0].replace(/-/g, '/'),
       referral_notes_oscar: c.reason_for_referral, //new services referral notes field
-      services_section: reduceOscarServices(c.services),
+      services_section: reduceOscarServices(c.services, c.external_id),
       // -----------------------------------------------------------------------
       // transitions:
       //   isUpdate || c.is_referred !== true
