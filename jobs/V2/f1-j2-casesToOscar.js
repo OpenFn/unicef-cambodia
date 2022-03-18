@@ -208,14 +208,27 @@ post(
         // );
         console.log(`Data provided by Primero:${JSON.stringify(c, null, 4)}`);
 
-        const primeroService = c.services_section.find(
+        //AK NOTE: Changed below from services_section.FIND to FILTER bc we expect >1 service from Primero
+        //Historically assumed would only send 1 service per cash, but this is wrong now
+        const primeroService = c.services_section.filter(
           // If any services in the services_section are "referral_from_oscar" then
           // we must set this WHOLE CASE's referral status to "ACCEPTED/REJECTED".
           s => s.service_response_type === 'referral_from_oscar'
         );
+        //This will return ALL Primero services marked as 'referrals from oscar'
+        //console.log('primero filtered services: ', primeroService);
 
+        //But now we want to find only the MOST RECENT service, taking the last item in the array
+        const primeroLastService = primeroService.length > 1 ? primeroService.length - 1 : 0;
+        //console.log('primeroLastService: ', primeroLastService);
+        console.log(
+          'Most recent Primero service to sync to Oscar: ',
+          primeroService[primeroLastService]
+        );
+
+        //Only map the referral status of the Most Recent service from Primero
         const referral_status = primeroService
-          ? statusMap[oscarStrings(primeroService.referral_status_ed6f91f)]
+          ? statusMap[oscarStrings(primeroService[primeroLastService].referral_status_ed6f91f)]
           : undefined;
 
         // Mappings for posting cases to Oscar
