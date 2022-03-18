@@ -365,6 +365,7 @@ fn(state => {
       return outputObject;
     }
 
+    // TODO: Refactor this or explain. What is 'mapKeysToServices' doing and why?
     function mapKeysToServices(object, caseId) {
       return Object.keys(object).map(key => {
         // Map across all of the keys (or service types) in the servicesObject
@@ -378,6 +379,7 @@ fn(state => {
           service_subtype: object[key].map(st => st.service_subtype),
           service_type: key,
           service_type_text: key,
+          referral_status_5fe9c1a: oscarService.referral_status_5fe9c1a,
           service_type_details_text: state.serviceMap[oscarService.name]
             ? 'n/a'
             : oscarService.name,
@@ -397,6 +399,7 @@ fn(state => {
       });
     }
 
+    // TODO: Refactor this or explain. What is 'classifyServices' doing and why?
     function classifyServices(arr, caseId) {
       return arr.map(service => {
         return {
@@ -407,14 +410,21 @@ fn(state => {
           service_subtype:
             (state.serviceMap[service.name] && state.serviceMap[service.name].subtype) || 'Other',
           // referral_status: statusMap[c.referral_status] || undefined
-          referral_status_5fe9c1a:
-            state.serviceRecordIds[caseId] === service.unique_id
-              ? c.resource === 'primero' && service.enrollment_date === null
-                ? statusMap[c.status]
-                : undefined
-              : undefined,
+          referral_status_5fe9c1a: determineStatus(service, caseId),
         };
       });
+    }
+
+    function determineStatus(service, caseId) {
+      if (
+        state.serviceRecordIds[caseId] && // IF... there is a serviceRecordId for this case
+        c.resource === 'primero' && // and the Oscar case source is 'primero'
+        service.enrollment_date === null // and the Oscar service enrollment date is null
+      ) {
+        return statusMap[c.status]; // THEN... return the mapped referral status
+      } else {
+        return undefined; // ELSE ... return undefined (this isn't a decision.)
+      }
     }
 
     function reduceOscarServices(oscarServicesArray, caseId) {
