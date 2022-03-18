@@ -98,7 +98,7 @@ post(
         };
       },
       body: state => {
-        git;
+        //git;
         const { oscarStrings, setOrganization } = state;
 
         const statusMap = {
