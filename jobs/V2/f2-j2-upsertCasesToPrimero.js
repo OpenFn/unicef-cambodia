@@ -366,6 +366,8 @@ fn(state => {
     }
 
     // TODO: @Emeka, refactor this or explain. What is 'mapKeysToServices' doing and why?
+    //@Taylor this is used to build the 'services_section' array. An object is created
+    // for each key e.g (social_work_case_work). The keys correspond to the 'type' in serviceMap
     function mapKeysToServices(object, caseId) {
       return Object.keys(object).map(key => {
         // Map across all of the keys (or service types) in the servicesObject
@@ -400,6 +402,8 @@ fn(state => {
     }
 
     // TODO: @Emeka, refactor this or explain. What is 'classifyServices' doing and why?
+    //@Taylor this is a partial oscar -> primero mapping. For instance, service_type on
+    //primero corresponds to type on  oscar
     function classifyServices(arr, caseId) {
       return arr.map(service => {
         return {
@@ -433,6 +437,12 @@ fn(state => {
     // it called "reduce"? Why is it seemingly more complex than arr.map(x => y)?
     // Why must we call mapKeysToServices with the result of classifyServices?
     // These are the big questions in life, eh man?!
+
+    //@Taylor the reduce merges the array of oscar->primero mapped objects
+    //into a single huge object that GROUPS the data by key. The returned
+    // object is passed to mapKeysToService that builds the final services_section array.
+    // The final result is that each object in the services_section belongs to a different
+    // service_type in primero
     function reduceOscarServices(oscarServicesArray, caseId) {
       const primeroServicesArray = mapKeysToServices(
         classifyServices(oscarServicesArray, caseId)
