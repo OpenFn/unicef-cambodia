@@ -212,7 +212,7 @@ fn(state => {
 // 1. For each case where resource === 'primero'
 fn(state => {
   const filteredCases = state.originalCases.filter(c => c.resource === 'primero');
-  const statusArray = ['accepted_270501', 'rejected_412652'];
+  const statusArray = ['accepted_850187', 'rejected__74769'];
   const primeroStatusMap = {
     Accepted: 'accepted',
     Active: 'accepted',
@@ -239,8 +239,8 @@ fn(state => {
         const referralsToOscar = (services_section || []).filter(
           serv =>
             serv.service_response_type === 'referral_to_oscar' &&
-            (serv.referral_status_5fe9c1a === undefined ||
-              !statusArray.includes(serv.referral_status_5fe9c1a))
+            (serv.referral_status_ed6f91f === undefined ||
+              !statusArray.includes(serv.referral_status_ed6f91f))
         );
 
         // 4. Finding matching service
@@ -325,9 +325,9 @@ fn(state => {
   // ===========================================================================
 
   const statusMap = {
-    Accepted: 'accepted_270501',
-    Active: 'accepted_270501',
-    Exited: 'rejected_412652',
+    Accepted: 'accepted_850187',
+    Active: 'accepted_850187',
+    Exited: 'rejected__74769',
   };
 
   state.cases = state.data.data.map(c => {
@@ -379,7 +379,7 @@ fn(state => {
           service_subtype: object[key].map(st => st.service_subtype),
           service_type: key,
           service_type_text: key,
-          referral_status_5fe9c1a: oscarService.referral_status_5fe9c1a,
+          referral_status_ed6f91f: oscarService.referral_status_ed6f91f,
           service_type_details_text: state.serviceMap[oscarService.name]
             ? 'n/a'
             : oscarService.name,
@@ -410,7 +410,7 @@ fn(state => {
           service_subtype:
             (state.serviceMap[service.name] && state.serviceMap[service.name].subtype) || 'Other',
           // referral_status: statusMap[c.referral_status] || undefined
-          referral_status_5fe9c1a: determineStatus(service, caseId),
+          referral_status_ed6f91f: determineStatus(service, caseId),
         };
       });
     }
