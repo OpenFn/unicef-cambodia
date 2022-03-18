@@ -365,7 +365,7 @@ fn(state => {
       return outputObject;
     }
 
-    // TODO: Refactor this or explain. What is 'mapKeysToServices' doing and why?
+    // TODO: @Emeka, refactor this or explain. What is 'mapKeysToServices' doing and why?
     function mapKeysToServices(object, caseId) {
       return Object.keys(object).map(key => {
         // Map across all of the keys (or service types) in the servicesObject
@@ -399,7 +399,7 @@ fn(state => {
       });
     }
 
-    // TODO: Refactor this or explain. What is 'classifyServices' doing and why?
+    // TODO: @Emeka, refactor this or explain. What is 'classifyServices' doing and why?
     function classifyServices(arr, caseId) {
       return arr.map(service => {
         return {
@@ -427,6 +427,12 @@ fn(state => {
       }
     }
 
+    // TODO: @Emeka, in my mind, this function should take an array of Oscar services
+    // and it should return an array of primero services to add/update.
+    // So.... Array X in, Array Y out. That's not really a reduce, but a map! So why is
+    // it called "reduce"? Why is it seemingly more complex than arr.map(x => y)?
+    // Why must we call mapKeysToServices with the result of classifyServices?
+    // These are the big questions in life, eh man?!
     function reduceOscarServices(oscarServicesArray, caseId) {
       const primeroServicesArray = mapKeysToServices(
         classifyServices(oscarServicesArray, caseId)
