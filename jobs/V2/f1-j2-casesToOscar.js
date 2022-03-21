@@ -227,12 +227,12 @@ post(
         );
 
         //Only map the referral status of the Most Recent service from Primero
-        const referral_status = primeroService
-          ? statusMap[oscarStrings(primeroService[0].referral_status_ed6f91f)]
-          : undefined;
         // const referral_status = primeroService
-        //   ? statusMap[oscarStrings(primeroService[primeroLastService].referral_status_ed6f91f)]
+        //   ? statusMap[oscarStrings(primeroService[0].referral_status_ed6f91f)]
         //   : undefined;
+        const referral_status = primeroService
+          ? statusMap[oscarStrings(primeroService[primeroLastService].referral_status_ed6f91f)]
+          : undefined;
 
         // Mappings for posting cases to Oscar
         const oscar = {
