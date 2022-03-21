@@ -213,7 +213,7 @@ post(
         const primeroService = c.services_section.filter(
           // If any services in the services_section are "referral_from_oscar" then
           // we must set this WHOLE CASE's referral status to "ACCEPTED/REJECTED".
-          s => s.service_response_type === 'referral_from_oscar'
+          s => s.service_response_type === 'referral_to_oscar'
         );
         //This will return ALL Primero services marked as 'referrals from oscar'
         //console.log('primero filtered services: ', primeroService);
@@ -228,8 +228,11 @@ post(
 
         //Only map the referral status of the Most Recent service from Primero
         const referral_status = primeroService
-          ? statusMap[oscarStrings(primeroService[primeroLastService].referral_status_ed6f91f)]
+          ? statusMap[oscarStrings(primeroService[0].referral_status_ed6f91f)]
           : undefined;
+        // const referral_status = primeroService
+        //   ? statusMap[oscarStrings(primeroService[primeroLastService].referral_status_ed6f91f)]
+        //   : undefined;
 
         // Mappings for posting cases to Oscar
         const oscar = {
