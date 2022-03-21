@@ -213,7 +213,7 @@ post(
         const primeroService = c.services_section.filter(
           // If any services in the services_section are "referral_from_oscar" then
           // we must set this WHOLE CASE's referral status to "ACCEPTED/REJECTED".
-          s => s.service_response_type === 'referral_to_oscar'
+          s => s.service_response_type === 'referral_to_oscar' || s.service_response_type === 'referral_from_oscar'
         );
         //This will return ALL Primero services marked as 'referrals from oscar'
         //console.log('primero filtered services: ', primeroService);
