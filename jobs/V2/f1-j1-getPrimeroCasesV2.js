@@ -17,9 +17,11 @@ fn(state => {
 
 // Clear data from previous runs.
 fn(state => {
+  // TODO: Can we get rid of all references to lastCaseCreated, lastUpdated, and lastCreated?
+  // This seems like legacy code. We no longer use these to create cursor (see L14).
   const { lastCaseCreated, lastUpdated, lastCreated } = state;
   console.log('The last case creation before this run is:', lastCaseCreated);
-  console.log('The last transition update before this run is:', lastUpdated);
+  console.log('The last case update before this run is:', lastUpdated);
   console.log('The last transition creation before this run is:', lastCreated);
 
   const initialState = { lastCaseCreated, lastUpdated, lastCreated };
@@ -102,10 +104,7 @@ fn(state => {
         state.lastCreated = `${d}-${m}-${y}`;
       }
 
-      const lastUpdate = state.data
-        .filter(x => x.transitions_changed_at)
-        .map(x => x.transitions_changed_at)
-        .sort((a, b) => b - a)[0];
+      const lastUpdate = state.data.map(c => c.last_updated_at).sort((a, b) => b - a)[0];
 
       if (lastUpdate) {
         console.log(
@@ -117,7 +116,7 @@ fn(state => {
       // =========================================================================
 
       console.log('The last case creation is now: ' + state.lastCaseCreated);
-      console.log('The last transition update is now: ' + state.lastUpdated);
+      console.log('The last case update is now: ' + state.lastUpdated);
       console.log('The last transition creation is now: ' + state.lastCreated);
       return state;
     }

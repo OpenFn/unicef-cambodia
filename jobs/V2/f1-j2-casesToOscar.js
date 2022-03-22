@@ -257,7 +257,7 @@ post(
           date_of_birth: oscarStrings(c.date_of_birth && c.date_of_birth.replace(/\//g, '-')),
           location_current_village_code: checkValue(c.location_current),
           address_current_village_code: checkValue(c.location_current), //oscarStrings(c.address_current),
-          reason_for_referral: oscarStrings(lastTransitionNote),
+          reason_for_referral: oscarStrings(lastTransitionNote), //TODO: Check if this is coming through
           external_case_worker_name: oscarStrings(c.owned_by),
           external_case_worker_id: oscarStrings(c.owned_by_id),
           external_case_worker_mobile: c.owned_by_phone || '000000000',
