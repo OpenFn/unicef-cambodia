@@ -261,10 +261,8 @@ post(
           external_case_worker_name: oscarStrings(c.owned_by),
           external_case_worker_id: oscarStrings(c.owned_by_id),
           external_case_worker_mobile: c.owned_by_phone || '000000000',
-          source: 'Primero', //TODO: Confirm mapping with Aicha
-          // source: c.workflow === 'referral_to_oscar' ? 'Primero' : undefined,
-          is_referred: true, //TODO: Confirm mapping with Aicha
-          //is_referred: c.workflow === 'referral_to_oscar' ? true : false,
+          resource: c.workflow === 'referral_to_oscar' ? 'Primero' : undefined,
+          is_referred: true, //NOTE: OSCaR wants us to send this even for decisions
           referral_status,
           organization_name: 'cif', //NOTE: Hardcoded for staging testing only; replaces lines below.
           organization_id: 'cif', //NOTE: Hardcoded
@@ -275,7 +273,7 @@ post(
             .map(s => {
               return s.service_subtype.map(st => {
                 return {
-                  uuid: oscarStrings(s.unique_id), //TODO: Need to capture Oscar service uuid; this assumes we overwrite Primero s.unique_id
+                  uuid: oscarStrings(s.unique_id), //NOTE: To revisit after Kiry confirms service uuid uniqueness
                   name: serviceMap[st] || 'Other',
                 };
               });
