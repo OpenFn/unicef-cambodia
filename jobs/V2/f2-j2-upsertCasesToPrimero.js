@@ -414,7 +414,6 @@ fn(state => {
             (state.serviceMap[service.name] && state.serviceMap[service.name].type) || 'Other',
           service_subtype:
             (state.serviceMap[service.name] && state.serviceMap[service.name].subtype) || 'Other',
-          // referral_status: statusMap[c.referral_status] || undefined
           referral_status_ed6f91f: determineStatus(service, caseId),
         };
       });
@@ -661,17 +660,10 @@ fn(state => {
 
     // Mappings for upserting cases in Primero (update if existing, insert if new)
     const primeroCase = {
+      // primero_field: oscar_field,
       //remote: true,
       oscar_number: c.global_id,
-      // NOTE ==================================================================
-      // `unique_identifier` below duplicates `case_id` but has been requested
-      // by Primero as a workaround for certain uuid/external_id duplicate
-      // issues in v1 of their public API. This will likely change soon.
       case_id: primeroId(c),
-      //unique_identifier: primeroId(c), //NOTE: @Aicha can we remove this old mapping now?
-      // =======================================================================
-      // FIELDS PREVIOUSLY IN CHILD{}
-      // primero_field: oscar_field,
       case_id: c.external_id, // externalId for upsert (will fail if multiple found)
       oscar_short_id: c.slug,
       mosvy_number: c.mosvy_number,
@@ -685,17 +677,12 @@ fn(state => {
       oscar_status: isUpdate ? null : c.status,
       protection_status: !isUpdate && c.is_referred == true ? 'oscar_referral' : null,
       owned_by: isUpdate && c.is_referred !== true ? null : setUser(c),
-      // owned_by_text:
-      //   isUpdate && c.is_referred !== true ? null : `${c.case_worker_name} ${c.case_worker_mobile}`, commenting out per Ajit's feedback
       oscar_reason_for_exiting: c.reason_for_exiting,
-      //has_referral: c.is_referred, //TODO: Confirm mapping with Aicha
       risk_level: c.is_referred == true ? c.level_of_risk : null,
       consent_for_services: isUpdate || c.is_referred !== true ? null : true,
       disclosure_other_orgs: isUpdate || c.is_referred !== true ? null : true,
       interview_subject: isUpdate || c.is_referred !== true ? null : 'other',
-      //content_source_other: isUpdate ? null : 'OSCaR', //TODO: Confirm mapping with Aicha
       module_id: 'primeromodule-cp',
-      //registration_date: isUpdate ? null : now.toISOString().split('T')[0].replace(/-/g, '/'),
       referral_notes_oscar: c.reason_for_referral, //new services referral notes field
       services_section: reduceOscarServices(c.services, c.external_id),
       // -----------------------------------------------------------------------
