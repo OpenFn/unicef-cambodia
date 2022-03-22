@@ -18,11 +18,22 @@ alterState(state => {
 
   state.cases = { referrals: [], nonReferrals: [] };
 
+  //Here we create an array of referrals by analyzing the Services of each case
+  state.data.forEach(
+    c =>
+      c.services_section.map(s => s.service_response_type).includes('referral_to_oscar') ||
+      c.services_section.map(s => s.service_response_type).includes('referral_from_oscar')
+        ? state.cases.referrals.push(c)
+        : undefined //state.cases.nonReferrals.push(c)
+    // NOTE: AK made this& change because it looked like the old logic would
+    // NOT sync nonReferrals if any referrals were present
+  );
+
+  // AK CHANGE: Added the below to populate the nonReferrals array
+  // Here we find nonReferrals by filtering cases where case.oscar_number is NOT null
+  // If a case has oscar_number, we assume it came from Oscar and want to sync info back
   state.data.forEach(c =>
-    c.services_section.map(s => s.service_response_type).includes('referral_to_oscar') ||
-    c.services_section.map(s => s.service_response_type).includes('referral_from_oscar')
-      ? state.cases.referrals.push(c)
-      : state.cases.nonReferrals.push(c)
+    c.oscar_number !== null ? state.cases.referrals.push(c) : state.cases.nonReferrals.push(c)
   );
 
   state.oscarStrings = value => {
@@ -35,8 +46,10 @@ alterState(state => {
     }
   };
 
+  //NOTE FOR AK: To test? And update considering multiple agencies now sending referrals?
   state.setOrganization = c => {
-    // NOTE: The "business" stipulates that all "oscar_referring_organization"
+    // NOTE: This assumes the first referral will tell us which is the referring organization.
+    // The "business" stipulates that all "oscar_referring_organization"
     // values will be the SAME for an array including any "referral_from_oscar"
     // items, and requires that we merely select the first item that matches.
     const fromOrg = c.services_section.find(s => s.service_response_type === 'referral_from_oscar');
@@ -65,6 +78,7 @@ alterState(state => {
 
   return state;
 });
+// =========================================== //
 
 post(
   // Oscar authentication, once per run
@@ -98,7 +112,6 @@ post(
         };
       },
       body: state => {
-        //git;
         const { oscarStrings, setOrganization } = state;
 
         const statusMap = {
@@ -208,28 +221,24 @@ post(
         // );
         console.log(`Data provided by Primero:${JSON.stringify(c, null, 4)}`);
 
-        //AK NOTE: Changed below from services_section.FIND to FILTER bc we expect >1 service from Primero
-        //Historically assumed would only send 1 service per cash, but this is wrong now
+        //AK NOTE: Changed below from services_section.find() to FILTER() bc we expect >1 service from Primero
+        //Historically assumed would only send 1 service per case, but this is no longer true bc we want to sync decisions
+        //This will return ALL Primero services marked as 'referrals'
         const primeroService = c.services_section.filter(
-          // If any services in the services_section are "referral_from_oscar" then
-          // we must set this WHOLE CASE's referral status to "ACCEPTED/REJECTED".
-          s => s.service_response_type === 'referral_to_oscar' || s.service_response_type === 'referral_from_oscar'
+          s =>
+            s.service_response_type === 'referral_to_oscar' ||
+            s.service_response_type === 'referral_from_oscar'
         );
-        //This will return ALL Primero services marked as 'referrals from oscar'
         //console.log('primero filtered services: ', primeroService);
 
-        //But now we want to find only the MOST RECENT service, taking the last item in the array
+        //Here we want to find only the MOST RECENT service, taking the last item in the service_section array
         const primeroLastService = primeroService.length > 1 ? primeroService.length - 1 : 0;
-        //console.log('primeroLastService: ', primeroLastService);
         console.log(
           'Most recent Primero service to sync to Oscar: ',
           primeroService[primeroLastService]
         );
 
-        //Only map the referral status of the Most Recent service from Primero
-        // const referral_status = primeroService
-        //   ? statusMap[oscarStrings(primeroService[0].referral_status_ed6f91f)]
-        //   : undefined;
+        //Here we only map the referral status of the Most Recent service from Primero
         const referral_status = primeroService
           ? statusMap[oscarStrings(primeroService[primeroLastService].referral_status_ed6f91f)]
           : undefined;
@@ -252,26 +261,29 @@ post(
           external_case_worker_name: oscarStrings(c.owned_by),
           external_case_worker_id: oscarStrings(c.owned_by_id),
           external_case_worker_mobile: c.owned_by_phone || '000000000',
-          organization_name: 'cif', //NOTE: For staging testing only...replaced line below.
-          organization_id: 'cif',
-          source: 'Primero',
+          source: 'Primero', //TODO: Confirm mapping with Aicha
+          // source: c.workflow === 'referral_to_oscar' ? 'Primero' : undefined,
+          is_referred: true, //TODO: Confirm mapping with Aicha
+          //is_referred: c.workflow === 'referral_to_oscar' ? true : false,
           referral_status,
-          //organization_name: setOrganization(c),
+          organization_name: 'cif', //NOTE: Hardcoded for staging testing only; replaces lines below.
+          organization_id: 'cif', //NOTE: Hardcoded
+          //organization_name: setOrganization(c), //NOTE: Add mappings back before go-live
           //organization_id: oscarStrings(c.owned_by_agency_id),
-          is_referred: true,
           services: c.services_section
             .filter(s => s.service_subtype)
             .map(s => {
               return s.service_subtype.map(st => {
                 return {
-                  uuid: oscarStrings(s.unique_id),
+                  uuid: oscarStrings(s.unique_id), //TODO: Need to capture Oscar service uuid; this assumes we overwrite Primero s.unique_id
                   name: serviceMap[st] || 'Other',
                 };
               });
             })
             .flat(),
-          transaction_id: c.transition_id,
-          // transaction_id: oscarStrings(c.transition_id),
+          transaction_id:
+            c.transitions && c.transitions.length > 0 ? c.transitions[0].transition_id : undefined,
+          // transaction_id: oscarStrings(c.transition_id), //TODO: Confirm mapping; not sure this was ever working
         };
 
         // NOTE: Logs for enhanced audit trail.
@@ -340,7 +352,8 @@ post(
 );
 
 alterState(state => {
-  // Update links for non-referrals
+  // Here we update links in OSCaR for non-referrals
+  // NOTE: We also sync these cases back to OSCaR to log the Primero external_id assigned
 
   if (state.cases.nonReferrals.length > 0)
     return post(
@@ -369,7 +382,7 @@ alterState(state => {
             })),
           };
           console.log(state.cases.nonReferrals);
-          console.log("'Update links' with non-referrals:", payload);
+          console.log(`'Update links' with non-referrals: ${JSON.stringify(payload, null, 4)}`);
           return payload;
         },
       })
