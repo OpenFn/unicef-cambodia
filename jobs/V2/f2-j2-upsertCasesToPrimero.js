@@ -221,6 +221,8 @@ fn(state => {
 
   const oscarReferrals = [];
 
+  // NOTE: If Oscar service does NOT have enrollment_date, we assume it's a referred service
+  // Services WITH enrollment_date are program services (non-referrals)
   filteredCases.forEach(c => {
     oscarReferrals.push(
       ...c.services.filter(service => service.enrollment_date === null).map(service => service.name)
@@ -243,6 +245,7 @@ fn(state => {
               !statusArray.includes(serv.referral_status_ed6f91f))
         );
 
+        // TO DISCUSS: What is a 'matching service'?
         // 4. Finding matching service
         const matchingService = referralsToOscar.filter(ref =>
           mappedOscarReferrals.includes(ref.service_type)
@@ -356,6 +359,8 @@ fn(state => {
       return null;
     }
 
+    // TODO: UPDATE the below logic to NO longer group services by service_typ
+    // NOW for each Oscar service, we want to create 1 Primero Service
     function byServiceType(outputObject, currentValue) {
       // Group the array of services by service type, returning an object
       // with a key for each service type, and an array of services for that
@@ -404,7 +409,7 @@ fn(state => {
       return arr.map(service => {
         return {
           ...service,
-          isReferral: service.enrollment_date ? true : false,
+          isReferral: service.enrollment_date ? true : false, //TODO: Confirm mapping with Aicha
           service_type:
             (state.serviceMap[service.name] && state.serviceMap[service.name].type) || 'Other',
           service_subtype:
@@ -663,12 +668,11 @@ fn(state => {
       // by Primero as a workaround for certain uuid/external_id duplicate
       // issues in v1 of their public API. This will likely change soon.
       case_id: primeroId(c),
-      //unique_identifier: primeroId(c),
+      //unique_identifier: primeroId(c), //NOTE: @Aicha can we remove this old mapping now?
       // =======================================================================
       // FIELDS PREVIOUSLY IN CHILD{}
       // primero_field: oscar_field,
       case_id: c.external_id, // externalId for upsert (will fail if multiple found)
-      // oscar_number: c.global_id,
       oscar_short_id: c.slug,
       mosvy_number: c.mosvy_number,
       name_first: isUpdate ? null : createName(c.given_name, c.local_given_name),
@@ -680,22 +684,22 @@ fn(state => {
       address_current: isUpdate ? null : c.address_current_village_code,
       oscar_status: isUpdate ? null : c.status,
       protection_status: !isUpdate && c.is_referred == true ? 'oscar_referral' : null,
-      //service_implementing_agency: `agency-${c.organization_name}`,
       owned_by: isUpdate && c.is_referred !== true ? null : setUser(c),
       // owned_by_text:
       //   isUpdate && c.is_referred !== true ? null : `${c.case_worker_name} ${c.case_worker_mobile}`, commenting out per Ajit's feedback
       oscar_reason_for_exiting: c.reason_for_exiting,
-      //has_referral: c.is_referred,
+      //has_referral: c.is_referred, //TODO: Confirm mapping with Aicha
       risk_level: c.is_referred == true ? c.level_of_risk : null,
       consent_for_services: isUpdate || c.is_referred !== true ? null : true,
       disclosure_other_orgs: isUpdate || c.is_referred !== true ? null : true,
       interview_subject: isUpdate || c.is_referred !== true ? null : 'other',
-      //content_source_other: isUpdate ? null : 'OSCaR',
+      //content_source_other: isUpdate ? null : 'OSCaR', //TODO: Confirm mapping with Aicha
       module_id: 'primeromodule-cp',
       //registration_date: isUpdate ? null : now.toISOString().split('T')[0].replace(/-/g, '/'),
       referral_notes_oscar: c.reason_for_referral, //new services referral notes field
       services_section: reduceOscarServices(c.services, c.external_id),
       // -----------------------------------------------------------------------
+      // NOTE: V1 mappings - to remove?
       // transitions:
       //   isUpdate || c.is_referred !== true
       //     ? null
