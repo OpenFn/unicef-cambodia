@@ -229,7 +229,7 @@ fn(state => {
   originalCases.forEach(oscarCase => {
     let { resource, status } = oscarCase;
     resource = resource ? resource.toUpperCase() : null;
-    oscarCase.isDescison = false;
+    oscarCase.isDecision = false;
     if (
       !resource ||
       resource != PRIMERO_RESOURCE ||
@@ -237,7 +237,7 @@ fn(state => {
     ) {
       nonDecisionOscars.push(oscarCase);
     } else if ((resource = PRIMERO_RESOURCE && status != REFERRED)) {
-      oscarCase.isDescison = true;
+      oscarCase.isDecision = true;
       decisionOscars.push(oscarCase);
     }
   });
@@ -252,7 +252,7 @@ fn(state => {
 fn(state => {
   const { nonDecisionOscars, decisionOscars, servicesStatusMap } = state;
   const primeroCasesToUpsert = [...nonDecisionOscars, ...decisionOscars].map(c => {
-    const { external_id, isDescison } = c;
+    const { external_id, isDecision } = c;
     const upsertByCaseId = !!external_id;
     return {
       oscar_number: c.global_id,
@@ -287,7 +287,7 @@ fn(state => {
       })),
       //non-primero properties
       upsertByCaseId,
-      isDescison,
+      isDecision,
     };
   });
 
