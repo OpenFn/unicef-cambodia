@@ -211,11 +211,13 @@ fn(state => {
     'Residential Care Institution': { subtype: 'residential_care_gov_only_other', type: 'other' },
     'Other Service': { subtype: 'other_other_service', type: 'other' },
   };
+
   const servicesStatusMap = {
     Accepted: 'accepted_850187',
     Active: 'accepted_850187',
     Rejected: 'rejected_74769',
   };
+
   const referralsStatusMap = {
     Accepted: 'accepted',
     Active: 'accepted',
@@ -274,7 +276,7 @@ fn(state => {
     distinguishedCases.filter(c => !c.isDecision)
   );
   console.log(
-    'Cases with decisions ',
+    'Oscar decisions ',
     distinguishedCases.filter(c => c.isDecision)
   );
 
@@ -321,6 +323,7 @@ fn(state => {
         consent_for_services: true,
         disclosure_other_orgs: true,
         module_id: 'primeromodule-cp',
+        risk_level: 'medium',
         services_section: c.services.map(s => ({
           unique_id: s.uuid,
           service_referral_notes: s.reason_for_referral,
@@ -340,7 +343,7 @@ fn(state => {
       };
       if (!primeroRecord.owned_by) {
         // TODO: Ask @Aicha to clarify if this is check should be done on 'owned_by' or 'location_current'
-        primeroRecord = null;
+        // primeroRecord = null;
       }
       return primeroRecord;
     })
@@ -351,6 +354,27 @@ fn(state => {
 });
 
 // TODO: @Emeka to add the upsert operation for all cases, and primero decisions
+
+each(
+  '$.primeroCasesToUpsert[*]',
+  fn(state => {
+    const primeroCase = state.data;
+    // destruct from a copy so that the upsertByCaseId can be unset from the current primero record
+    const { upsertByCaseId } = { ...primeroCase };
+
+    //unset non-primero properties
+    delete primeroCase.upsertByCaseId;
+    delete primeroCase.isDecision;
+
+    return upsertCase(
+      {
+        externalIds: upsertByCaseId ? ['case_id'] : ['oscar_number'],
+        data: primeroCase,
+      },
+      fn(state => {})
+    )(state);
+  })
+);
 
 // each(
 //   '$.cases[*]',
