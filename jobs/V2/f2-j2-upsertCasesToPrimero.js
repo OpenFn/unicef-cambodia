@@ -224,9 +224,9 @@ fn(state => {
   const { PRIMERO_RESOURCE, REFERRED } = enums;
 
   const distinguishedCases = originalCases.map(oscarCase => {
-    let { resource, status } = oscarCase;
+    let { resource, status, external_id } = oscarCase;
     resource = resource ? resource.toUpperCase() : null;
-    oscarCase.isDecision = false;
+    oscarCase.upsertByCaseId = !!external_id;
     if (
       !resource ||
       resource != PRIMERO_RESOURCE ||
@@ -256,11 +256,10 @@ fn(state => {
 fn(state => {
   const { distinguishedCases, servicesStatusMap } = state;
   const primeroCasesToUpsert = distinguishedCases.map(c => {
-    const { external_id, isDecision } = c;
-    const upsertByCaseId = !!external_id;
+    const { isDecision, upsertByCaseId } = c;
     return {
       oscar_number: c.global_id,
-      case_id: external_id,
+      case_id: c.external_id,
       remote: true,
       case_id_display: c.external_id_display,
       oscar_short_id: c.slug,
