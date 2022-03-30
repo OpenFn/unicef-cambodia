@@ -204,18 +204,24 @@ fn(state => {
     'Other Service': { subtype: 'other_other_service', type: 'other' },
   };
 
+  const servicesStatusMap = {
+    Accepted: 'accepted_850187',
+    Active: 'accepted_850187',
+    Rejected: 'rejected_74769',
+  };
+
   const enums = {
-    PRIMERO_RESOUURCE: 'PRIMERO',
+    PRIMERO_RESOURCE: 'PRIMERO',
     REFERRED: 'REFERRED',
   };
 
-  return { ...state, serviceMap, enums };
+  return { ...state, serviceMap, servicesStatusMap, enums };
 });
 
-//distinguish between oscar cases
+//distinguish between oscar cases: ADDED ON REWRITE
 fn(state => {
   const { originalCases, enums } = state;
-  const { PRIMERO_RESOUURCE, REFERRED } = enums;
+  const { PRIMERO_RESOURCE, REFERRED } = enums;
 
   const nonDecisionOscars = [];
   const decisionOscars = [];
@@ -223,14 +229,15 @@ fn(state => {
   originalCases.forEach(oscarCase => {
     let { resource, status } = oscarCase;
     resource = resource ? resource.toUpperCase() : null;
-
+    oscarCase.isDescison = false;
     if (
       !resource ||
-      resource != PRIMERO_RESOUURCE ||
-      (resource == PRIMERO_RESOUURCE && status === REFERRED)
+      resource != PRIMERO_RESOURCE ||
+      (resource == PRIMERO_RESOURCE && status === REFERRED)
     ) {
       nonDecisionOscars.push(oscarCase);
-    } else if ((resource = PRIMERO_RESOUURCE && status != REFERRED)) {
+    } else if ((resource = PRIMERO_RESOURCE && status != REFERRED)) {
+      oscarCase.isDescison = true;
       decisionOscars.push(oscarCase);
     }
   });
@@ -241,431 +248,50 @@ fn(state => {
   return { ...state, nonDecisionOscars, decisionOscars };
 });
 
+//set primero mapping
 fn(state => {
-  console.log('Referrals updated. Case:Service ID map =', state.serviceRecordIds);
-  return state;
-});
-
-fn(state => {
-  // ===========================================================================
-  // NOTE: As of September 25, 2020, Oscar has changed the structure of this
-  // payload for a subset of cases, depending on whether or not data exists in
-  // the services array. Below, we create an empty array (if it's been removed
-  // to ensure that all payloads adhere to the integration contract.
-  state.data.data = state.originalCases
-    .map(c => {
-      const normalizedServicesArray = c.services || [];
-      return { ...c, services: normalizedServicesArray };
-    })
-    .filter(c => {
-      // remove 'demo' cases
-      if (c.organization_name == 'demo') {
-        console.log(`Dropping demo case: ${c.global_id}`);
-        return false;
-      }
-      return true;
-    });
-  // ===========================================================================
-
-  const statusMap = {
-    Accepted: 'accepted_850187',
-    Active: 'accepted_850187',
-    Exited: 'rejected__74769',
-  };
-
-  state.cases = state.data.data.map(c => {
-    function convertDate(str) {
-      if (str) {
-        const date = new Date(str);
-        monthNames = [
-          'jan',
-          'feb',
-          'mar',
-          'apr',
-          'may',
-          'jun',
-          'jul',
-          'aug',
-          'sep',
-          'oct',
-          'nov',
-          'dec',
-        ];
-        var dd = date.getDate();
-        var mmm = monthNames[date.getMonth()];
-        var yyyy = date.getFullYear();
-        return `${dd}-${mmm}-${yyyy} 00:00`;
-      }
-      return null;
-    }
-
-    function byServiceType(outputObject, currentValue) {
-      // Group the array of services by service type, returning an object
-      // with a key for each service type, and an array of services for that
-      // type.
-      (outputObject[currentValue['service_type']] =
-        outputObject[currentValue['service_type']] || []).push(currentValue);
-      return outputObject;
-    }
-
-    // TODO: @Emeka, refactor this or explain. What is 'mapKeysToServices' doing and why?
-    function mapKeysToServices(object, caseId) {
-      return Object.keys(object).map(key => {
-        // Map across all of the keys (or service types) in the servicesObject
-        // to return an array of services, where each service is built from the
-        // first service of that type for each type.
-
-        const oscarService = object[key][0];
-
-        return {
-          unique_id: state.serviceRecordIds[caseId] || oscarService.uuid, // UUID DOES NOT EXIST
-          service_subtype: object[key].map(st => st.service_subtype),
-          service_type: key,
-          service_type_text: key,
-          referral_status_ed6f91f: oscarService.referral_status_ed6f91f,
-          service_type_details_text: state.serviceMap[oscarService.name]
-            ? 'n/a'
-            : oscarService.name,
-          service_implementing_agency: `agency-${c.organization_name}`,
-          service_response_day_time: oscarService.enrollment_date
-            ? `${oscarService.enrollment_date}T00:00:00.000Z`
-            : oscarService.enrollment_date,
-          oscar_case_worker_name: c.case_worker_name,
-          oscar_referring_organization: `agency-${c.organization_name}`,
-          oscar_case_worker_telephone: c.case_worker_mobile,
-          service_response_type: oscarService.enrollment_date
-            ? 'service_being_provided_by_oscar_partner_47618'
-            : oscarService.enrollment_date === null && c.resource === 'primero'
-            ? 'referral_to_oscar'
-            : 'referral_from_oscar',
-        };
-      });
-    }
-
-    // TODO: @Emeka, refactor this or explain. What is 'classifyServices' doing and why?
-    function classifyServices(arr, caseId) {
-      return arr.map(service => {
-        return {
-          ...service,
-          isReferral: service.enrollment_date ? true : false,
-          service_type:
-            (state.serviceMap[service.name] && state.serviceMap[service.name].type) || 'Other',
-          service_subtype:
-            (state.serviceMap[service.name] && state.serviceMap[service.name].subtype) || 'Other',
-          // referral_status: statusMap[c.referral_status] || undefined
-          referral_status_ed6f91f: determineStatus(service, caseId),
-        };
-      });
-    }
-
-    function determineStatus(service, caseId) {
-      if (
-        state.serviceRecordIds[caseId] && // IF... there is a serviceRecordId for this case
-        c.resource === 'primero' && // and the Oscar case source is 'primero'
-        service.enrollment_date === null // and the Oscar service enrollment date is null
-      ) {
-        return statusMap[c.status]; // THEN... return the mapped referral status
-      } else {
-        return undefined; // ELSE ... return undefined (this isn't a decision.)
-      }
-    }
-
-    // TODO: @Emeka, in my mind, this function should take an array of Oscar services
-    // and it should return an array of primero services to add/update.
-    // So.... Array X in, Array Y out. That's not really a reduce, but a map! So why is
-    // it called "reduce"? Why is it seemingly more complex than arr.map(x => y)?
-    // Why must we call mapKeysToServices with the result of classifyServices?
-    // These are the big questions in life, eh man?!
-    function reduceOscarServices(oscarServicesArray, caseId) {
-      const primeroServicesArray = mapKeysToServices(
-        classifyServices(oscarServicesArray, caseId)
-          .filter(x => !x.isReferral)
-          .reduce((obj, elem) => byServiceType(obj, elem), {}),
-        caseId
-      );
-
-      const primeroReferralsArray = mapKeysToServices(
-        classifyServices(oscarServicesArray, caseId)
-          .filter(x => x.isReferral)
-          .reduce((obj, elem) => byServiceType(obj, elem), {}),
-        caseId
-      );
-
-      // Finally, return this new SMALLER array of primeroServices where Oscar's
-      // initially services have been aggregated/reduced down by service_type.
-      return primeroServicesArray.concat(primeroReferralsArray);
-    }
-
-    const now = new Date();
-
-    // NOTE: These logs are extremely VERBOSE but more secure, given that we don't know
-    // exactly what will be provided by the API.
-    // console.log(
-    //   `Data provided by Oscar (ON: ${c.global_id} / extId: ${c.external_id}) : ${JSON.stringify(
-    //     {
-    //       oscar_short_id: c.slug,
-    //       //address_current_village_code: c.address_current_village_code,
-    //       external_case_worker_id: c.external_case_worker_id,
-    //       external_id: c.external_id,
-    //       external_id_display: c.external_id_display,
-    //       global_id: c.global_id,
-    //       is_referred: c.is_referred,
-    //       location_current_village_code: c.location_current_village_code,
-    //       organization_id: c.organization_id,
-    //       organization_name: c.organization_name,
-    //       services: c.services.map(service => ({
-    //         uuid: service.uuid,
-    //         enrollment_date: service.enrollment_date,
-    //       })),
-    //       status: c.status,
-    //     },
-    //     null,
-    //     2
-    //   )}`
-    // );
-    console.log(
-      `Data provided by Oscar (ON: ${c.global_id} / extId: ${c.external_id}) : ${JSON.stringify(
-        c,
-        null,
-        4
-      )}`
-    );
-
-    function genderTransform(str) {
-      switch (str) {
-        case 'male':
-        case 'female':
-          return str;
-
-        case undefined:
-        case null:
-        case '':
-          return null;
-
-        default:
-          return 'other';
-      }
-    }
-
-    function calcAge(str) {
-      if (!str) return 0;
-      var today = new Date();
-      var birthDate = new Date(str);
-      var age = today.getFullYear() - birthDate.getFullYear();
-
-      if (age > 30 || age < 1) return 0;
-
-      var m = today.getMonth() - birthDate.getMonth();
-      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-        age--;
-      }
-      return age;
-    }
-
-    function primeroId(c) {
-      return c.external_id ? c.external_id : null;
-    }
-
-    function setUser(c) {
-      if (c.is_referred) {
-        return setProvinceUser(c);
-      }
-      return setAgencyUser(c);
-    }
-
-    function setProvinceUser(c) {
-      const provinceUserMap = {
-        12: 'mgrpnh',
-        '08': 'mgrkdl',
-        17: 'mgrsrp',
-        '02': 'mgrbtb',
-        18: 'mgrshv',
-        22: 'mgrstg',
-        16: 'mgrrtk',
-        11: 'mgrmdk',
-        10: 'mgrkrt',
-        25: 'mgrtkm',
-        '03': 'mgrkcm',
-        22: 'mgromc',
-        13: 'mgrpvh',
-        '06': 'mgrktm',
-        '01': 'mgrbmc',
-        24: 'mgrpln',
-        15: 'mgrpst',
-        23: 'mgrkep',
-        21: 'mgrtakeo',
-        '09': 'mgrkkg',
-        '07': 'mgrkpt',
-        '05': 'mgrksp',
-        20: 'mgrsvg',
-        14: 'mgrpvg',
-        '04': 'mgrkch',
-      };
-
-      const { location_current_village_code, organization_address_code } = c;
-      const source = location_current_village_code || organization_address_code;
-
-      if (source) {
-        const subCode = source.slice(0, 2);
-        user = provinceUserMap[subCode];
-        if (user) {
-          return user;
-        } else {
-          throw 'Province user not found for this case. Check the case location and list of available province users.';
-        }
-      } else {
-        return null;
-      }
-    }
-
-    function createName(given, local) {
-      if (local && given) {
-        return `${local} (${given})`; //Format: khmer name (engligh name)
-      }
-      if (given && !local) {
-        return given;
-      }
-      if (!given && local) {
-        return local;
-      } else {
-        return null;
-      }
-    }
-
-    function setAgencyUser(c) {
-      const agencyMap = {
-        'agency-agh': 'agency-agh-user',
-        'agency-ahc': 'agency-ahc-user',
-        'agency-ajl': 'agency-ajl-user',
-        'agency-auscam': 'agency-auscam-user',
-        'agency-brc': 'agency-brc-user',
-        'agency-cccu': 'agency-cccu-user',
-        'agency-cct': 'agency-cct-user',
-        'agency-cfi': 'agency-cfi-user',
-        'agency-cif': 'agency-cif-user',
-        'agency-css': 'agency-css-user',
-        'agency-cvcd': 'agency-cvcd-user',
-        'agency-cwd': 'agency-cwd-user',
-        'agency-demo': 'agency-demo-user',
-        'agency-fco': 'agency-fco-user',
-        'agency-fit': 'agency-fit-user',
-        'agency-fsc': 'agency-fsc-user',
-        'agency-fsi': 'agency-fsi-user',
-        'agency-fts': 'agency-fts-user',
-        'agency-gca': 'agency-gca-user',
-        'agency-gct': 'agency-gct-user',
-        'agency-hfj': 'agency-hfj-user',
-        'agency-hol': 'agency-hol-user',
-        'agency-holt': 'agency-holt-user',
-        'agency-icf': 'agency-icf-user',
-        'agency-isf': 'agency-isf-user',
-        'agency-kmo': 'agency-kmo-user',
-        'agency-kmr': 'agency-kmr-user',
-        'agency-lwb': 'agency-lwb-user',
-        'agency-mande': 'agency-mande-user',
-        'agency-mho': 'agency-mho-user',
-        'agency-mrs': 'agency-mrs-user',
-        'agency-msl': 'agency-msl-user',
-        'agency-mtp': 'agency-mtp-user',
-        'agency-my': 'agency-my-user',
-        'agency-myan': 'agency-myan-user',
-        'agency-newsmile': 'agency-newsmile-user',
-        'agency-pepy': 'agency-pepy-user',
-        'agency-rok': 'agency-rok-user',
-        'agency-scc': 'agency-scc-user',
-        'agency-shk': 'agency-shk-user',
-        'agency-spo': 'agency-spo-user',
-        'agency-ssc': 'agency-ssc-user',
-        'agency-tlc': 'agency-tlc-user',
-        'agency-tmw': 'agency-tmw-user',
-        'agency-tutorials': 'agency-tutorials-user',
-        'agency-voice': 'agency-voice-user',
-        'agency-wmo': 'agency-wmo-user',
-      };
-
-      if (c.organization_name) {
-        return agencyMap[`agency-${c.organization_name}`];
-      } else {
-        throw `No agency user found for the organization ${c.organization_name}. Please create an agency user for this organization and update the job accordingly.`;
-      }
-    }
-
-    //const isUpdate = c.external_id && c.is_referred!==true; //cannot contain is_referred, oscar will repeatedly send
-    const isUpdate = c.external_id;
-
-    const locationCode = c.location_current_village_code
-      ? parseInt(c.location_current_village_code, 10).toString()
-      : null;
-
-    // Mappings for upserting cases in Primero (update if existing, insert if new)
-    const primeroCase = {
-      //remote: true,
+  const { nonDecisionOscars, decisionOscars, servicesStatusMap } = state;
+  const primeroCasesToUpsert = [...nonDecisionOscars, ...decisionOscars].map(c => {
+    const { external_id, isDescison } = c;
+    const upsertByCaseId = !!external_id;
+    return {
       oscar_number: c.global_id,
-      // NOTE ==================================================================
-      // `unique_identifier` below duplicates `case_id` but has been requested
-      // by Primero as a workaround for certain uuid/external_id duplicate
-      // issues in v1 of their public API. This will likely change soon.
-      case_id: primeroId(c),
-      //unique_identifier: primeroId(c),
-      // =======================================================================
-      // FIELDS PREVIOUSLY IN CHILD{}
-      // primero_field: oscar_field,
-      case_id: c.external_id, // externalId for upsert (will fail if multiple found)
-      // oscar_number: c.global_id,
+      case_id: external_id,
+      remote: true,
+      case_id_display: c.external_id_display,
       oscar_short_id: c.slug,
       mosvy_number: c.mosvy_number,
-      name_first: isUpdate ? null : createName(c.given_name, c.local_given_name),
-      name_last: isUpdate ? null : createName(c.family_name, c.local_family_name),
-      sex: isUpdate ? null : genderTransform(c.gender),
-      date_of_birth: isUpdate ? null : c.date_of_birth,
-      age: isUpdate ? null : calcAge(c.date_of_birth),
-      location_current: isUpdate ? null : locationCode,
-      address_current: isUpdate ? null : c.address_current_village_code,
-      oscar_status: isUpdate ? null : c.status,
-      protection_status: !isUpdate && c.is_referred == true ? 'oscar_referral' : null,
-      //service_implementing_agency: `agency-${c.organization_name}`,
-      owned_by: isUpdate && c.is_referred !== true ? null : setUser(c),
-      // owned_by_text:
-      //   isUpdate && c.is_referred !== true ? null : `${c.case_worker_name} ${c.case_worker_mobile}`, commenting out per Ajit's feedback
+      name_first: c.given_name,
+      name_last: c.family_name,
+      sex: c.gender,
+      age: c.age,
+      date_of_birth: c.date_of_birth,
+      address_current: c.address_current_village_code,
+      location_current: c.location_current_village_code,
+      oscar_status: c.status,
+      service_implementing_agency: c.organization_name,
+      owned_by: c.location_current_village_code || c.organization_address_code,
       oscar_reason_for_exiting: c.reason_for_exiting,
-      //has_referral: c.is_referred,
-      risk_level: c.is_referred == true ? c.level_of_risk : null,
-      consent_for_services: isUpdate || c.is_referred !== true ? null : true,
-      disclosure_other_orgs: isUpdate || c.is_referred !== true ? null : true,
-      interview_subject: isUpdate || c.is_referred !== true ? null : 'other',
-      //content_source_other: isUpdate ? null : 'OSCaR',
-      module_id: 'primeromodule-cp',
-      //registration_date: isUpdate ? null : now.toISOString().split('T')[0].replace(/-/g, '/'),
-      referral_notes_oscar: c.reason_for_referral, //new services referral notes field
-      services_section: reduceOscarServices(c.services, c.external_id),
-      // -----------------------------------------------------------------------
-      // transitions:
-      //   isUpdate || c.is_referred !== true
-      //     ? null
-      //     : reduceOscarServices(c.services).map(t => ({
-      //         service_section_unique_id: t.unique_id,
-      //         service: t.service_type,
-      //         created_at: now.toISOString().split('T')[0].replace(/-/g, '/'),
-      //         type: 'referral',
-      //       })),
-      //END FIELDS PREVIOUSLY IN CHILD{}
+      services_section: c.services.map(s => ({
+        unique_id: s.uuid,
+        service_referral_notes: s.reason_for_referral,
+        service_subtype: s.name,
+        service_type_text: s.name,
+        service_type_details_text: s.name,
+        service_response_day_time: s.enrollment_date,
+        service_response_type: null,
+        oscar_case_worker_name: s.case_worker_name,
+        oscar_referring_organization: s.organization_name,
+        oscar_case_worker_telephone: s.case_worker_mobile,
+        referral_status_ed6f91f: servicesStatusMap[c.status],
+      })),
+      //non-primero properties
+      upsertByCaseId,
+      isDescison,
     };
-
-    // Note: Sometimes OSCAR sends `null`, sometimes they send `''` (empty
-    // strings). Primero wants to discard both of these before making upserts.
-    const removeEmpty = obj => {
-      Object.keys(obj).forEach(key => {
-        if (obj[key] && typeof obj[key] === 'object') removeEmpty(obj[key]);
-        else if (obj[key] == null || obj[key] == '') delete obj[key];
-      });
-    };
-
-    removeEmpty(primeroCase);
-    return primeroCase;
   });
 
-  // This removes all cases set to `false`;
-  return { ...state, cases: state.cases.filter(c => c) };
+  return { ...state, primeroCasesToUpsert };
 });
 
 each(
