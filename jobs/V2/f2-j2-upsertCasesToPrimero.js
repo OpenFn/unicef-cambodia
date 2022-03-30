@@ -1,8 +1,64 @@
+//utils/formatters
 fn(state => {
   // Saving original cases, creating Case:Service ID map =======================
   state.originalCases = state.data.data;
   state.serviceRecordIds = {};
   // ===========================================================================
+
+  const convertToPrimeroDate = dateString => {
+    if (!dateString) return null;
+    const dateArray = dateString.split('-');
+    return `${dateArray[0]}/${dateArray[1]}/${dateArray[2]}`;
+  };
+
+  const calculateAge = dateOfBirth => {
+    if (!dateOfBirth) return null;
+    const currentYear = new Date().toISOString().split('T')[0].split('-')[0];
+    const yearOfBirth = dateOfBirth.split('-')[0];
+    return +currentYear - +yearOfBirth;
+  };
+
+  const setGender = gender => {
+    gender = gender && gender.toLowerCase();
+    const genderMap = {
+      male: 'male',
+      female: 'female',
+    };
+    return genderMap[gender] || 'other';
+  };
+
+  const setLocationCode = location => {
+    if (!location) return;
+    return parseInt(location).toString();
+  };
+
+  const provinceMap = {
+    12: 'mgrpnh',
+    8: 'mgrkdl',
+    17: 'mgrsrp',
+    2: 'mgrbtb',
+    18: 'mgrshv',
+    22: 'mgrstg',
+    16: 'mgrrtk',
+    11: 'mgrmdk',
+    10: 'mgrkrt',
+    25: 'mgrtkm',
+    3: 'mgrkcm',
+    22: 'mgromc',
+    13: 'mgrpvh',
+    6: 'mgrktm',
+    1: 'mgrbmc',
+    24: 'mgrpln',
+    15: 'mgrpst',
+    23: 'mgrkep',
+    21: 'mgrtakeo',
+    9: 'mgrkkg',
+    7: 'mgrkpt',
+    5: 'mgrksp',
+    20: 'mgrsvg',
+    14: 'mgrpvg',
+    4: 'mgrkch',
+  };
 
   const serviceMap = {
     'Generalist social work / case work': {
@@ -21,10 +77,7 @@ fn(state => {
       subtype: 'family_based_care_longterm_foster',
       type: 'family_based_care',
     },
-    'Kinship care': {
-      subtype: 'family_based_care_kinship',
-      type: 'family_based_care',
-    },
+    'Kinship care': { subtype: 'family_based_care_kinship', type: 'family_based_care' },
     'Domestic adoption support': {
       subtype: 'family_based_care_domestic_adoption',
       type: 'family_based_care',
@@ -41,34 +94,19 @@ fn(state => {
       subtype: 'family_based_care_independent_living',
       type: 'family_based_care',
     },
-    'Drug and Alcohol Counselling': {
-      subtype: 'drug_alcohol_counselling',
-      type: 'drug_alcohol',
-    },
+    'Drug and Alcohol Counselling': { subtype: 'drug_alcohol_counselling', type: 'drug_alcohol' },
     'Detox / rehabilitation services': {
       subtype: 'drug_alcohol_detox_rehabilitation',
       type: 'drug_alcohol',
     },
-    'Detox support': {
-      subtype: 'drug_alcohol_detox_support',
-      type: 'drug_alcohol',
-    },
-    'Generalist counselling': {
-      subtype: 'counselling_generalist',
-      type: 'counselling',
-    },
+    'Detox support': { subtype: 'drug_alcohol_detox_support', type: 'drug_alcohol' },
+    'Generalist counselling': { subtype: 'counselling_generalist', type: 'counselling' },
     'Counselling for abuse survivors': {
       subtype: 'counselling_abuse_survivors',
       type: 'counselling',
     },
-    'Trauma counselling': {
-      subtype: 'counselling_trauma',
-      type: 'counselling',
-    },
-    'Family counselling / mediation': {
-      subtype: 'counselling_family',
-      type: 'counselling',
-    },
+    'Trauma counselling': { subtype: 'counselling_trauma', type: 'counselling' },
+    'Family counselling / mediation': { subtype: 'counselling_family', type: 'counselling' },
     'Direct material assistance': {
       subtype: 'financial_development_material_assistance',
       type: 'financial_development',
@@ -101,18 +139,9 @@ fn(state => {
       subtype: 'disability_support_aid_provision',
       type: 'disability_support',
     },
-    'Peripheral supports': {
-      subtype: 'disability_support_peripheral',
-      type: 'disability_support',
-    },
-    'Support groups': {
-      subtype: 'disability_support_groups',
-      type: 'disability_support',
-    },
-    'Support to access care': {
-      subtype: 'medical_support_access_care',
-      type: 'medical_support',
-    },
+    'Peripheral supports': { subtype: 'disability_support_peripheral', type: 'disability_support' },
+    'Support groups': { subtype: 'disability_support_groups', type: 'disability_support' },
+    'Support to access care': { subtype: 'medical_support_access_care', type: 'medical_support' },
     'Provision of medical care': {
       subtype: 'medical_support_provision_medical_case',
       type: 'medical_support',
@@ -121,10 +150,7 @@ fn(state => {
       subtype: 'medical_support_medical_training',
       type: 'medical_support',
     },
-    'Health education': {
-      subtype: 'medical_support_healt_education',
-      type: 'medical_support',
-    },
+    'Health education': { subtype: 'medical_support_healt_education', type: 'medical_support' },
     'Support to access legal services': {
       subtype: 'legal_support_access_legal_services',
       type: 'legal_support',
@@ -133,10 +159,7 @@ fn(state => {
       subtype: 'legal_support_advocacy_services',
       type: 'legal_support',
     },
-    'Legal representation': {
-      subtype: 'legal_support_representation',
-      type: 'legal_support',
-    },
+    'Legal representation': { subtype: 'legal_support_representation', type: 'legal_support' },
     'Prison visitation support': {
       subtype: 'legal_support_prision_visitation',
       type: 'legal_support',
@@ -153,10 +176,7 @@ fn(state => {
       subtype: 'mental_health_support_direct_medical_support',
       type: 'mental_health_support',
     },
-    'School support': {
-      subtype: 'training_education_school_support',
-      type: 'training_education',
-    },
+    'School support': { subtype: 'training_education_school_support', type: 'training_education' },
     'Supplementary school education': {
       subtype: 'training_education_supplementary',
       type: 'training_education',
@@ -173,18 +193,9 @@ fn(state => {
       subtype: 'training_education_scholarships',
       type: 'training_education',
     },
-    'Life skills': {
-      subtype: 'training_education_life_skills',
-      type: 'training_education',
-    },
-    'Family support': {
-      subtype: 'family_support_family_support',
-      type: 'family_support',
-    },
-    'Rescue Services': {
-      subtype: 'anti_trafficking_rescue',
-      type: 'anti_trafficking',
-    },
+    'Life skills': { subtype: 'training_education_life_skills', type: 'training_education' },
+    'Family support': { subtype: 'family_support_family_support', type: 'family_support' },
+    'Rescue Services': { subtype: 'anti_trafficking_rescue', type: 'anti_trafficking' },
     'Transitional Accommodation': {
       subtype: 'anti_trafficking_transitional_accomodation',
       type: 'anti_trafficking',
@@ -197,17 +208,18 @@ fn(state => {
       subtype: 'anti_trafficking_community_reintegration',
       type: 'anti_trafficking',
     },
-    'Residential Care Institution': {
-      subtype: 'residential_care_gov_only_other',
-      type: 'other',
-    },
+    'Residential Care Institution': { subtype: 'residential_care_gov_only_other', type: 'other' },
     'Other Service': { subtype: 'other_other_service', type: 'other' },
   };
-
   const servicesStatusMap = {
     Accepted: 'accepted_850187',
     Active: 'accepted_850187',
     Rejected: 'rejected_74769',
+  };
+  const referralsStatusMap = {
+    Accepted: 'accepted',
+    Active: 'accepted',
+    Exited: 'rejected',
   };
 
   const enums = {
@@ -215,10 +227,21 @@ fn(state => {
     REFERRED: 'REFERRED',
   };
 
-  return { ...state, serviceMap, servicesStatusMap, enums };
+  return {
+    ...state,
+    serviceMap,
+    servicesStatusMap,
+    referralsStatusMap,
+    provinceMap,
+    enums,
+    convertToPrimeroDate,
+    calculateAge,
+    setGender,
+    setLocationCode,
+  };
 });
 
-//distinguish between oscar cases: ADDED ON REWRITE
+//distinguish cases
 fn(state => {
   const { originalCases, enums } = state;
   const { PRIMERO_RESOURCE, REFERRED } = enums;
@@ -254,50 +277,75 @@ fn(state => {
     'Cases with decisions ',
     distinguishedCases.filter(c => c.isDecision)
   );
+
+  return state;
 });
 
 //set primero mapping
 fn(state => {
-  const { distinguishedCases, servicesStatusMap } = state;
-  const primeroCasesToUpsert = distinguishedCases.map(c => {
-    const { isDecision, upsertByCaseId } = c;
-    return {
-      oscar_number: c.global_id,
-      case_id: c.external_id,
-      remote: true,
-      case_id_display: c.external_id_display,
-      oscar_short_id: c.slug,
-      mosvy_number: c.mosvy_number,
-      name_first: c.given_name,
-      name_last: c.family_name,
-      sex: c.gender,
-      age: c.age,
-      date_of_birth: c.date_of_birth,
-      address_current: c.address_current_village_code,
-      location_current: c.location_current_village_code,
-      oscar_status: c.status,
-      service_implementing_agency: c.organization_name,
-      owned_by: c.location_current_village_code || c.organization_address_code,
-      oscar_reason_for_exiting: c.reason_for_exiting,
-      services_section: c.services.map(s => ({
-        unique_id: s.uuid,
-        service_referral_notes: s.reason_for_referral,
-        service_subtype: s.name,
-        service_type_text: s.name,
-        service_type_details_text: s.name,
-        service_response_day_time: s.enrollment_date,
-        service_response_type: null,
-        oscar_case_worker_name: s.case_worker_name,
-        oscar_referring_organization: s.organization_name,
-        oscar_case_worker_telephone: s.case_worker_mobile,
-        referral_status_ed6f91f: servicesStatusMap[c.status],
-      })),
-      //non-primero properties
-      upsertByCaseId,
-      isDecision,
-    };
-  });
+  const {
+    distinguishedCases,
+    servicesStatusMap,
+    referralsStatusMap,
+    provinceMap,
+    convertToPrimeroDate,
+    calculateAge,
+    setGender,
+    setLocationCode,
+  } = state;
+  const primeroCasesToUpsert = distinguishedCases
+    .map(c => {
+      const { isDecision, upsertByCaseId } = c;
+      const currentLocation = setLocationCode(
+        c.location_current_village_code || c.address_current_village_code
+      );
+      let primeroRecord = {
+        remote: true,
+        oscar_number: c.global_id,
+        case_id: c.external_id,
+        case_id_display: c.external_id_display,
+        oscar_short_id: c.slug,
+        mosvy_number: c.mosvy_number,
+        name_first: c.given_name,
+        name_last: c.family_name,
+        sex: setGender(c.gender),
+        age: calculateAge(c.age),
+        date_of_birth: convertToPrimeroDate(c.date_of_birth),
+        address_current: c.address_current_village_code,
+        location_current: provinceMap[currentLocation],
+        oscar_status: c.status,
+        service_implementing_agency: c.organization_name,
+        owned_by: c.location_current_village_code || c.organization_address_code,
+        oscar_reason_for_exiting: c.reason_for_exiting,
+        referral_status: referralsStatusMap[c.status], // @Aicha is this referral.status or referral_status
+        consent_for_services: true,
+        disclosure_other_orgs: true,
+        module_id: 'primeromodule-cp',
+        services_section: c.services.map(s => ({
+          unique_id: s.uuid,
+          service_referral_notes: s.reason_for_referral,
+          service_subtype: s.name,
+          service_type_text: s.name,
+          service_type_details_text: s.name,
+          service_response_day_time: s.enrollment_date,
+          service_response_type: 'referral_from_oscar',
+          oscar_case_worker_name: s.case_worker_name,
+          oscar_referring_organization: `agency-${s.organization_name}`,
+          oscar_case_worker_telephone: s.case_worker_mobile,
+          referral_status_ed6f91f: servicesStatusMap[c.status],
+        })),
+        //non-primero properties
+        upsertByCaseId,
+        isDecision,
+      };
+      if (!primeroRecord.location_current) {
+        primeroRecord = null;
+      }
+      return primeroRecord;
+    })
+    .filter(Boolean); // remove nulls
 
+  console.log({ primeroCasesToUpsert });
   return { ...state, primeroCasesToUpsert };
 });
 
