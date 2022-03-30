@@ -223,10 +223,7 @@ fn(state => {
   const { originalCases, enums } = state;
   const { PRIMERO_RESOURCE, REFERRED } = enums;
 
-  const nonDecisionOscars = [];
-  const decisionOscars = [];
-
-  originalCases.forEach(oscarCase => {
+  const distinguishedCases = originalCases.map(oscarCase => {
     let { resource, status } = oscarCase;
     resource = resource ? resource.toUpperCase() : null;
     oscarCase.isDecision = false;
@@ -235,23 +232,30 @@ fn(state => {
       resource != PRIMERO_RESOURCE ||
       (resource == PRIMERO_RESOURCE && status === REFERRED)
     ) {
-      nonDecisionOscars.push(oscarCase);
+      oscarCase.isDecision = false;
     } else if ((resource = PRIMERO_RESOURCE && status != REFERRED)) {
       oscarCase.isDecision = true;
-      decisionOscars.push(oscarCase);
     }
+
+    return oscarCase;
   });
 
-  console.log('Cases withOUT decisions ', nonDecisionOscars);
-  console.log('Cases with decisions ', decisionOscars);
+  console.log(
+    'Cases withOUT decisions ',
+    distinguishedCases.filter(c => !c.isDecision)
+  );
+  console.log(
+    'Cases with decisions ',
+    distinguishedCases.filter(c => c.isDecision)
+  );
 
-  return { ...state, nonDecisionOscars, decisionOscars };
+  return { ...state, distinguishedCases };
 });
 
 //set primero mapping
 fn(state => {
-  const { nonDecisionOscars, decisionOscars, servicesStatusMap } = state;
-  const primeroCasesToUpsert = [...nonDecisionOscars, ...decisionOscars].map(c => {
+  const { distinguishedCases, servicesStatusMap } = state;
+  const primeroCasesToUpsert = distinguishedCases.map(c => {
     const { external_id, isDecision } = c;
     const upsertByCaseId = !!external_id;
     return {
