@@ -371,7 +371,9 @@ each(
         externalIds: upsertByCaseId ? ['case_id'] : ['oscar_number'],
         data: primeroCase,
       },
-      fn(state => {})
+      fn(state => {
+        return state;
+      })
     )(state);
   })
 );
