@@ -240,6 +240,12 @@ fn(state => {
     return oscarCase;
   });
 
+  return { ...state, distinguishedCases };
+});
+
+// log distinguished cases
+fn(state => {
+  const { distinguishedCases } = state;
   console.log(
     'Cases withOUT decisions ',
     distinguishedCases.filter(c => !c.isDecision)
@@ -248,8 +254,6 @@ fn(state => {
     'Cases with decisions ',
     distinguishedCases.filter(c => c.isDecision)
   );
-
-  return { ...state, distinguishedCases };
 });
 
 //set primero mapping
