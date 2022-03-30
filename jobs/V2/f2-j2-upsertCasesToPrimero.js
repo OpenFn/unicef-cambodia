@@ -204,98 +204,41 @@ fn(state => {
     'Other Service': { subtype: 'other_other_service', type: 'other' },
   };
 
-  return { ...state, serviceMap };
-});
-
-// Oscar cases ---> Primero
-// User Story 2: 'View Oscar cases in Primero' AND User Story 4: 'Sending referrals to Primero'=
-// 1. For each case where resource === 'primero'
-fn(state => {
-  const filteredCases = state.originalCases.filter(c => c.resource === 'primero');
-  const statusArray = ['accepted_850187', 'rejected__74769'];
-  const primeroStatusMap = {
-    Accepted: 'accepted',
-    Active: 'accepted',
-    Exited: 'rejected',
+  const enums = {
+    PRIMERO_RESOUURCE: 'PRIMERO',
+    REFERRED: 'REFERRED',
   };
 
-  const oscarReferrals = [];
+  return { ...state, serviceMap, enums };
+});
 
-  filteredCases.forEach(c => {
-    oscarReferrals.push(
-      ...c.services.filter(service => service.enrollment_date === null).map(service => service.name)
-    );
+//distinguish between oscar cases
+fn(state => {
+  const { originalCases, enums } = state;
+  const { PRIMERO_RESOUURCE, REFERRED } = enums;
+
+  const nonDecisionOscars = [];
+  const decisionOscars = [];
+
+  originalCases.forEach(oscarCase => {
+    let { resource, status } = oscarCase;
+    resource = resource ? resource.toUpperCase() : null;
+
+    if (
+      !resource ||
+      resource != PRIMERO_RESOUURCE ||
+      (resource == PRIMERO_RESOUURCE && status === REFERRED)
+    ) {
+      nonDecisionOscars.push(oscarCase);
+    } else if ((resource = PRIMERO_RESOUURCE && status != REFERRED)) {
+      decisionOscars.push(oscarCase);
+    }
   });
 
-  const mappedOscarReferrals = oscarReferrals.map(r => state.serviceMap[r].type);
+  console.log('Cases withOUT decisions ', nonDecisionOscars);
+  console.log('Cases with decisions ', decisionOscars);
 
-  return each(
-    filteredCases,
-    fn(state => {
-      const { external_id, referral_status, status } = state.data;
-      const case_id = external_id;
-      return getCases({ remote: true, case_id }, state => {
-        const { services_section = null } = state.data[0] || {};
-        const referralsToOscar = (services_section || []).filter(
-          serv =>
-            serv.service_response_type === 'referral_to_oscar' &&
-            (serv.referral_status_ed6f91f === undefined ||
-              !statusArray.includes(serv.referral_status_ed6f91f))
-        );
-
-        // 4. Finding matching service
-        const matchingService = referralsToOscar.filter(ref =>
-          mappedOscarReferrals.includes(ref.service_type)
-        );
-
-        // TODO: @Aicha, restore this "if/throw" and remove this TODO once you're done testing.
-        // Abort if multiple referrals are found.
-        // if (matchingService.length > 1)
-        //   throw new Error('Multiple services found. Aborting upsert.');
-
-        // Skip entirely if no referrals are found.
-        if (matchingService.length === 0) return state;
-
-        // 5. saving 'service_record_id'
-        const service_record_id = matchingService[0].unique_id;
-        console.log(`Case ${case_id} has matching service ${service_record_id}.`);
-        state.serviceRecordIds[case_id] = service_record_id;
-        console.log(`Assigned to Case:Service ID map.`);
-
-        // 6. Get referrals from 'case_id'
-        return getReferrals({ externalId: 'case_id', id: case_id }, state => {
-          const referrals = state.data;
-          if (referrals.length === 0) {
-            throw new Error('No referrals found.');
-          }
-
-          const matchingReferral = referrals.find(
-            ref => ref.service_record_id === service_record_id
-          );
-
-          if (!matchingReferral) {
-            console.log('No matching referral found. Aborting upsert.');
-            state.serviceRecordIds[case_id] = service_record_id;
-            return state;
-          }
-
-          const data = {
-            status: primeroStatusMap[referral_status || status],
-            id: matchingReferral.id,
-            type: 'Referral',
-            record_id: matchingReferral.record_id,
-            record_type: 'case',
-          };
-          return updateReferrals({
-            externalId: 'record_id',
-            id: matchingReferral.record_id,
-            referral_id: matchingReferral.id,
-            data,
-          })(state);
-        })(state);
-      })(state);
-    })
-  )(state);
+  return { ...state, nonDecisionOscars, decisionOscars };
 });
 
 fn(state => {
