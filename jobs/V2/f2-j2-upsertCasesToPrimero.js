@@ -357,16 +357,16 @@ fn(state => {
 
 each(
   '$.primeroCasesToUpsert[*]',
-  fn(state => {
+  fn(async state => {
     const primeroCase = state.data;
-    // destruct from a copy so that the upsertByCaseId can be unset from the current primero record
+    // destruct from a copy so that upsertByCaseId can be unset from the current primero record
     const { upsertByCaseId } = { ...primeroCase };
 
     //unset non-primero properties
     delete primeroCase.upsertByCaseId;
     delete primeroCase.isDecision;
 
-    return upsertCase(
+    await upsertCase(
       {
         externalIds: upsertByCaseId ? ['case_id'] : ['oscar_number'],
         data: primeroCase,
