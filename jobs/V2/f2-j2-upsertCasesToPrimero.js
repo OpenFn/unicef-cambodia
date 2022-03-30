@@ -312,10 +312,10 @@ fn(state => {
         age: calculateAge(c.age),
         date_of_birth: convertToPrimeroDate(c.date_of_birth),
         address_current: c.address_current_village_code,
-        location_current: provinceMap[currentLocation],
+        location_current: c.location_current_village_code,
         oscar_status: c.status,
         service_implementing_agency: c.organization_name,
-        owned_by: c.location_current_village_code || c.organization_address_code,
+        owned_by: provinceMap[currentLocation],
         oscar_reason_for_exiting: c.reason_for_exiting,
         referral_status: referralsStatusMap[c.status], // @Aicha is this referral.status or referral_status
         consent_for_services: true,
@@ -338,7 +338,8 @@ fn(state => {
         upsertByCaseId,
         isDecision,
       };
-      if (!primeroRecord.location_current) {
+      if (!primeroRecord.owned_by) {
+        // TODO: Ask @Aicha to clarify if this is check should be done on 'owned_by' or 'location_current'
         primeroRecord = null;
       }
       return primeroRecord;
