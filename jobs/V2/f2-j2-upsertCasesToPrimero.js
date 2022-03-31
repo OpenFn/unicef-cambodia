@@ -319,7 +319,7 @@ fn(state => {
         // service_implementing_agency: c.organization_name, TODO: Check Primero complaint
         owned_by: provinceMap[currentLocation],
         oscar_reason_for_exiting: c.reason_for_exiting,
-        // referral_status: referralsStatusMap[c.status], // @Aicha is this referral.status or referral_status, TODO: Check Primero complaint
+        // referral_status: referralsStatusMap[c.status], //TODO: Check Primero complaint
         consent_for_services: true,
         disclosure_other_orgs: true,
         module_id: 'primeromodule-cp',
@@ -335,7 +335,7 @@ fn(state => {
           oscar_case_worker_name: s.case_worker_name,
           oscar_referring_organization: `agency-${s.organization_name}`,
           oscar_case_worker_telephone: s.case_worker_mobile,
-          // referral_status_ed6f91f: servicesStatusMap[c.status] || 'accepted_850187', //TODO: Check Primero complaint
+          // referral_status_ed6f91f: servicesStatusMap[c.status], //TODO: Check Primero complaint
         })),
         //non-primero properties
         upsertByCaseId,
