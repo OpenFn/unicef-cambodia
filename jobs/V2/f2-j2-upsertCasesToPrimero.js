@@ -335,7 +335,7 @@ fn(state => {
           oscar_case_worker_name: s.case_worker_name,
           oscar_referring_organization: `agency-${s.organization_name}`,
           oscar_case_worker_telephone: s.case_worker_mobile,
-         // referral_status_ed6f91f: servicesStatusMap[c.status] || 'accepted_850187', //TODO: Check Primero complaint
+          // referral_status_ed6f91f: servicesStatusMap[c.status] || 'accepted_850187', //TODO: Check Primero complaint
         })),
         //non-primero properties
         upsertByCaseId,
@@ -353,8 +353,7 @@ fn(state => {
   return { ...state, primeroCasesToUpsert };
 });
 
-// TODO: @Emeka to add the upsert operation for all cases, and primero decisions
-
+// do operations on each record
 each(
   '$.primeroCasesToUpsert[*]',
   fn(async state => {
@@ -372,7 +371,7 @@ each(
         data: primeroCase,
       },
       upsertCaseState => {
-     return  getCases({ remote: true, case_id: primeroCase.case_id }, getCaseState => {
+        return getCases({ remote: true, case_id: primeroCase.case_id }, getCaseState => {
           console.log('Getting casess');
         })(upsertCaseState);
       }
