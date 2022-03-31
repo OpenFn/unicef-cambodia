@@ -335,7 +335,7 @@ fn(state => {
           oscar_case_worker_name: s.case_worker_name,
           oscar_referring_organization: `agency-${s.organization_name}`,
           oscar_case_worker_telephone: s.case_worker_mobile,
-          referral_status_ed6f91f: servicesStatusMap[c.status], //TODO: Check Primero complaint
+          referral_status_ed6f91f: referralsStatusMap[c.status], //TODO: Check Primero complaint
         })),
         //non-primero properties
         upsertByCaseId,
@@ -349,7 +349,9 @@ fn(state => {
     })
     .filter(Boolean); // remove nulls
 
-  console.log({ primeroCasesToUpsert });
+  console.log({
+    primeroCasesToUpsert: JSON.stringify(primeroCasesToUpsert.services_section, null, 2),
+  });
   return { ...state, primeroCasesToUpsert };
 });
 
@@ -366,16 +368,12 @@ each(
     delete primeroCase.upsertByCaseId;
     delete primeroCase.isDecision;
 
-    try {
-      const upsertState = upsertCase({
-        externalIds: upsertByCaseId ? ['case_id'] : ['oscar_number'],
-        data: primeroCase,
-      })(state);
-      return upsertState;
-    } catch (e) {
-      console.log(e.toString());
-      return state;
-    }
+    const upsertState = upsertCase({
+      externalIds: upsertByCaseId ? ['case_id'] : ['oscar_number'],
+      data: primeroCase,
+    })(state);
+
+    return upsertState;
   })
 );
 
