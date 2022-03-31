@@ -302,7 +302,7 @@ fn(state => {
         c.location_current_village_code || c.address_current_village_code
       );
       let primeroRecord = {
-        remote: true,
+        // remote: true,
         oscar_number: c.global_id,
         case_id: c.external_id,
         case_id_display: c.external_id_display,
@@ -312,14 +312,14 @@ fn(state => {
         name_last: c.family_name,
         sex: setGender(c.gender),
         age: calculateAge(c.age),
-        date_of_birth: convertToPrimeroDate(c.date_of_birth),
+        // date_of_birth: convertToPrimeroDate(c.date_of_birth), TODO: Check Primero complaint
         address_current: c.address_current_village_code,
         location_current: c.location_current_village_code,
         oscar_status: c.status,
-        service_implementing_agency: c.organization_name,
+        // service_implementing_agency: c.organization_name, TODO: Check Primero complaint
         owned_by: provinceMap[currentLocation],
         oscar_reason_for_exiting: c.reason_for_exiting,
-        referral_status: referralsStatusMap[c.status], // @Aicha is this referral.status or referral_status
+        // referral_status: referralsStatusMap[c.status], // @Aicha is this referral.status or referral_status, TODO: Check Primero complaint
         consent_for_services: true,
         disclosure_other_orgs: true,
         module_id: 'primeromodule-cp',
@@ -335,7 +335,7 @@ fn(state => {
           oscar_case_worker_name: s.case_worker_name,
           oscar_referring_organization: `agency-${s.organization_name}`,
           oscar_case_worker_telephone: s.case_worker_mobile,
-          referral_status_ed6f91f: servicesStatusMap[c.status],
+          referral_status_ed6f91f: servicesStatusMap[c.status], //TODO: Check Primero complaint
         })),
         //non-primero properties
         upsertByCaseId,
@@ -366,15 +366,16 @@ each(
     delete primeroCase.upsertByCaseId;
     delete primeroCase.isDecision;
 
-    await upsertCase(
-      {
+    try {
+      const upsertState = upsertCase({
         externalIds: upsertByCaseId ? ['case_id'] : ['oscar_number'],
         data: primeroCase,
-      },
-      fn(state => {
-        return state;
-      })
-    )(state);
+      })(state);
+      return upsertState;
+    } catch (e) {
+      console.log(e.toString());
+      return state;
+    }
   })
 );
 
