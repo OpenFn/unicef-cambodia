@@ -29,24 +29,22 @@ getCases(
 // GET new Primero cases with oscar_number
 // User Story 2: View all Oscar cases in Primero
 // #2 - Request all oscar cases ================================================
-fn(state => {
-  return getCases(
-    {
-      remote: true,
-      last_updated_at: `${state.cursor}..`,
-      oscar_number: 'range||*.*', //testing
-    },
-    state => {
-      console.log(`Other cases: ${JSON.stringify(state.data.map(x => x.case_id_display))}`);
+getCases(
+  {
+    remote: true,
+    last_updated_at: state => `${state.cursor}..`,
+    oscar_number: 'range||*.*', //testing
+  },
+  state => {
+    console.log(`Other cases: ${JSON.stringify(state.data.map(x => x.case_id_display))}`);
 
-      // #3 - Combine cases =====
-      state.data = state.data.concat(state.oscarRefs);
-      delete state.oscarRefs;
+    // #3 - Combine cases =====
+    state.data = state.data.concat(state.oscarRefs);
+    delete state.oscarRefs;
 
-      return state;
-    }
-  )(state);
-});
+    return state;
+  }
+);
 
 // After job completes successfully, update cursor
 fn(state => {
