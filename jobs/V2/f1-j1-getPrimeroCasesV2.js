@@ -32,23 +32,19 @@ fn(state => {
 // GET Primero cases with oscar referrals
 // User Story 1: Generating government referrals
 // #1 - Request oscar referrals only ===========================================
-fn(state => {
-  return getCases(
-    {
-      remote: true,
-      last_updated_at: `${state.cursor}..`,
-      service_response_types: 'list||referral_to_oscar', //testing
-    },
-    state => {
-      console.log(
-        `Oscar referral cases: ${JSON.stringify(state.data.map(x => x.case_id_display))}`
-      );
+getCases(
+  {
+    remote: true,
+    last_updated_at: state => `${state.cursor}..`,
+    service_response_types: 'list||referral_to_oscar', //testing
+  },
+  state => {
+    console.log(`Oscar referral cases: ${JSON.stringify(state.data.map(x => x.case_id_display))}`);
 
-      state.oscarRefs = state.data;
-      return { ...state, data: {}, references: [] };
-    }
-  )(state);
-});
+    state.oscarRefs = state.data;
+    return { ...state, data: {}, references: [] };
+  }
+);
 
 // GET new Primero cases with oscar_number
 // User Story 2: View all Oscar cases in Primero
