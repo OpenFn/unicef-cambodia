@@ -281,6 +281,7 @@ fn(state => {
   };
 });
 
+//
 //distinguish cases
 fn(state => {
   const { originalCases, enums } = state;
@@ -334,6 +335,7 @@ fn(state => {
     setGender,
     setLocationCode,
   } = state;
+  //TODO: @Taylor - see data flow diagram, here we should only be upserting cases withOUT decisions
   const primeroCasesToUpsert = distinguishedCases
     .map(c => {
       const { isDecision, upsertByCaseId } = c;
@@ -341,7 +343,7 @@ fn(state => {
         c.location_current_village_code || c.address_current_village_code
       );
       const locationCode = c.location_current_village_code
-        ? parseInt(c.location_current_village_code, 10).toString()
+        ? parseInt(currentLocation, 10).toString()
         : null;
       const isUpdate = c.external_id;
       let primeroRecord = {
