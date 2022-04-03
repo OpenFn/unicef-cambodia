@@ -5,6 +5,7 @@ fn(state => {
   state.serviceRecordIds = {};
   // ===========================================================================
 
+  // AK TODO: Discuss with @Aicha, I think format should be YYYY-MM-DD
   const convertToPrimeroDate = dateString => {
     if (!dateString) return null;
     const dateArray = dateString.split('-');
@@ -31,6 +32,39 @@ fn(state => {
     if (!location) return;
     return parseInt(location).toString();
   };
+
+  function createName(given, local) {
+    if (local && given) {
+      return `${local} (${given})`; //Format: khmer name (engligh name)
+    }
+    if (given && !local) {
+      return given;
+    }
+    if (!given && local) {
+      return local;
+    } else {
+      return null;
+    }
+  }
+
+  function setUser(c) {
+    if (c.is_referred) {
+      return setProvinceUser(c);
+    }
+    return setAgencyUser(c);
+  }
+
+  function determineStatus(service, caseId) {
+    if (
+      state.serviceRecordIds[caseId] && // IF... there is a serviceRecordId for this case
+      c.resource === 'primero' && // and the Oscar case source is 'primero'
+      service.enrollment_date === null // and the Oscar service enrollment date is null
+    ) {
+      return servicesStatusMap[c.status]; // THEN... return the mapped referral status
+    } else {
+      return undefined; // ELSE ... return undefined (this isn't a decision.)
+    }
+  }
 
   const provinceMap = {
     12: 'mgrpnh',
@@ -216,6 +250,7 @@ fn(state => {
     Accepted: 'accepted_850187',
     Active: 'accepted_850187',
     Rejected: 'rejected_74769',
+    Exited: 'rejected_74769',
   };
 
   const referralsStatusMap = {
@@ -240,6 +275,9 @@ fn(state => {
     calculateAge,
     setGender,
     setLocationCode,
+    createName,
+    setUser,
+    determineStatus,
   };
 });
 
@@ -290,6 +328,7 @@ fn(state => {
     servicesStatusMap,
     referralsStatusMap,
     provinceMap,
+    serviceMap,
     convertToPrimeroDate,
     calculateAge,
     setGender,
@@ -301,41 +340,55 @@ fn(state => {
       const currentLocation = setLocationCode(
         c.location_current_village_code || c.address_current_village_code
       );
+      const locationCode = c.location_current_village_code
+        ? parseInt(c.location_current_village_code, 10).toString()
+        : null;
+      const isUpdate = c.external_id;
       let primeroRecord = {
-        // remote: true,
         oscar_number: c.global_id,
         case_id: c.external_id,
         case_id_display: c.external_id_display,
         oscar_short_id: c.slug,
         mosvy_number: c.mosvy_number,
-        name_first: c.given_name,
-        name_last: c.family_name,
-        sex: setGender(c.gender),
-        age: calculateAge(c.age),
-        // date_of_birth: convertToPrimeroDate(c.date_of_birth), TODO: Check Primero complaint
-        address_current: c.address_current_village_code,
-        location_current: c.location_current_village_code,
-        oscar_status: c.status,
-        // service_implementing_agency: c.organization_name, TODO: Check Primero complaint
-        owned_by: provinceMap[currentLocation],
+        name_first: isUpdate ? null : createName(c.given_name, c.local_given_name),
+        name_last: isUpdate ? null : createName(c.family_name, c.local_family_name),
+        sex: isUpdate ? null : setGender(c.gender),
+        age: isUpdate ? null : calculateAge(c.age),
+        date_of_birth: isUpdate ? null : c.date_of_birth,
+        // date_of_birth: convertToPrimeroDate(c.date_of_birth), TODO: @Aicha confirm formatting incorrect?
+        address_current: isUpdate ? null : c.address_current_village_code,
+        location_current: isUpdate ? null : locationCode,
+        oscar_status: isUpdate ? null : c.status,
+        protection_status: !isUpdate && c.is_referred == true ? 'oscar_referral' : null,
+        owned_by: isUpdate && c.is_referred !== true ? null : setUser(c), //TODO: @Aicha to update user mapping with Mohan's list
         oscar_reason_for_exiting: c.reason_for_exiting,
-        // referral_status: referralsStatusMap[c.status], //TODO: Check Primero complaint
-        consent_for_services: true,
-        disclosure_other_orgs: true,
+        consent_for_services: isUpdate || c.is_referred !== true ? null : true,
+        disclosure_other_orgs: isUpdate || c.is_referred !== true ? null : true,
+        interview_subject: isUpdate || c.is_referred !== true ? null : 'other',
         module_id: 'primeromodule-cp',
-        risk_level: 'medium',
+        risk_level: c.is_referred === true ? c.level_of_risk : null,
+        referral_notes_oscar: c.reason_for_referral,
         services_section: c.services.map(s => ({
           unique_id: s.uuid,
           service_referral_notes: s.reason_for_referral,
-          service_subtype: s.name,
-          service_type_text: s.name,
-          service_type_details_text: s.name,
-          service_response_day_time: s.enrollment_date,
-          service_response_type: 'referral_from_oscar',
-          oscar_case_worker_name: s.case_worker_name,
-          oscar_referring_organization: `agency-${s.organization_name}`,
-          oscar_case_worker_telephone: s.case_worker_mobile,
-          // referral_status_ed6f91f: servicesStatusMap[c.status], //TODO: Check Primero complaint
+          service_subtype: (serviceMap[s.name] && serviceMap[s.name].subtype) || 'Other',
+          service_type: (serviceMap[s.name] && serviceMap[s.name].type) || 'Other',
+          service_type_text: (serviceMap[s.name] && serviceMap[s.name].type) || 'Other',
+          service_type_details_text: serviceMap[s.name] ? 'n/a' : s.name,
+          service_response_day_time: s.enrollment_date
+            ? `${s.enrollment_date}T00:00:00.000Z`
+            : undefined,
+          service_response_type: s.enrollment_date
+            ? 'service_being_provided_by_oscar_partner_47618'
+            : s.enrollment_date === null && c.resource === 'primero'
+            ? 'referral_to_oscar'
+            : 'referral_from_oscar',
+          oscar_case_worker_name: c.case_worker_name,
+          oscar_case_worker_telephone: c.case_worker_mobile,
+          oscar_referring_organization: `agency-${c.organization_name}`,
+          service_implementing_agency: `agency-${c.organization_name}`, //TODO: @Aicha should these be the same?
+          referral_status_ed6f91f: determineStatus(s, c.external_id),
+          isReferral: s.enrollment_date ? true : false,
         })),
         //non-primero properties
         upsertByCaseId,
