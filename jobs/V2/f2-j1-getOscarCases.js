@@ -16,7 +16,9 @@ alterState(state => {
   console.log(`lastQueryDate (from the previous run): ${lastQueryDate}`);
 
   const now = new Date().toISOString().replace('T', ' ').slice(0, 10);
+  
   state.thisQueryDate = `${now} 00:00:00`;
+
   console.log(
     `Current datetime, rounded to 00:00:00, to be used to update lastQueryDate after this query: ${thisQueryDate}`
   );
@@ -51,7 +53,7 @@ post(
       }),
       query: {
         // NOTE: since_date must be rounded to 00:00:00 to work with Oscar API.
-        since_date: state.lastQueryDate || '2022-03-16 00:00:00',
+        since_date: state.lastQueryDate || '2022-04-05 00:00:00',
         //referred_external: true, //old query parameter - to remove to pull ALL cases, not just referrals
       },
     },
