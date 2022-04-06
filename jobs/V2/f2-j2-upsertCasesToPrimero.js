@@ -81,18 +81,6 @@ fn(state => {
     }
   }
 
-  function determineStatus(service, caseId) {
-    if (
-      state.serviceRecordIds[caseId] && // IF... there is a serviceRecordId for this case
-      c.resource === 'primero' && // and the Oscar case source is 'primero'
-      service.enrollment_date === null // and the Oscar service enrollment date is null
-    ) {
-      return servicesStatusMap[c.status]; // THEN... return the mapped referral status
-    } else {
-      return undefined; // ELSE ... return undefined (this isn't a decision.)
-    }
-  }
-
   function setServiceResponseType(c, s) {
     if (s.enrollment_date) return 'service_being_provided_by_oscar_partner_47618';
 
@@ -397,7 +385,6 @@ fn(state => {
         oscar_referring_organization: `agency-${c.organization_name}`,
         oscar_case_worker_telephone: c.case_worker_mobile,
         service_implementing_agency: `agency-${c.organization_name}`, //TODO: @Aicha should these be the same?
-        referral_status_ed6f91f: determineStatus(s, c.external_id),
       })),
     };
   }
@@ -413,7 +400,6 @@ fn(state => {
     createName,
     setUser,
     serviceMap,
-    determineStatus,
     setServiceResponseType,
     buildCaseRecord,
   };
@@ -434,7 +420,7 @@ fn(state => {
   return { ...state, cases, decisions };
 });
 
-// // build cases for primero
+// build cases for primero
 fn(state => {
   const { cases, buildCaseRecord } = state;
 
@@ -450,7 +436,7 @@ fn(state => {
   return { ...state, cases: finalized };
 });
 
-// // log cases before sending to primero
+// log cases before sending to primero
 fn(state => {
   console.log('Prepared cases:', JSON.stringify(state.cases, null, 2));
   return state;
@@ -467,14 +453,17 @@ each(
 
 // build decisions for primero, add array for referrals to update
 fn(state => {
-  const { decisions, buildCaseRecord } = state;
+  const { decisions, buildCaseRecord, servicesStatusMap } = state;
 
   const finalized = decisions
     .map(buildCaseRecord)
+    // add status to each service in the service section
     .map(d => ({
       ...d,
-      extraField1: true, // TODO: @Aicha to add back field 1
-      extraField2: false, // TODO: @Aicha to add back field 2
+      services_section: d.services_section.map(s => ({
+        ...s,
+        referral_status_edf41f2: servicesStatusMap[d.__original_oscar_record.status],
+      })),
     }))
     .map(d => {
       delete d.__original_oscar_record;
