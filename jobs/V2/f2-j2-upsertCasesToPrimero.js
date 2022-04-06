@@ -358,6 +358,7 @@ fn(state => {
     const isUpdate = c.external_id;
 
     return {
+      __original_oscar_record: c,
       oscar_number: c.global_id,
       case_id: c.external_id,
       case_id_display: c.external_id_display,
@@ -433,19 +434,23 @@ fn(state => {
   return { ...state, cases, decisions };
 });
 
-// build cases for primero
+// // build cases for primero
 fn(state => {
   const { cases, buildCaseRecord } = state;
 
   const finalized = cases
     .map(buildCaseRecord)
+    .map(c => {
+      delete c.__original_oscar_record;
+      return c;
+    })
     // TODO: @Aicha to confirm: if "owned_by" is FALSY, then don't send this record to Primero.
     .filter(c => c.owned_by);
 
   return { ...state, cases: finalized };
 });
 
-// log cases before sending to primero
+// // log cases before sending to primero
 fn(state => {
   console.log('Prepared cases:', JSON.stringify(state.cases, null, 2));
   return state;
@@ -460,7 +465,7 @@ each(
   })
 );
 
-// build decisions for primero
+// build decisions for primero, add array for referrals to update
 fn(state => {
   const { decisions, buildCaseRecord } = state;
 
@@ -472,11 +477,11 @@ fn(state => {
       extraField2: false, // TODO: @Aicha to add back field 2
     }))
     .map(d => {
-      // if (!d.external_id) throw new Error(`Aborting: No external_id for case ${d.case_id_display}`);
+      delete d.__original_oscar_record;
       return d;
     });
 
-  return { ...state, decisions: finalized };
+  return { ...state, decisions: finalized, referrals: [] };
 });
 
 // log decisions before sending to primero
@@ -493,41 +498,60 @@ each(
       externalId: 'case_id',
       id: state => state.data.case_id,
     },
-    resp => {
-      const referrals = resp.data;
-      console.log('referrals:', referrals);
+    nextState => {
+      const decision = nextState.references[nextState.references.length - 1];
+      console.log('decision', decision);
 
-      const theOnlyOscarSerivceWeCareAbout = state.data.services_section[0];
+      const referrals = nextState.data;
+      console.log('referrals', referrals);
 
+      // TODO: @Aicha, is it only ever the FIRST service? How do we match?
       const matchingReferral = referrals.find(
-        // TODO: @Aicha, is it only ever the FIRST service? How do we match?
-        r => r.service_record_id == theOnlyOscarSerivceWeCareAbout.unique_id
+        r => r.service_record_id == decision.services_section[0].unique_id
       );
 
       console.log('match:', matchingReferral);
 
-      return updateReferral({
-        externalId: 'case_id',
-        id: state.data.case_id,
-        referral_id: matchingReferral.id,
-        data: {
-          // TODO: How do we map these?
-          // status: "TODO",
-          // id: '4c58d02f-3182-4006-b2fe-96aa797f5ee7',
-          // type: 'Referral',
-          // record_id: '406b539a-e662-425e-810b-47e4fa7da496',
-          // record_type: 'case',
-        },
-      })(resp);
+      if (matchingReferral)
+        nextState.referrals.push({
+          ...matchingReferral,
+          status: 'SOMETHING', // Todo: @Aicha, how do we set the status?
+          case_id: decision.case_id,
+        });
+
+      return nextState;
     }
   )
+);
+
+// log matching referrals
+fn(state => {
+  console.log('Referrals to update:', state.referrals);
+  return state;
+});
+
+// for each referral, we update it
+each(
+  '$.referrals[*]',
+  updateReferral({
+    externalId: 'case_id',
+    id: dataValue('case_id'),
+    referral_id: dataValue('id'),
+    data: {
+      status: dataValue('status'),
+      id: dataValue('id'),
+      type: 'Referral',
+      record_id: dataValue('record_id'),
+      record_type: dataValue('case'),
+    },
+  })
 );
 
 // for EACH decision, we update the primero case record
 each(
   '$.decisions[*]',
   upsertCase({
-    externalIds: 'case_id',
+    externalIds: ['case_id'],
     data: state => state.data,
   })
 );
