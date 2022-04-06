@@ -464,11 +464,17 @@ each(
 fn(state => {
   const { decisions, buildCaseRecord } = state;
 
-  const finalized = decisions.map(buildCaseRecord).map(c => ({
-    ...c,
-    extraField1: true, // TODO: @Aicha to add back field 1
-    extraField2: false, // TODO: @Aicha to add back field 2
-  }));
+  const finalized = decisions
+    .map(buildCaseRecord)
+    .map(d => ({
+      ...d,
+      extraField1: true, // TODO: @Aicha to add back field 1
+      extraField2: false, // TODO: @Aicha to add back field 2
+    }))
+    .map(d => {
+      // if (!d.external_id) throw new Error(`Aborting: No external_id for case ${d.case_id_display}`);
+      return d;
+    });
 
   return { ...state, decisions: finalized };
 });
@@ -484,29 +490,36 @@ each(
   '$.decisions[*]',
   getReferrals(
     {
-      externalId: 'record_id',
-      id: state => state.data.external_id,
+      externalId: 'case_id',
+      id: state => state.data.case_id,
     },
     resp => {
       const referrals = resp.data;
+      console.log('referrals:', referrals);
 
-      const theOneWeCareAbout = resp.data.find('SOMEHOW');
+      const matchingReferral = referrals.find(
+        // TODO: @Aicha, is it only ever the FIRST service? How do we match?
+        r => r.service_record_id == state.data.services_section[0].unique_id
+      );
 
-      return updateReferral({
-        externalId: 'record_id',
-        id: state.data.externalId,
-        referral_id: '37612f65-3bda-48eb-b526-d31383f94166',
-        data: theOneWeCareAbout,
-      })(resp);
+      console.log('match:', matchingReferral);
+
+      return resp;
+      // return updateReferral({
+      //   externalId: 'case_id',
+      //   id: state.data.case_id,
+      //   referral_id: '37612f65-3bda-48eb-b526-d31383f94166',
+      //   data: matchingReferral,
+      // })(resp);
     }
   )
 );
 
 // for EACH decision, we update the primero case record
-each(
-  '$.decisions[*]',
-  upsertCase({
-    externalIds: 'case_id',
-    data: state => state.data,
-  })
-);
+// each(
+//   '$.decisions[*]',
+//   upsertCase({
+//     externalIds: 'case_id',
+//     data: state => state.data,
+//   })
+// );
