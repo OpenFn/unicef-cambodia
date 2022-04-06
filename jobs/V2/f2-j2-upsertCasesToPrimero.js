@@ -497,29 +497,37 @@ each(
       const referrals = resp.data;
       console.log('referrals:', referrals);
 
+      const theOnlyOscarSerivceWeCareAbout = state.data.services_section[0];
+
       const matchingReferral = referrals.find(
         // TODO: @Aicha, is it only ever the FIRST service? How do we match?
-        r => r.service_record_id == state.data.services_section[0].unique_id
+        r => r.service_record_id == theOnlyOscarSerivceWeCareAbout.unique_id
       );
 
       console.log('match:', matchingReferral);
 
-      return resp;
-      // return updateReferral({
-      //   externalId: 'case_id',
-      //   id: state.data.case_id,
-      //   referral_id: '37612f65-3bda-48eb-b526-d31383f94166',
-      //   data: matchingReferral,
-      // })(resp);
+      return updateReferral({
+        externalId: 'case_id',
+        id: state.data.case_id,
+        referral_id: matchingReferral.id,
+        data: {
+          // TODO: How do we map these?
+          // status: "TODO",
+          // id: '4c58d02f-3182-4006-b2fe-96aa797f5ee7',
+          // type: 'Referral',
+          // record_id: '406b539a-e662-425e-810b-47e4fa7da496',
+          // record_type: 'case',
+        },
+      })(resp);
     }
   )
 );
 
 // for EACH decision, we update the primero case record
-// each(
-//   '$.decisions[*]',
-//   upsertCase({
-//     externalIds: 'case_id',
-//     data: state => state.data,
-//   })
-// );
+each(
+  '$.decisions[*]',
+  upsertCase({
+    externalIds: 'case_id',
+    data: state => state.data,
+  })
+);
