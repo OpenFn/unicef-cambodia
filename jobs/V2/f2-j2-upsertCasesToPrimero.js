@@ -1,4 +1,4 @@
-// create dataClips and functions for later use
+// we create dataClips and functions for later use
 fn(state => {
   // Saving original cases, creating Case:Service ID map =======================
   state.originalCases = state.data.data;
@@ -405,7 +405,7 @@ fn(state => {
   };
 });
 
-// separate cases from decisions
+// we separate cases from decisions
 fn(state => {
   const { originalCases } = state;
 
@@ -420,7 +420,7 @@ fn(state => {
   return { ...state, cases, decisions };
 });
 
-// build cases for primero
+// we build cases for primero
 fn(state => {
   const { cases, buildCaseRecord } = state;
 
@@ -436,13 +436,13 @@ fn(state => {
   return { ...state, cases: finalized };
 });
 
-// log cases before sending to primero
+// we log cases before sending to primero
 fn(state => {
   console.log('Prepared cases:', JSON.stringify(state.cases, null, 2));
   return state;
 });
 
-// upsert Primero cases based on matching 'oscar_number' OR 'case_id'
+// we upsert Primero cases based on matching 'oscar_number' OR 'case_id'
 each(
   '$.cases[*]',
   upsertCase({
@@ -451,7 +451,7 @@ each(
   })
 );
 
-// build decisions for primero, add array for referrals to update
+// we build decisions for primero, add array for referrals to update
 fn(state => {
   const { decisions, buildCaseRecord, servicesStatusMap } = state;
 
@@ -469,7 +469,7 @@ fn(state => {
   return { ...state, decisions: finalized, referrals: [] };
 });
 
-// log decisions before sending to primero
+// we log decisions before sending to primero
 fn(state => {
   console.log('Prepared decisions:', JSON.stringify(state.decisions, null, 2));
   return state;
@@ -515,7 +515,7 @@ fn(state => {
   return state;
 });
 
-// for each referral, we update it
+// for each referral, we update its service status
 each(
   '$.referrals[*]',
   updateReferral({
@@ -532,7 +532,7 @@ each(
   })
 );
 
-// for EACH decision, we update the primero case record
+// for EACH decision, we upsert the primero case record
 each(
   '$.decisions[*]',
   upsertCase({
