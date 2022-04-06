@@ -48,9 +48,8 @@ fn(state => {
   }
 
   function setUser(c) {
-    if (c.is_referred) {
-      return setProvinceUser(c);
-    }
+    if (c.is_referred) return setProvinceUser(c);
+
     return setAgencyUser(c);
   }
 
@@ -347,6 +346,61 @@ fn(state => {
     Exited: 'rejected',
   };
 
+  function buildCaseRecord(c) {
+    const currentLocation = setLocationCode(
+      c.location_current_village_code || c.address_current_village_code
+    );
+
+    const locationCode = c.location_current_village_code
+      ? parseInt(currentLocation, 10).toString()
+      : null;
+
+    const isUpdate = c.external_id;
+
+    return {
+      oscar_number: c.global_id,
+      case_id: c.external_id,
+      case_id_display: c.external_id_display,
+      oscar_short_id: c.slug,
+      mosvy_number: c.mosvy_number,
+      name_first: isUpdate ? null : createName(c.given_name, c.local_given_name),
+      name_last: isUpdate ? null : createName(c.family_name, c.local_family_name),
+      sex: isUpdate ? null : setGender(c.gender),
+      age: isUpdate ? null : calculateAge(c.age),
+      date_of_birth: isUpdate ? null : c.date_of_birth,
+      // date_of_birth: convertToPrimeroDate(c.date_of_birth), // TODO: @Aicha confirm formatting incorrect?
+      address_current: isUpdate ? null : c.address_current_village_code,
+      location_current: isUpdate ? null : locationCode,
+      oscar_status: isUpdate ? null : c.status,
+      protection_status: !isUpdate && c.is_referred == true ? 'oscar_referral' : null,
+      owned_by: isUpdate ? null : setUser(c), // TODO: @Aicha to update user mapping with Mohan's list
+      oscar_reason_for_exiting: c.reason_for_exiting,
+      consent_for_services: true,
+      disclosure_other_orgs: true,
+      interview_subject: isUpdate || c.is_referred !== true ? null : 'other',
+      module_id: 'primeromodule-cp',
+      risk_level: c.is_referred === true ? c.level_of_risk : null,
+      referral_notes_oscar: c.reason_for_referral,
+      services_section: c.services.map(s => ({
+        unique_id: s.uuid,
+        service_referral_notes: s.reason_for_referral,
+        service_type: (serviceMap[s.name] && serviceMap[s.name].type) || 'Other',
+        service_subtype: [(serviceMap[s.name] && serviceMap[s.name].subtype) || 'Other'],
+        service_type_text: (serviceMap[s.name] && serviceMap[s.name].type) || 'Other',
+        service_type_details_text: serviceMap[s.name] ? 'n/a' : s.name,
+        service_response_day_time: s.enrollment_date
+          ? `${s.enrollment_date}T00:00:00.000Z`
+          : undefined,
+        service_response_type: setServiceResponseType(c, s),
+        oscar_case_worker_name: c.case_worker_name,
+        oscar_referring_organization: `agency-${c.organization_name}`,
+        oscar_case_worker_telephone: c.case_worker_mobile,
+        service_implementing_agency: `agency-${c.organization_name}`, //TODO: @Aicha should these be the same?
+        referral_status_ed6f91f: determineStatus(s, c.external_id),
+      })),
+    };
+  }
+
   return {
     ...state,
     servicesStatusMap,
@@ -360,6 +414,7 @@ fn(state => {
     serviceMap,
     determineStatus,
     setServiceResponseType,
+    buildCaseRecord,
   };
 });
 
@@ -378,160 +433,76 @@ fn(state => {
   return { ...state, cases, decisions };
 });
 
-// set primero mapping
+// set primero case mapping
 fn(state => {
-  const {
-    calculateAge,
-    cases,
-    createName,
-    serviceMap,
-    setGender,
-    setLocationCode,
-    determineStatus,
-    setUser,
-    setServiceResponseType,
-  } = state;
+  const { cases, buildCaseRecord } = state;
 
-  const primeroCasesToUpsert = cases
-    .map(c => {
-      const currentLocation = setLocationCode(
-        c.location_current_village_code || c.address_current_village_code
-      );
+  const finalized = cases
+    .map(buildCaseRecord)
+    // TODO: @Aicha to confirm: if "owned_by" is FALSY, then don't send this record to Primero.
+    .filter(c => c.owned_by);
 
-      const locationCode = c.location_current_village_code
-        ? parseInt(currentLocation, 10).toString()
-        : null;
-
-      const isUpdate = c.external_id;
-
-      const primeroRecord = {
-        oscar_number: c.global_id,
-        case_id: c.external_id,
-        case_id_display: c.external_id_display,
-        oscar_short_id: c.slug,
-        mosvy_number: c.mosvy_number,
-        name_first: isUpdate ? null : createName(c.given_name, c.local_given_name),
-        name_last: isUpdate ? null : createName(c.family_name, c.local_family_name),
-        sex: isUpdate ? null : setGender(c.gender),
-        age: isUpdate ? null : calculateAge(c.age),
-        date_of_birth: isUpdate ? null : c.date_of_birth,
-        // date_of_birth: convertToPrimeroDate(c.date_of_birth), // TODO: @Aicha confirm formatting incorrect?
-        address_current: isUpdate ? null : c.address_current_village_code,
-        location_current: isUpdate ? null : locationCode,
-        oscar_status: isUpdate ? null : c.status,
-        protection_status: !isUpdate && c.is_referred == true ? 'oscar_referral' : null,
-        owned_by: isUpdate && c.is_referred !== true ? null : setUser(c), // TODO: @Aicha to update user mapping with Mohan's list
-        oscar_reason_for_exiting: c.reason_for_exiting,
-        consent_for_services: isUpdate || c.is_referred !== true ? null : true,
-        disclosure_other_orgs: isUpdate || c.is_referred !== true ? null : true,
-        interview_subject: isUpdate || c.is_referred !== true ? null : 'other',
-        module_id: 'primeromodule-cp',
-        risk_level: c.is_referred === true ? c.level_of_risk : null,
-        referral_notes_oscar: c.reason_for_referral,
-        services_section: c.services.map(s => ({
-          unique_id: s.uuid,
-          service_referral_notes: s.reason_for_referral,
-          service_subtype: (serviceMap[s.name] && serviceMap[s.name].subtype) || 'Other',
-          service_type: (serviceMap[s.name] && serviceMap[s.name].type) || 'Other',
-          service_type_text: (serviceMap[s.name] && serviceMap[s.name].type) || 'Other',
-          service_type_details_text: serviceMap[s.name] ? 'n/a' : s.name,
-          service_response_day_time: s.enrollment_date
-            ? `${s.enrollment_date}T00:00:00.000Z`
-            : undefined,
-          service_response_type: setServiceResponseType(c, s),
-          oscar_case_worker_name: c.case_worker_name,
-          oscar_case_worker_telephone: c.case_worker_mobile,
-          oscar_referring_organization: `agency-${c.organization_name}`,
-          service_implementing_agency: `agency-${c.organization_name}`, //TODO: @Aicha should these be the same?
-          referral_status_ed6f91f: determineStatus(s, c.external_id),
-          isReferral: s.enrollment_date ? true : false,
-        })),
-      };
-
-      if (!primeroRecord.owned_by) {
-        // TODO: Ask @Aicha to clarify if this is check should be done on 'owned_by' or 'location_current'
-        // primeroRecord = null;
-      }
-
-      return primeroRecord;
-    })
-    .filter(Boolean); // remove nulls
-
-  return { ...state, primeroCasesToUpsert };
+  return { ...state, cases: finalized };
 });
 
-// upsert cases by case_id or oscar_number
+// log cases before sending to primero
+fn(state => {
+  console.log(
+    'Prepared primero case data used in `upsertCase(...)`: ',
+    JSON.stringify(state.cases, null, 2)
+  );
+  return state;
+});
+
+// upsert Primero cases based on matching 'oscar_number' OR 'case_id'
 each(
-  '$.primeroCasesToUpsert[*]',
-  upsertCase(
+  '$.cases[*]',
+  upsertCase({
+    externalIds: state => (!!state.data.external_id ? ['case_id'] : ['oscar_number']),
+    data: state => state.data,
+  })
+);
+
+fn(state => {
+  const { decisions, buildCaseRecord } = state;
+
+  const finalized = decisions.map(buildCaseRecord).map(c => ({
+    ...c,
+    extraField1: true, // TODO: @Aicha to add back field 1
+    extraField2: false, // TODO: @Aicha to add back field 2
+  }));
+
+  return { ...state, decisions: finalized };
+});
+
+// for EACH decision, we get its referrals and then we update a single referral
+each(
+  '$.decisions[*]',
+  getReferrals(
     {
-      externalIds: state => (!!state.data.external_id ? ['case_id'] : ['oscar_number']),
-      data: state => state.data,
+      externalId: 'record_id',
+      id: state => state.data.external_id,
+    },
+    resp => {
+      const referrals = resp.data;
+
+      const theOneWeCareAbout = resp.data.find('SOMEHOW');
+
+      return updateReferral({
+        externalId: 'record_id',
+        id: state.data.externalId,
+        referral_id: '37612f65-3bda-48eb-b526-d31383f94166',
+        data: theOneWeCareAbout,
+      })(resp);
     }
-    // TODO: @ Aicha, why do we get cases here?
-    // upsertCaseState => {
-    //   return getCases({ remote: true, case_id: primeroCase.case_id }, getCaseState => {
-    //     console.log('Getting casess');
-    //   })(upsertCaseState);
-    // }
   )
 );
 
-// // upsert cases
-// each(
-//   '$.cases[*]',
-//   upsertCase({
-//     // Upsert Primero cases based on matching 'oscar_number' OR 'case_id'
-//     externalIds: state => (state.data.case_id ? ['case_id'] : ['oscar_number']),
-//     // externalIds: ['oscar_number', 'case_id'],
-//     data: state => {
-//       const c = state.data;
-//       // NOTE: This is extremely VERBOSE but more secure, given that we don't
-//       // know exactly what will be provided by the API.
-//       // console.log(
-//       //   'Data provided to Primero for upload `upsertCase`: ',
-//       //   JSON.stringify(
-//       //     {
-//       //       remote: c.remote,
-//       //       oscar_number: c.oscar_number,
-//       //       case_id: c.case_id,
-//       //       unique_identifier: c.unique_identifier,
-//       //       // FIELDS PREVIOUSLY IN CHILD{}
-//       //       case_id: c.case_id,
-//       //       oscar_number: c.oscar_number,
-//       //       oscar_short_id: c.oscar_short_id,
-//       //       mosvy_number: c.mosvy_number,
-//       //       name_first: c.name_first,
-//       //       name_last: c.name_last,
-//       //       sex: c.sex,
-//       //       date_of_birth: c.date_of_birth,
-//       //       age: c.age,
-//       //       location_current: c.location_current,
-//       //       //address_current: c.address_current,
-//       //       oscar_status: c.oscar_status,
-//       //       protection_status: c.protection_status,
-//       //       service_implementing_agency: c.service_implementing_agency,
-//       //       owned_by: c.owned_by,
-//       //       owned_by_text: c.owned_by_text,
-//       //       oscar_reason_for_exiting: c.oscar_reason_for_exiting,
-//       //       has_referral: c.has_referral,
-//       //       risk_level: c.risk_level,
-//       //       consent_for_services: c.consent_for_services,
-//       //       disclosure_other_orgs: c.consent_for_services,
-//       //       interview_subject: c.interview_subject,
-//       //       content_source_other: c.content_source_other,
-//       //       module_id: c.module_id,
-//       //       registration_date: c.registration_date,
-//       //       referral_notes_oscar: c.referral_notes_oscar,
-//       //       services_section: c.services_section,
-//       //       //END FIELDS PREVIOUSLY IN CHILD{}
-//       //     },
-//       //     null,
-//       //     2
-//       //   )
-//       // );
-//       console.log('Data provided to Primero for upload `upsertCase`: ', JSON.stringify(c, null, 4));
-//       return state.data;
-//     },
-//   })
-// );
+// for EACH decision, we update the primero case record
+each(
+  '$.decisions[*]',
+  upsertCase({
+    externalIds: 'case_id',
+    data: state => state.data,
+  })
+);
