@@ -433,7 +433,7 @@ fn(state => {
   return { ...state, cases, decisions };
 });
 
-// set primero case mapping
+// build cases for primero
 fn(state => {
   const { cases, buildCaseRecord } = state;
 
@@ -447,10 +447,7 @@ fn(state => {
 
 // log cases before sending to primero
 fn(state => {
-  console.log(
-    'Prepared primero case data used in `upsertCase(...)`: ',
-    JSON.stringify(state.cases, null, 2)
-  );
+  console.log('Prepared cases:', JSON.stringify(state.cases, null, 2));
   return state;
 });
 
@@ -463,6 +460,7 @@ each(
   })
 );
 
+// build decisions for primero
 fn(state => {
   const { decisions, buildCaseRecord } = state;
 
@@ -473,6 +471,12 @@ fn(state => {
   }));
 
   return { ...state, decisions: finalized };
+});
+
+// log decisions before sending to primero
+fn(state => {
+  console.log('Prepared decisions:', JSON.stringify(state.decisions, null, 2));
+  return state;
 });
 
 // for EACH decision, we get its referrals and then we update a single referral
