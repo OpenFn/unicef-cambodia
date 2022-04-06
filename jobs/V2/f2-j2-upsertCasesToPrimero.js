@@ -464,11 +464,7 @@ fn(state => {
         ...s,
         referral_status_edf41f2: servicesStatusMap[d.__original_oscar_record.status],
       })),
-    }))
-    .map(d => {
-      delete d.__original_oscar_record;
-      return d;
-    });
+    }));
 
   return { ...state, decisions: finalized, referrals: [] };
 });
@@ -504,7 +500,7 @@ each(
       if (matchingReferral)
         nextState.referrals.push({
           ...matchingReferral,
-          status: 'SOMETHING', // Todo: @Aicha, how do we set the status?
+          status: nextState.referralStatusMap[decision.__original_oscar_record.status],
           case_id: decision.case_id,
         });
 
@@ -541,6 +537,9 @@ each(
   '$.decisions[*]',
   upsertCase({
     externalIds: ['case_id'],
-    data: state => state.data,
+    data: state => {
+      delete state.data.__original_oscar_record;
+      return state.data;
+    },
   })
 );
