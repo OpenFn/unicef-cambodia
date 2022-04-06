@@ -47,12 +47,40 @@ fn(state => {
     }
   }
 
-  // function setUser(c) {
-  //   if (c.is_referred) {
-  //     return setProvinceUser(c);
-  //   }
-  //   return setAgencyUser(c);
-  // }
+  function setUser(c) {
+    if (c.is_referred) {
+      return setProvinceUser(c);
+    }
+    return setAgencyUser(c);
+  }
+
+  function setProvinceUser(c) {
+    const { location_current_village_code, organization_address_code } = c;
+    const source = location_current_village_code || organization_address_code;
+
+    if (source) {
+      const subCode = source.slice(0, 2);
+      user = provinceUserMap[subCode];
+      if (user) {
+        return user;
+      } else {
+        throw 'Province user not found for this case. Check the case location and list of available province users.';
+      }
+    } else {
+      return null;
+    }
+  }
+
+  function setAgencyUser(c) {
+    if (c.organization_name) {
+      return agencyUserMap[`agency-${c.organization_name}`];
+    } else {
+      throw (
+        `No agency user found for the organization ${c.organization_name}. ` +
+        'Please create an agency user for this organization and update the job accordingly.'
+      );
+    }
+  }
 
   function determineStatus(service, caseId) {
     if (
@@ -66,32 +94,92 @@ fn(state => {
     }
   }
 
-  const provinceMap = {
+  function setServiceResponseType(c, s) {
+    if (s.enrollment_date) return 'service_being_provided_by_oscar_partner_47618';
+
+    if (s.enrollment_date === null && c.resource === 'primero') {
+      return 'referral_to_oscar';
+    }
+
+    return 'referral_from_oscar';
+  }
+
+  const provinceUserMap = {
     12: 'mgrpnh',
-    8: 'mgrkdl',
+    '08': 'mgrkdl',
     17: 'mgrsrp',
-    2: 'mgrbtb',
+    '02': 'mgrbtb',
     18: 'mgrshv',
     22: 'mgrstg',
     16: 'mgrrtk',
     11: 'mgrmdk',
     10: 'mgrkrt',
     25: 'mgrtkm',
-    3: 'mgrkcm',
+    '03': 'mgrkcm',
     22: 'mgromc',
     13: 'mgrpvh',
-    6: 'mgrktm',
-    1: 'mgrbmc',
+    '06': 'mgrktm',
+    '01': 'mgrbmc',
     24: 'mgrpln',
     15: 'mgrpst',
     23: 'mgrkep',
     21: 'mgrtakeo',
-    9: 'mgrkkg',
-    7: 'mgrkpt',
-    5: 'mgrksp',
+    '09': 'mgrkkg',
+    '07': 'mgrkpt',
+    '05': 'mgrksp',
     20: 'mgrsvg',
     14: 'mgrpvg',
-    4: 'mgrkch',
+    '04': 'mgrkch',
+  };
+
+  const agencyUserMap = {
+    'agency-agh': 'agency-agh-user',
+    'agency-ahc': 'agency-ahc-user',
+    'agency-ajl': 'agency-ajl-user',
+    'agency-auscam': 'agency-auscam-user',
+    'agency-brc': 'agency-brc-user',
+    'agency-cccu': 'agency-cccu-user',
+    'agency-cct': 'agency-cct-user',
+    'agency-cfi': 'agency-cfi-user',
+    'agency-cif': 'agency-cif-user',
+    'agency-css': 'agency-css-user',
+    'agency-cvcd': 'agency-cvcd-user',
+    'agency-cwd': 'agency-cwd-user',
+    'agency-demo': 'agency-demo-user',
+    'agency-fco': 'agency-fco-user',
+    'agency-fit': 'agency-fit-user',
+    'agency-fsc': 'agency-fsc-user',
+    'agency-fsi': 'agency-fsi-user',
+    'agency-fts': 'agency-fts-user',
+    'agency-gca': 'agency-gca-user',
+    'agency-gct': 'agency-gct-user',
+    'agency-hfj': 'agency-hfj-user',
+    'agency-hol': 'agency-hol-user',
+    'agency-holt': 'agency-holt-user',
+    'agency-icf': 'agency-icf-user',
+    'agency-isf': 'agency-isf-user',
+    'agency-kmo': 'agency-kmo-user',
+    'agency-kmr': 'agency-kmr-user',
+    'agency-lwb': 'agency-lwb-user',
+    'agency-mande': 'agency-mande-user',
+    'agency-mho': 'agency-mho-user',
+    'agency-mrs': 'agency-mrs-user',
+    'agency-msl': 'agency-msl-user',
+    'agency-mtp': 'agency-mtp-user',
+    'agency-my': 'agency-my-user',
+    'agency-myan': 'agency-myan-user',
+    'agency-newsmile': 'agency-newsmile-user',
+    'agency-pepy': 'agency-pepy-user',
+    'agency-rok': 'agency-rok-user',
+    'agency-scc': 'agency-scc-user',
+    'agency-shk': 'agency-shk-user',
+    'agency-spo': 'agency-spo-user',
+    'agency-ssc': 'agency-ssc-user',
+    'agency-tlc': 'agency-tlc-user',
+    'agency-tmw': 'agency-tmw-user',
+    'agency-tutorials': 'agency-tutorials-user',
+    'agency-voice': 'agency-voice-user',
+    'agency-wmo': 'agency-wmo-user',
   };
 
   const serviceMap = {
@@ -261,17 +349,17 @@ fn(state => {
 
   return {
     ...state,
-    serviceMap,
     servicesStatusMap,
     referralsStatusMap,
-    provinceMap,
     convertToPrimeroDate,
     calculateAge,
     setGender,
     setLocationCode,
     createName,
-    // setUser,
+    setUser,
+    serviceMap,
     determineStatus,
+    setServiceResponseType,
   };
 });
 
@@ -279,11 +367,7 @@ fn(state => {
 fn(state => {
   const { originalCases } = state;
 
-  const isDecision = c => {
-    const test = x => x.resource == 'primero' && x.status !== 'Referred';
-    // console.log(`${c.given_name}: resource "${c.resource}" + status "${c.status}" => ${test(c)}`);
-    return test(c);
-  };
+  const isDecision = x => x.resource == 'primero' && x.status !== 'Referred';
 
   const cases = originalCases.filter(c => !isDecision(c));
   const decisions = originalCases.filter(c => isDecision(c));
@@ -295,116 +379,103 @@ fn(state => {
 });
 
 // set primero mapping
-// fn(state => {
-//   const {
-//     distinguishedCases,
-//     servicesStatusMap,
-//     referralsStatusMap,
-//     provinceMap,
-//     serviceMap,
-//     convertToPrimeroDate,
-//     calculateAge,
-//     setGender,
-//     setLocationCode,
-//   } = state;
-//   //TODO: @Taylor - see data flow diagram, here we should only be upserting cases withOUT decisions
-//   const primeroCasesToUpsert = distinguishedCases
-//     .map(c => {
-//       const { isDecision, upsertByCaseId } = c;
-//       const currentLocation = setLocationCode(
-//         c.location_current_village_code || c.address_current_village_code
-//       );
-//       const locationCode = c.location_current_village_code
-//         ? parseInt(currentLocation, 10).toString()
-//         : null;
-//       const isUpdate = c.external_id;
-//       let primeroRecord = {
-//         oscar_number: c.global_id,
-//         case_id: c.external_id,
-//         case_id_display: c.external_id_display,
-//         oscar_short_id: c.slug,
-//         mosvy_number: c.mosvy_number,
-//         name_first: isUpdate ? null : createName(c.given_name, c.local_given_name),
-//         name_last: isUpdate ? null : createName(c.family_name, c.local_family_name),
-//         sex: isUpdate ? null : setGender(c.gender),
-//         age: isUpdate ? null : calculateAge(c.age),
-//         date_of_birth: isUpdate ? null : c.date_of_birth,
-//         // date_of_birth: convertToPrimeroDate(c.date_of_birth), TODO: @Aicha confirm formatting incorrect?
-//         address_current: isUpdate ? null : c.address_current_village_code,
-//         location_current: isUpdate ? null : locationCode,
-//         oscar_status: isUpdate ? null : c.status,
-//         protection_status: !isUpdate && c.is_referred == true ? 'oscar_referral' : null,
-//         owned_by: isUpdate && c.is_referred !== true ? null : setUser(c), //TODO: @Aicha to update user mapping with Mohan's list
-//         oscar_reason_for_exiting: c.reason_for_exiting,
-//         consent_for_services: isUpdate || c.is_referred !== true ? null : true,
-//         disclosure_other_orgs: isUpdate || c.is_referred !== true ? null : true,
-//         interview_subject: isUpdate || c.is_referred !== true ? null : 'other',
-//         module_id: 'primeromodule-cp',
-//         risk_level: c.is_referred === true ? c.level_of_risk : null,
-//         referral_notes_oscar: c.reason_for_referral,
-//         services_section: c.services.map(s => ({
-//           unique_id: s.uuid,
-//           service_referral_notes: s.reason_for_referral,
-//           service_subtype: (serviceMap[s.name] && serviceMap[s.name].subtype) || 'Other',
-//           service_type: (serviceMap[s.name] && serviceMap[s.name].type) || 'Other',
-//           service_type_text: (serviceMap[s.name] && serviceMap[s.name].type) || 'Other',
-//           service_type_details_text: serviceMap[s.name] ? 'n/a' : s.name,
-//           service_response_day_time: s.enrollment_date
-//             ? `${s.enrollment_date}T00:00:00.000Z`
-//             : undefined,
-//           service_response_type: s.enrollment_date
-//             ? 'service_being_provided_by_oscar_partner_47618'
-//             : s.enrollment_date === null && c.resource === 'primero'
-//             ? 'referral_to_oscar'
-//             : 'referral_from_oscar',
-//           oscar_case_worker_name: c.case_worker_name,
-//           oscar_case_worker_telephone: c.case_worker_mobile,
-//           oscar_referring_organization: `agency-${c.organization_name}`,
-//           service_implementing_agency: `agency-${c.organization_name}`, //TODO: @Aicha should these be the same?
-//           referral_status_ed6f91f: determineStatus(s, c.external_id),
-//           isReferral: s.enrollment_date ? true : false,
-//         })),
-//         //non-primero properties
-//         upsertByCaseId,
-//         isDecision,
-//       };
-//       if (!primeroRecord.owned_by) {
-//         // TODO: Ask @Aicha to clarify if this is check should be done on 'owned_by' or 'location_current'
-//         // primeroRecord = null;
-//       }
-//       return primeroRecord;
-//     })
-//     .filter(Boolean); // remove nulls
+fn(state => {
+  const {
+    calculateAge,
+    cases,
+    createName,
+    serviceMap,
+    setGender,
+    setLocationCode,
+    determineStatus,
+    setUser,
+    setServiceResponseType,
+  } = state;
 
-//   console.log({ primeroCasesToUpsert });
-//   return { ...state, primeroCasesToUpsert };
-// });
+  const primeroCasesToUpsert = cases
+    .map(c => {
+      const currentLocation = setLocationCode(
+        c.location_current_village_code || c.address_current_village_code
+      );
 
-// // do operations on each record
-// each(
-//   '$.primeroCasesToUpsert[*]',
-//   fn(async state => {
-//     const primeroCase = state.data;
-//     // destruct from a copy so that upsertByCaseId can be unset from the current primero record
-//     const { upsertByCaseId } = { ...primeroCase };
+      const locationCode = c.location_current_village_code
+        ? parseInt(currentLocation, 10).toString()
+        : null;
 
-//     //unset non-primero properties
-//     delete primeroCase.upsertByCaseId;
-//     delete primeroCase.isDecision;
+      const isUpdate = c.external_id;
 
-//     return upsertCase(
-//       {
-//         externalIds: upsertByCaseId ? ['case_id'] : ['oscar_number'],
-//         data: primeroCase,
-//       },
-//       upsertCaseState => {
-//         return getCases({ remote: true, case_id: primeroCase.case_id }, getCaseState => {
-//           console.log('Getting casess');
-//         })(upsertCaseState);
-//       }
-//     )(state);
-//   })
-// );
+      const primeroRecord = {
+        oscar_number: c.global_id,
+        case_id: c.external_id,
+        case_id_display: c.external_id_display,
+        oscar_short_id: c.slug,
+        mosvy_number: c.mosvy_number,
+        name_first: isUpdate ? null : createName(c.given_name, c.local_given_name),
+        name_last: isUpdate ? null : createName(c.family_name, c.local_family_name),
+        sex: isUpdate ? null : setGender(c.gender),
+        age: isUpdate ? null : calculateAge(c.age),
+        date_of_birth: isUpdate ? null : c.date_of_birth,
+        // date_of_birth: convertToPrimeroDate(c.date_of_birth), // TODO: @Aicha confirm formatting incorrect?
+        address_current: isUpdate ? null : c.address_current_village_code,
+        location_current: isUpdate ? null : locationCode,
+        oscar_status: isUpdate ? null : c.status,
+        protection_status: !isUpdate && c.is_referred == true ? 'oscar_referral' : null,
+        owned_by: isUpdate && c.is_referred !== true ? null : setUser(c), // TODO: @Aicha to update user mapping with Mohan's list
+        oscar_reason_for_exiting: c.reason_for_exiting,
+        consent_for_services: isUpdate || c.is_referred !== true ? null : true,
+        disclosure_other_orgs: isUpdate || c.is_referred !== true ? null : true,
+        interview_subject: isUpdate || c.is_referred !== true ? null : 'other',
+        module_id: 'primeromodule-cp',
+        risk_level: c.is_referred === true ? c.level_of_risk : null,
+        referral_notes_oscar: c.reason_for_referral,
+        services_section: c.services.map(s => ({
+          unique_id: s.uuid,
+          service_referral_notes: s.reason_for_referral,
+          service_subtype: (serviceMap[s.name] && serviceMap[s.name].subtype) || 'Other',
+          service_type: (serviceMap[s.name] && serviceMap[s.name].type) || 'Other',
+          service_type_text: (serviceMap[s.name] && serviceMap[s.name].type) || 'Other',
+          service_type_details_text: serviceMap[s.name] ? 'n/a' : s.name,
+          service_response_day_time: s.enrollment_date
+            ? `${s.enrollment_date}T00:00:00.000Z`
+            : undefined,
+          service_response_type: setServiceResponseType(c, s),
+          oscar_case_worker_name: c.case_worker_name,
+          oscar_case_worker_telephone: c.case_worker_mobile,
+          oscar_referring_organization: `agency-${c.organization_name}`,
+          service_implementing_agency: `agency-${c.organization_name}`, //TODO: @Aicha should these be the same?
+          referral_status_ed6f91f: determineStatus(s, c.external_id),
+          isReferral: s.enrollment_date ? true : false,
+        })),
+      };
+
+      if (!primeroRecord.owned_by) {
+        // TODO: Ask @Aicha to clarify if this is check should be done on 'owned_by' or 'location_current'
+        // primeroRecord = null;
+      }
+
+      return primeroRecord;
+    })
+    .filter(Boolean); // remove nulls
+
+  return { ...state, primeroCasesToUpsert };
+});
+
+// upsert cases by case_id or oscar_number
+each(
+  '$.primeroCasesToUpsert[*]',
+  upsertCase(
+    {
+      externalIds: state => (!!state.data.external_id ? ['case_id'] : ['oscar_number']),
+      data: state => state.data,
+    }
+    // TODO: @ Aicha, why do we get cases here?
+    // upsertCaseState => {
+    //   return getCases({ remote: true, case_id: primeroCase.case_id }, getCaseState => {
+    //     console.log('Getting casess');
+    //   })(upsertCaseState);
+    // }
+  )
+);
 
 // // upsert cases
 // each(
