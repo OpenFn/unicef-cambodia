@@ -321,14 +321,14 @@ fn(state => {
     'Other Service': { subtype: 'other_other_service', type: 'other' },
   };
 
-  const servicesStatusMap = {
+  const serviceStatusMap = {
     Accepted: 'accepted_850187',
     Active: 'accepted_850187',
     Rejected: 'rejected_74769',
     Exited: 'rejected_74769',
   };
 
-  const referralsStatusMap = {
+  const referralStatusMap = {
     Accepted: 'accepted',
     Active: 'accepted',
     Exited: 'rejected',
@@ -391,8 +391,8 @@ fn(state => {
 
   return {
     ...state,
-    servicesStatusMap,
-    referralsStatusMap,
+    serviceStatusMap,
+    referralStatusMap,
     convertToPrimeroDate,
     calculateAge,
     setGender,
@@ -409,7 +409,7 @@ fn(state => {
 fn(state => {
   const { originalCases } = state;
 
-  const isDecision = x => x.resource == 'primero' && x.status !== 'Referred';
+  const isDecision = c => c.resource == 'primero' && c.status !== 'Referred';
 
   const cases = originalCases.filter(c => !isDecision(c));
   const decisions = originalCases.filter(c => isDecision(c));
@@ -453,7 +453,7 @@ each(
 
 // we build decisions for primero, add array for referrals to update
 fn(state => {
-  const { decisions, buildCaseRecord, servicesStatusMap } = state;
+  const { decisions, buildCaseRecord, serviceStatusMap } = state;
 
   const finalized = decisions
     .map(buildCaseRecord)
@@ -462,7 +462,7 @@ fn(state => {
       ...d,
       services_section: d.services_section.map(s => ({
         ...s,
-        referral_status_edf41f2: servicesStatusMap[d.__original_oscar_record.status],
+        referral_status_edf41f2: serviceStatusMap[d.__original_oscar_record.status],
       })),
     }));
 
@@ -478,46 +478,47 @@ fn(state => {
 // for EACH decision, we get its referrals and then we update a single referral
 each(
   '$.decisions[*]',
-  // TODO: WE NEED TO ADD THE FOLLLOWING... See L234 in the "OLD" job
-  // 1. Get Primero Cases
-  // 2. Filter Primero Services to find only those that have NOT been accepted/rejected
-  // 3. Find 1 Service that matches OSCaR service, matching on service subtype
-  // 4. AND THEN... getReferrals where id.service_record_id = matchingPrimeroService.unique_id
+  getCases({ case_id: dataValue('case_id') }, { withReferrals: true }, nextState => {
+    const decision = nextState.references[nextState.references.length - 1];
 
-  getReferrals(
-    {
-      externalId: 'case_id',
-      id: state => state.data.case_id,
-    },
-    nextState => {
-      const decision = nextState.references[nextState.references.length - 1];
-      console.log('decision', decision);
+    if (nextState.data.length > 1) throw new Error('Duplicate case_id on Primero');
+    const parentCase = nextState.data[0];
 
-      const referrals = nextState.data;
-      console.log('referrals', referrals);
+    const oscarReferredServiceId = decision.__original_oscar_record.services.find(
+      s => s.enrollment_date === null
+    ).uuid;
 
-      // TODO: MATCH where r.service_record_id == matchingPrimeroService[0].unique_id
-      const matchingReferral = referrals.find(
-        r => r.service_record_id == decision.services_section[0].unique_id
-      );
+    const oscarReferredService = decision.services_section.find(
+      s => s.unique_id === oscarReferredServiceId
+    );
 
-      console.log('match:', matchingReferral);
+    const matchingReferral = parentCase.referrals.find(
+      r =>
+        // where status is in_progress...
+        r.status === 'in_progress' &&
+        // and where there's a service on the parentCase with subtype[0] that
+        // matches the oscarRefferedService subtype[0] (only one for each)
+        parentCase.services_section.find(
+          s => s.service_subtype[0] === oscarReferredService.service_subtype[0]
+        )
+    );
 
-      if (matchingReferral)
-        nextState.referrals.push({
-          ...matchingReferral,
-          status: nextState.referralStatusMap[decision.__original_oscar_record.status],
-          case_id: decision.case_id,
-        });
+    if (matchingReferral) console.log('Matching referral found:', matchingReferral);
 
-      return nextState;
-    }
-  )
+    if (matchingReferral)
+      nextState.referrals.push({
+        ...matchingReferral,
+        status: nextState.referralStatusMap[decision.__original_oscar_record.status],
+        case_id: decision.case_id,
+      });
+
+    return nextState;
+  })
 );
 
 // log matching referrals
 fn(state => {
-  console.log('Referrals to update:', state.referrals);
+  console.log('Referrals to update:', JSON.stringify(state.referrals, null, 2));
   return state;
 });
 
@@ -525,9 +526,9 @@ fn(state => {
 each(
   '$.referrals[*]',
   updateReferral({
-    externalId: 'case_id',
-    id: dataValue('case_id'),
-    referral_id: dataValue('id'),
+    caseExternalId: 'record_id',
+    caseId: dataValue('record_id'),
+    id: dataValue('id'),
     data: {
       status: dataValue('status'),
       id: dataValue('id'),
