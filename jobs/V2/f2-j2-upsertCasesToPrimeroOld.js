@@ -229,7 +229,7 @@ fn(state => {
     );
   });
 
-  const mappedOscarReferrals = oscarReferrals.map(r => state.serviceMap[r].type);
+  const mappedOscarReferrals = oscarReferrals.map(r => state.serviceMap[r].subtype);
 
   return each(
     filteredCases,
@@ -241,27 +241,23 @@ fn(state => {
         const referralsToOscar = (services_section || []).filter(
           serv =>
             serv.service_response_type === 'referral_to_oscar' &&
-            (serv.referral_status_ed6f91f === undefined ||
-              !statusArray.includes(serv.referral_status_ed6f91f))
+            serv.referral_status_ed6f91f !== 'accepted_850187' &&
+            serv.referral_status_ed6f91f !== 'rejected__74769'
         );
 
-        // TO DISCUSS: What is a 'matching service'?
         // 4. Finding matching service
         const matchingService = referralsToOscar.filter(ref =>
-          mappedOscarReferrals.includes(ref.service_type)
+          mappedOscarReferrals.includes(ref.service_subtype)
         );
-
-        // TODO: @Aicha, restore this "if/throw" and remove this TODO once you're done testing.
-        // Abort if multiple referrals are found.
-        // if (matchingService.length > 1)
-        //   throw new Error('Multiple services found. Aborting upsert.');
 
         // Skip entirely if no referrals are found.
         if (matchingService.length === 0) return state;
 
         // 5. saving 'service_record_id'
         const service_record_id = matchingService[0].unique_id;
-        console.log(`Case ${case_id} has matching service ${service_record_id}.`);
+        console.log(
+          `Primero case ${case_id} has service matching Oscar referral ${service_record_id}.`
+        );
         state.serviceRecordIds[case_id] = service_record_id;
         console.log(`Assigned to Case:Service ID map.`);
 
