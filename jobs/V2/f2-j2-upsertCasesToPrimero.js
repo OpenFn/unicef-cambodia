@@ -496,7 +496,7 @@ each(
       const referrals = nextState.data;
       console.log('referrals', referrals);
 
-      // TODO: @Aicha, @Aleksa is it only ever the FIRST service? How do we match?
+      // TODO: MATCH where r.service_record_id == matchingPrimeroService[0].unique_id
       const matchingReferral = referrals.find(
         r => r.service_record_id == decision.services_section[0].unique_id
       );
