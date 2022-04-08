@@ -21,8 +21,6 @@ getCases(
     service_response_types: 'list||referral_to_oscar',
   },
   state => {
-    console.log('Oscar referral cases:', JSON.stringify(state.data.map(x => x.case_id_display)));
-
     return { ...state, oscarRefs: state.data, data: {}, references: [] };
   }
 );
@@ -38,6 +36,7 @@ each(
       .map(r => {
         state.referralIds.push(r.service_record_id);
       });
+    console.log('Oscar referral cases:', JSON.stringify(state.data.map(x => x.case_id_display)));
     return state;
   })
 );
