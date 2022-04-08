@@ -26,6 +26,32 @@ getCases(
   }
 );
 
+// TODO: Add the below logic, to get Referrals for each case returned in step #1 above
+// Then only return a list of 'oscarRefs' cases where the related services have a matching Referral
+
+//==== Borrowed & adapted from the Progres implementation =====//
+// each(
+//   '$.oscarRefs[*]',
+//   getReferrals({ externalId: 'record_id', id: dataValue('id') }, state => {
+//     state.data
+//       .filter(r => new Date(r.created_at) >= new Date(state.cursor))
+//       .map(r => {
+//         state.referralIds.push(r.service_record_id);
+//       });
+//     return state;
+//   })
+// );
+
+// fn(state => ({
+//   ...state,
+//   oscarRefs: state.cases.map(c => ({
+//     ...c,
+//     services_section: c.services_section
+//       .filter(s => state.referralIds.includes(s.unique_id))
+//   })),
+// }));
+//======================================================================
+
 // GET new Primero cases with oscar_number
 // User Story 2: View all Oscar cases in Primero
 // #2 - Request all oscar cases ================================================
