@@ -478,6 +478,12 @@ fn(state => {
 // for EACH decision, we get its referrals and then we update a single referral
 each(
   '$.decisions[*]',
+  // TODO: WE NEED TO ADD THE FOLLLOWING... See L234 in the "OLD" job
+  // 1. Get Primero Cases
+  // 2. Filter Primero Services to find only those that have NOT been accepted/rejected
+  // 3. Find 1 Service that matches OSCaR service, matching on service subtype
+  // 4. AND THEN... getReferrals where id.service_record_id = matchingPrimeroService.unique_id
+
   getReferrals(
     {
       externalId: 'case_id',
