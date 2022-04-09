@@ -31,14 +31,12 @@ each(
   getReferrals({ externalId: 'record_id', id: dataValue('id') }, state => {
     // referrals = [ { referralId: blah, serviceRecordId: 1 } ]
 
-    state.data
-      ? state.data
-          .filter(r => new Date(r.created_at) >= new Date(state.cursor))
-          .map(r => {
-            state.referralIds.push(r.service_record_id);
-          })
-      : {};
-    console.log('Oscar referral cases with record ids:', JSON.stringify(state.data.map(x => x.id)));
+    state.data ? state.data
+      .filter(r => new Date(r.created_at) >= new Date(state.cursor))
+      .map(r => {
+        state.referralIds.push(r.service_record_id);
+      }) : {{;
+    console.log('Oscar referral cases:', JSON.stringify(state.data.map(x => x.case_id_display)));
     return state;
   })
 );
@@ -47,14 +45,10 @@ each(
 fn(state => {
   const { oscarRefs, referralIds } = state;
 
-  const sentOscarRefs = oscarRefs
-    ? oscarRefs.map(c => ({
-        ...c,
-        services_section: c.services_section.filter(service =>
-          referralIds.includes(service.unique_id)
-        ),
-      }))
-    : {};
+  const sentOscarRefs = oscarRefs.map(c => ({
+    ...c,
+    services_section: c.services_section ? c.services_section.filter(service => referralIds.includes(service.unique_id)) : {},
+  }));
 
   return { ...state, oscarRefs: sentOscarRefs };
 });
@@ -66,18 +60,13 @@ getCases(
   {
     remote: true,
     last_updated_at: state => `${state.cursor}..`,
-    oscar_number: 'range||*.*',
+    oscar_number: 'range||*.*', //testing
   },
   state => {
-    //Do not include cases that have a referral_to_oscar, we get those in the step above
-    let casesWithReferral = state.data.filter(c =>
-      c.services_section.some(s => s.service_response_type === 'referral_to_oscar')
-    );
-    state.data = state.data ? state.data.filter(c => !casesWithReferral.includes(c)) : state.data;
     console.log(`Other cases: ${JSON.stringify(state.data.map(x => x.case_id_display))}`);
 
     // #3 - Combine cases =====
-    state.data = state.oscarRefs.length > 0 ? state.data.concat(state.oscarRefs) : state.data;
+    state.data = state.data.concat(state.oscarRefs);
     delete state.oscarRefs;
 
     return state;
