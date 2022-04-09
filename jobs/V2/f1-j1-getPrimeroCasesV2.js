@@ -35,7 +35,7 @@ each(
       .filter(r => new Date(r.created_at) >= new Date(state.cursor))
       .map(r => {
         state.referralIds.push(r.service_record_id);
-      }) : {{;
+      }) : {};
     console.log('Oscar referral cases:', JSON.stringify(state.data.map(x => x.case_id_display)));
     return state;
   })
