@@ -1,7 +1,7 @@
 // Either use a manual cursor, or take the cursor from the last run.
 fn(state => {
   console.log('Last sync end date:', state.lastRunDateTime);
-  const manualCursor = '2021-12-08T00:00:00.000Z';
+  const manualCursor = '2022-04-08T00:44:07.288Z';
   const cursor = state.lastRunDateTime || manualCursor;
   return { ...state, cursor };
 });
@@ -31,11 +31,11 @@ each(
   getReferrals({ externalId: 'record_id', id: dataValue('id') }, state => {
     // referrals = [ { referralId: blah, serviceRecordId: 1 } ]
 
-    state.data ? state.data
+    state.data
       .filter(r => new Date(r.created_at) >= new Date(state.cursor))
       .map(r => {
         state.referralIds.push(r.service_record_id);
-      }) : {};
+      });
     console.log('Oscar referral cases:', JSON.stringify(state.data.map(x => x.case_id_display)));
     return state;
   })
@@ -47,7 +47,7 @@ fn(state => {
 
   const sentOscarRefs = oscarRefs.map(c => ({
     ...c,
-    services_section: c.services_section ? c.services_section.filter(service => referralIds.includes(service.unique_id)) : {},
+    services_section: c.services_section.filter(service => referralIds.includes(service.unique_id)),
   }));
 
   return { ...state, oscarRefs: sentOscarRefs };
