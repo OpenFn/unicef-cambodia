@@ -73,7 +73,7 @@ getCases(
     let casesWithReferral = state.data.filter(c =>
       c.services_section.some(s => s.service_response_type === 'referral_to_oscar')
     );
-    state.data = state.data.filter(c => !casesWithReferral.includes(c));
+    state.data = state.data ? state.data.filter(c => !casesWithReferral.includes(c)) : state.data;
     console.log(`Other cases: ${JSON.stringify(state.data.map(x => x.case_id_display))}`);
 
     // #3 - Combine cases =====
