@@ -63,6 +63,13 @@ getCases(
     oscar_number: 'range||*.*', //testing
   },
   state => {
+    //TODO: Do not include any cases that have a 'referral_to_oscar' service, bc we handle those in the steps above
+    // See suggested code below...
+    // let casesWithReferral = state.data.filter(c =>
+    //   c.services_section.some(s => s.service_response_type === 'referral_to_oscar')
+    // );
+    // state.data = state.data.filter(c => !casesWithReferral.includes(c)); //returns cases withOUT referrals
+
     console.log(`Other cases: ${JSON.stringify(state.data.map(x => x.case_id_display))}`);
 
     // #3 - Combine cases =====
