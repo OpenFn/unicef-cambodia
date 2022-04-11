@@ -545,6 +545,7 @@ each(
   upsertCase({
     externalIds: ['case_id'],
     data: state => {
+      console.log(JSON.stringify(state.data, null, 2));
       delete state.data.__original_oscar_record;
       return state.data;
     },
