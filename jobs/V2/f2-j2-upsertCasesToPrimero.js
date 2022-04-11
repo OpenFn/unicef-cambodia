@@ -371,6 +371,7 @@ fn(state => {
       risk_level: c.is_referred === true ? c.level_of_risk : null,
       referral_notes_oscar: c.reason_for_referral,
       services_section: c.services.map(s => ({
+        // TODO: @Aicha, decide if we'd like to write anything for unique_id
         unique_id: s.uuid,
         service_referral_notes: s.reason_for_referral,
         service_type: (serviceMap[s.name] && serviceMap[s.name].type) || 'Other',
@@ -479,10 +480,11 @@ fn(state => {
 each(
   '$.decisions[*]',
   getCases({ case_id: dataValue('case_id') }, { withReferrals: true }, nextState => {
-    const decision = nextState.references[nextState.references.length - 1];
+    const { decisions, references, data } = nextState;
+    const decision = references[references.length - 1];
 
-    if (nextState.data.length > 1) throw new Error('Duplicate case_id on Primero');
-    const parentCase = nextState.data[0];
+    if (data.length > 1) throw new Error('Duplicate case_id on Primero');
+    const parentCase = data[0];
 
     const oscarReferredServiceId = decision.__original_oscar_record.services.find(
       s => s.enrollment_date === null
@@ -492,15 +494,40 @@ each(
       s => s.unique_id === oscarReferredServiceId
     );
 
+    // There's a service on the parentCase with subtype[0] that
+    // matches the oscarRefferedService subtype[0] (only one for each)
+    const matchingService = parentCase.services_section.find(
+      s => s.service_subtype[0] === oscarReferredService.service_subtype[0]
+    );
+
+    // NOTE: Once we've found the matching service, overwrite its Oscar-generated
+    // uuid with the Primero Unique ID so that we can update this service in
+    // Primero.
+    // TODO: Confirm that this is really the logic we want to apply.
+    const updatedDecisions = decisions.map(d => {
+      // find the right case...
+      if (d.case_id === decision.case_id) {
+        return {
+          ...d,
+          services_section: d.services_section.map(s => {
+            // and find the right service...
+            if (s.unique_id === oscarReferredServiceId)
+              return {
+                ...s,
+                // Update the unique_id when we've got our needle in the haystack
+                unique_id: matchingService.unique_id,
+              };
+            return s;
+          }),
+        };
+      }
+      return d;
+    });
+
     const matchingReferral = parentCase.referrals.find(
       r =>
         // where status is in_progress...
-        r.status === 'in_progress' &&
-        // and where there's a service on the parentCase with subtype[0] that
-        // matches the oscarRefferedService subtype[0] (only one for each)
-        parentCase.services_section.find(
-          s => s.service_subtype[0] === oscarReferredService.service_subtype[0]
-        )
+        r.status === 'in_progress' && matchingService
     );
 
     if (matchingReferral) console.log('Matching referral found:', matchingReferral);
@@ -512,7 +539,7 @@ each(
         case_id: decision.case_id,
       });
 
-    return nextState;
+    return { ...nextState, decisions: updatedDecisions };
   })
 );
 
@@ -545,8 +572,9 @@ each(
   upsertCase({
     externalIds: ['case_id'],
     data: state => {
-      delete state.data.__original_oscar_record;
-      return state.data;
+      const decision = state.data;
+      delete decision.__original_oscar_record;
+      return decision;
     },
   })
 );
