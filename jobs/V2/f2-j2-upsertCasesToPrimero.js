@@ -322,10 +322,10 @@ fn(state => {
   };
 
   const serviceStatusMap = {
-    Accepted: 'accepted_850187',
-    Active: 'accepted_850187',
-    Rejected: 'rejected_74769',
-    Exited: 'rejected_74769',
+    Accepted: 'accepted_340953',
+    Active: 'accepted_340953',
+    Rejected: 'rejected_936484',
+    Exited: 'rejected_936484',
   };
 
   const referralStatusMap = {
