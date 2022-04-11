@@ -20,38 +20,40 @@ getCases(
     // necessarily ALREADY BEEN sent to Oscar:
     service_response_types: 'list||referral_to_oscar',
   },
+  { withReferrals: true },
   state => {
-    return { ...state, oscarRefs: state.data, data: {}, references: [] };
+    const oscarRefs = state.data;
+
+    const referralIds = oscarRefs
+      .map(c =>
+        c.referrals
+          .filter(r => new Date(r.created_at) >= new Date(state.cursor))
+          .map(r => r.service_record_id)
+      )
+      .flat();
+
+    console.log('Detected referral Ids:', referralIds);
+
+    // we filter the services_section in each oscarRef to return only the services that have been sent to Oscar
+    const sentOscarRefs = oscarRefs
+      // TODO: @Aicha, why do some not have a services_section array? ==========
+      .filter(c => c.services_section)
+      // =======================================================================
+      .map(c => ({
+        ...c,
+        services_section: c.services_section.filter(service => {
+          if (referralIds.includes(service.unique_id)) {
+            console.log('detected service sent to oscar', service.unique_id);
+            return true;
+          }
+          console.log('N/A, service not sent to oscar', service.unique_id);
+          return false;
+        }),
+      }));
+
+    return { ...state, oscarRefs: sentOscarRefs, referralIds, data: {}, references: [] };
   }
 );
-
-// for each oscarRef we get referrals and push the serviceRecordIds for each referral into the referralId array.
-each(
-  '$.oscarRefs[*]',
-  getReferrals({ externalId: 'record_id', id: dataValue('id') }, state => {
-    // referrals = [ { referralId: blah, serviceRecordId: 1 } ]
-
-    state.data
-      .filter(r => new Date(r.created_at) >= new Date(state.cursor))
-      .map(r => {
-        state.referralIds.push(r.service_record_id);
-      });
-    console.log('Oscar referral cases:', JSON.stringify(state.data.map(x => x.case_id_display)));
-    return state;
-  })
-);
-
-// we filter the services_section in each oscarRef to return only the services that have been sent to Oscar
-fn(state => {
-  const { oscarRefs, referralIds } = state;
-
-  const sentOscarRefs = oscarRefs.map(c => ({
-    ...c,
-    services_section: c.services_section.filter(service => referralIds.includes(service.unique_id)),
-  }));
-
-  return { ...state, oscarRefs: sentOscarRefs };
-});
 
 // GET new Primero cases with oscar_number
 // User Story 2: View all Oscar cases in Primero
@@ -62,15 +64,22 @@ getCases(
     last_updated_at: state => `${state.cursor}..`,
     oscar_number: 'range||*.*', //testing
   },
+  {},
   state => {
-    //TODO: Do not include any cases that have a 'referral_to_oscar' service, bc we handle those in the steps above
-    // See suggested code below...
-    // let casesWithReferral = state.data.filter(c =>
-    //   c.services_section.some(s => s.service_response_type === 'referral_to_oscar')
-    // );
-    // state.data = state.data.filter(c => !casesWithReferral.includes(c)); //returns cases withOUT referrals
+    console.log();
+    // Do not include any cases that have a 'referral_to_oscar' service, bc we handle those in the steps above
+    console.log(
+      `Other cases before filter: ${JSON.stringify(state.data.map(x => x.case_id_display))}`
+    );
 
-    console.log(`Other cases: ${JSON.stringify(state.data.map(x => x.case_id_display))}`);
+    state.data.filter(
+      // only allow if services_section does NOT! have some with service_response_type === 'referral_to_oscar'
+      c => !c.services_section.some(s => s.service_response_type === 'referral_to_oscar')
+    );
+
+    console.log(
+      `Other cases after filter: ${JSON.stringify(state.data.map(x => x.case_id_display))}`
+    );
 
     // #3 - Combine cases =====
     state.data = state.data.concat(state.oscarRefs);
