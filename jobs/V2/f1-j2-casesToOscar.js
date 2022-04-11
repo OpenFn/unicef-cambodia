@@ -115,8 +115,8 @@ post(
         const { oscarStrings, setOrganization } = state;
 
         const statusMap = {
-          accepted_850187: 'Accepted',
-          rejected__74769: 'Exited',
+          accepted_340953: 'Accepted',
+          rejected_936484: 'Exited',
         };
 
         function checkValue(data) {
