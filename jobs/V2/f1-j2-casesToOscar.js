@@ -1,18 +1,12 @@
 // Primero cases --> OSCaR
 // User Story 1: Generating government referrals, creating referrals in Oscar
-alterState(state => {
+fn(state => {
   // ===========================================================================
-  // NOTE: As of September 25, 2020, Primero has changed the structure of this
-  // payload for a subset of cases, depending on whether or not data exists in
-  // the services array. Below, we create an empty array if it's been removed to
-  // ensure that all payloads adhere to the integration contract.
-  console.log('data', state.data);
 
-  state.data = state.data.map(c => ({
-    ...c,
-    services_section: c.services_section || [],
-    transitions: c.transitions || [],
-  }));
+  // First, remove all cases without services
+  console.log('Initial state.data for f1-j2', state.data);
+  state.data = state.data.filter(c => c.services_section && c.services_section.length > 0);
+  console.log('state.data for f1-j2 after filtering', state.data);
 
   // ===========================================================================
 
