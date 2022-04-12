@@ -177,6 +177,8 @@ post(
         };
 
         const c = state.data;
+        console.log('line 180 - state.data ::', c);
+        console.log('transitions ::', c.transitions);
         const lastTransitionNote =
           c.transitions.length > 0 &&
           c.transitions.sort((a, b) => (a.created_at < b.created_at ? 1 : -1))[0].notes;
