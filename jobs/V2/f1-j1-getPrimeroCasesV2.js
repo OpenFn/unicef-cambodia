@@ -23,7 +23,7 @@ getCases(
   { withReferrals: true },
   state => {
     const oscarRefs = state.data;
-
+    console.log(JSON.stringify(oscarRefs));
     const referralIds = oscarRefs
       .map(c =>
         c.referrals
