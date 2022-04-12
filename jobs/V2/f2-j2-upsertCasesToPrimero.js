@@ -498,10 +498,12 @@ each(
 
     console.log('oscarReferredService ::', oscarReferredService);
 
+    console.log('parentCase ::', parentCase);
+
     // There's a service on the parentCase with subtype[0] that
     // matches the oscarRefferedService subtype[0] (only one for each)
     const matchingService = parentCase.services_section.find(s => {
-      console.log('subtypes ::', s.service_subtype);
+      console.log('parentCase services subtype ::', s.service_subtype);
       return s.service_subtype[0] === oscarReferredService.service_subtype[0];
     });
 
