@@ -504,42 +504,46 @@ each(
     // uuid with the Primero Unique ID so that we can update this service in
     // Primero.
     // TODO: Confirm that this is really the logic we want to apply.
-    const updatedDecisions = decisions.map(d => {
-      // find the right case...
-      if (d.case_id === decision.case_id) {
-        return {
-          ...d,
-          services_section: d.services_section.map(s => {
-            // and find the right service...
-            if (s.unique_id === oscarReferredServiceId)
-              return {
-                ...s,
-                // Update the unique_id when we've got our needle in the haystack
-                unique_id: matchingService.unique_id,
-              };
-            return s;
-          }),
-        };
-      }
-      return d;
-    });
-
-    const matchingReferral = parentCase.referrals.find(
-      r =>
-        // where status is in_progress...
-        r.status === 'in_progress' && matchingService
-    );
-
-    if (matchingReferral) console.log('Matching referral found:', matchingReferral);
-
-    if (matchingReferral)
-      nextState.referrals.push({
-        ...matchingReferral,
-        status: nextState.referralStatusMap[decision.__original_oscar_record.status],
-        case_id: decision.case_id,
+    if (matchingService) {
+      const updatedDecisions = decisions.map(d => {
+        // find the right case...
+        if (d.case_id === decision.case_id) {
+          return {
+            ...d,
+            services_section: d.services_section.map(s => {
+              // and find the right service...
+              if (s.unique_id === oscarReferredServiceId)
+                return {
+                  ...s,
+                  // Update the unique_id when we've got our needle in the haystack
+                  unique_id: matchingService.unique_id,
+                };
+              return s;
+            }),
+          };
+        }
+        return d;
       });
 
-    return { ...nextState, decisions: updatedDecisions };
+      const matchingReferral = parentCase.referrals.find(
+        r =>
+          // where status is in_progress...
+          r.status === 'in_progress' && matchingService
+      );
+
+      if (matchingReferral) console.log('Matching referral found:', matchingReferral);
+
+      if (matchingReferral)
+        nextState.referrals.push({
+          ...matchingReferral,
+          status: nextState.referralStatusMap[decision.__original_oscar_record.status],
+          case_id: decision.case_id,
+        });
+
+      return { ...nextState, decisions: updatedDecisions };
+    }
+    // TODO: @Aicha, please confirm that we don't update decisions if no matching services are found.
+    return { ...nextState };
   })
 );
 
