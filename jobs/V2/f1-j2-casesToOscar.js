@@ -343,7 +343,7 @@ post(
   )
 );
 
-alterState(state => {
+fn(state => {
   // Here we update links in OSCaR for non-referrals
   // NOTE: We also sync these cases back to OSCaR to log the Primero external_id assigned
 
