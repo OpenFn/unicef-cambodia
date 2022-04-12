@@ -27,7 +27,8 @@ getCases(
     const referralIds = oscarRefs
       .map(c =>
         c.referrals
-          .filter(r => new Date(r.created_at) >= new Date(state.cursor))
+          // TO-DO Aleksa & Aicha - Aicha commented this line out because if a sync fails the caseworker would need to recreate the referral
+          // .filter(r => new Date(r.created_at) >= new Date(state.cursor))
           .map(r => r.service_record_id)
       )
       .flat();
