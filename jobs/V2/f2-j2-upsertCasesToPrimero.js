@@ -490,15 +490,22 @@ each(
       s => s.enrollment_date === null
     ).uuid;
 
+    console.log('oscarReferredServiceId ::', oscarReferredServiceId);
+
     const oscarReferredService = decision.services_section.find(
       s => s.unique_id === oscarReferredServiceId
     );
 
+    console.log('oscarReferredService ::', oscarReferredService);
+
     // There's a service on the parentCase with subtype[0] that
     // matches the oscarRefferedService subtype[0] (only one for each)
-    const matchingService = parentCase.services_section.find(
-      s => s.service_subtype[0] === oscarReferredService.service_subtype[0]
-    );
+    const matchingService = parentCase.services_section.find(s => {
+      console.log('subtypes ::', s.service_subtype);
+      return s.service_subtype[0] === oscarReferredService.service_subtype[0];
+    });
+
+    console.log('matchingService ::', matchingService);
 
     // NOTE: Once we've found the matching service, overwrite its Oscar-generated
     // uuid with the Primero Unique ID so that we can update this service in
