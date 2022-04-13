@@ -69,7 +69,7 @@ fn(state => {
         'Referral to or from oscar not detected, the "owned_by_agency" is',
         c.owned_by_agency
       );
-      console.log("line 72", state.cases.referrals);
+      console.log('line 72', state.cases.referrals);
       return c.owned_by_agency.substring(7);
     }
   };
