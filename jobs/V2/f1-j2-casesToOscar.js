@@ -30,6 +30,9 @@ fn(state => {
     c.oscar_number !== null ? state.cases.referrals.push(c) : state.cases.nonReferrals.push(c)
   );
 
+  console.log('state.cases on line 33 oft he job', state.cases);
+  console.log('state.cases.referrals on line 34 of the job', state.cases.referrals);
+
   state.oscarStrings = value => {
     // NOTE: OSCaR API has unique behavior that requires us to send empty strings for null values.
     if (value) {
