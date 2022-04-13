@@ -110,12 +110,18 @@ _Agency/Organization Ids should follow the below naming conventions, otherwise t
     - Primero Agency ID: `'agency-{organization_name}'` (e.g., `agency-cif`)
 
 ## (8) 2021 Primero V2 Upgrade 
-OpenFn updated the IO Solution between the Primero and OSCaR systems to work with Primero V2 and added changes to sync Oscar 2nd referrals and map `risk level`. See links to the updated documentation below: 
+OpenFn updated the IO Solution between the Primero and OSCaR systems to work with Primero V2. The changes listed below were also added to the solution: 
+- **Syncing of 2nd referrals** to enable caseworkers to send multiple referrals over time for 1 child
+- **Syncing referral decisions** to “accept”/”reject” referrals and notify source systems
+- **New field mapping:** ‘risk level’
+
+
+See links to the updated documentation below: 
 
 - [V2 mapping specifications](https://docs.google.com/spreadsheets/d/1Zg9KGkHbh0ptjpj4YX9qFkojz9ydJ9aVT_UtkvE7Wu8/edit#gid=112592766)
 - [V2 data flow diagrams](https://drive.google.com/file/d/14_Nk0xML9k_0mmtI__fNGASm-brXfn-7/view?usp=sharing)
-- [V2 Testing slides](https://docs.google.com/presentation/d/19Fs5kTlF5EV117F9TRVXVWqQPLw5jTxn9hapmCjXOt8/edit#slide=id)
-- [V2 Training deck](https://docs.google.com/presentation/u/2/d/1Q1kAIAwa1atXuQi2aIYoISVItJHntYk-gOsK3V_dg3w/edit#slide=id.ga81cdd0b96_0_480)
+- [V2 testing slides](https://docs.google.com/presentation/d/19Fs5kTlF5EV117F9TRVXVWqQPLw5jTxn9hapmCjXOt8/edit#slide=id)
+- [V2 training deck](https://docs.google.com/presentation/u/2/d/1Q1kAIAwa1atXuQi2aIYoISVItJHntYk-gOsK3V_dg3w/edit#slide=id.ga81cdd0b96_0_480)
 
 
 ## (9) Administration
