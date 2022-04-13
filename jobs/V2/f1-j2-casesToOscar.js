@@ -30,7 +30,7 @@ fn(state => {
     c.oscar_number !== null ? state.cases.referrals.push(c) : state.cases.nonReferrals.push(c)
   );
 
-  console.log('state.cases on line 33 oft he job', state.cases);
+  console.log('state.cases on line 33 of the job', state.cases);
   console.log('state.cases.referrals on line 34 of the job', state.cases.referrals);
 
   state.oscarStrings = value => {
@@ -76,6 +76,11 @@ fn(state => {
   return state;
 });
 // =========================================== //
+
+fn(state => {
+  console.log('the array we perform EACH on', state.cases.referrals);
+  return state;
+});
 
 post(
   // Oscar authentication, once per run
