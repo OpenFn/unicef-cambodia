@@ -1,6 +1,6 @@
 // Primero cases --> OSCaR
 // User Story 1: Generating government referrals, creating referrals in Oscar
-alterState(state => {
+fn(state => {
   // ===========================================================================
 
   // First, remove all cases without services
@@ -69,7 +69,7 @@ alterState(state => {
 });
 // =========================================== //
 
-alterState(state => {
+fn(state => {
   console.log('nonReferrals', state.cases.nonReferrals.length);
   console.log('referrals', state.cases.referrals.length);
   // state.cases.referrals.map(({ case_id, name, oscar_number, services_section }) =>
@@ -107,7 +107,7 @@ post(
   }
 );
 
-alterState(state => {
+fn(state => {
   const { oscarStrings, setOrganization, cases } = state;
 
   const statusMap = {
@@ -339,14 +339,11 @@ alterState(state => {
     //   )
     // );
     // console.log('Case data to be posted to Oscar: ', JSON.stringify(oscar, null, 4));
-    console.log('Mapped a referral!');
+
     return { organization: oscar };
   });
 
-  console.log(
-    'list of mapped referrals',
-    mappedReferrals.map(x => x.organization.external_id)
-  );
+  // console.log('list of mapped referrals', JSON.stringify(mappedReferrals, null, 2));
 
   return { ...state, cases: { ...cases, referrals: mappedReferrals } };
 });
@@ -354,20 +351,22 @@ alterState(state => {
 // User Story 1.8b: Create referrals in Oscar
 each(
   '$.cases.referrals[*]',
-  post(
-    '/api/v1/organizations/clients/upsert/',
-    {
+  fn(topState => {
+    // TODO: @Taylor/@Stu why does post not respect the each here?
+    return post('/api/v1/organizations/clients/upsert/', {
       headers: state => state.oscarHeaders,
       body: state => state.data,
-    },
-    next => {
-      console.log('oscar says', next.response.status, next.response.config.data);
-      return next;
-    }
-  )
+      transformResponse: [
+        data => {
+          console.log('Oscar says', JSON.stringify(data, null, 2));
+          return data;
+        },
+      ],
+    })(topState);
+  })
 );
 
-alterState(state => {
+fn(state => {
   // Here we update links in OSCaR for non-referrals
   // NOTE: We also sync these cases back to OSCaR to log the Primero external_id assigned
 
