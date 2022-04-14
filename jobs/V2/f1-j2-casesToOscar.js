@@ -1,6 +1,6 @@
 // Primero cases --> OSCaR
 // User Story 1: Generating government referrals, creating referrals in Oscar
-fn(state => {
+alterState(state => {
   // ===========================================================================
 
   // First, remove all cases without services
@@ -69,7 +69,7 @@ fn(state => {
 });
 // =========================================== //
 
-fn(state => {
+alterState(state => {
   console.log('nonReferrals', state.cases.nonReferrals.length);
   console.log('referrals', state.cases.referrals.length);
   // state.cases.referrals.map(({ case_id, name, oscar_number, services_section }) =>
@@ -107,7 +107,7 @@ post(
   }
 );
 
-fn(state => {
+alterState(state => {
   const { oscarStrings, setOrganization, cases } = state;
 
   const statusMap = {
@@ -367,7 +367,7 @@ each(
   )
 );
 
-fn(state => {
+alterState(state => {
   // Here we update links in OSCaR for non-referrals
   // NOTE: We also sync these cases back to OSCaR to log the Primero external_id assigned
 
