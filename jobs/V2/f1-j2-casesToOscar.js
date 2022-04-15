@@ -351,18 +351,15 @@ fn(state => {
 // User Story 1.8b: Create referrals in Oscar
 each(
   '$.cases.referrals[*]',
-  fn(topState => {
-    // TODO: @Taylor/@Stu why does post not respect the each here?
-    return post('/api/v1/organizations/clients/upsert/', {
-      headers: state => state.oscarHeaders,
-      body: state => state.data,
-      transformResponse: [
-        data => {
-          console.log('Oscar says', JSON.stringify(data, null, 2));
-          return data;
-        },
-      ],
-    })(topState);
+  post('/api/v1/organizations/clients/upsert/', {
+    headers: state => state.oscarHeaders,
+    body: state => state.data,
+    transformResponse: [
+      data => {
+        console.log('Oscar says', JSON.stringify(data, null, 2));
+        return data;
+      },
+    ],
   })
 );
 
