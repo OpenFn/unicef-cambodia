@@ -3,9 +3,10 @@
 fn(state => {
   // ===========================================================================
 
+  // NOTE: AK Commented out the below, because this meant we were NOT syncing cases without services
   // First, remove all cases without services
   // console.log('Initial state.data for f1-j2', state.data);
-  state.data = state.data.filter(c => c.services_section && c.services_section.length > 0);
+  // state.data = state.data.filter(c => c.services_section && c.services_section.length > 0); //TO REMOVE?
   // console.log('state.data for f1-j2 after filtering', state.data);
 
   // ===========================================================================
