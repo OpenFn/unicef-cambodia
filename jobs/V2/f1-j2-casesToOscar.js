@@ -3,10 +3,13 @@
 fn(state => {
   // ===========================================================================
 
-  // NOTE: AK Commented out the below, because this meant we were NOT syncing cases without services
-  // First, remove all cases without services
+  // **TODO: @Aicha to discuss with Taylor; with L12 this means that nonReferrals [] is always empty
+  // After removing this line, to test to make sure isReferral classification is working
+  // **NOTE** AK thinks the below line should be removed, because cases WITHOUT services are nonReferrals
+  // ===========================================================================
+  // First, we remove all cases without services
   // console.log('Initial state.data for f1-j2', state.data);
-  // state.data = state.data.filter(c => c.services_section && c.services_section.length > 0); //TO REMOVE?
+  state.data = state.data.filter(c => c.services_section && c.services_section.length > 0); //But if we remove, isReferral is not working as we expect
   // console.log('state.data for f1-j2 after filtering', state.data);
 
   // ===========================================================================
@@ -24,6 +27,7 @@ fn(state => {
   state.data.forEach(c =>
     isRefferal(c) ? state.cases.referrals.push(c) : state.cases.nonReferrals.push(c)
   );
+  //TODO: Test to ensure nonReferrals is not always empty
 
   state.oscarStrings = value => {
     // NOTE: OSCaR API has unique behavior that requires us to send empty strings for null values.
