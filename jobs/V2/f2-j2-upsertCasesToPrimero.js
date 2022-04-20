@@ -348,8 +348,8 @@ fn(state => {
     return {
       __original_oscar_record: c,
       oscar_number: c.global_id,
-      case_id: c.external_id,
-      case_id_display: c.external_id_display,
+      case_id: c.external_id === '' ? undefined : c.external_id,
+      case_id_display: c.external_id_display === '' ? undefined : c.external_id_display,
       oscar_short_id: c.slug,
       mosvy_number: c.mosvy_number,
       name_first: isUpdate ? undefined : createName(c.given_name, c.local_given_name),
