@@ -1,45 +1,22 @@
 // Primero cases --> OSCaR
 // User Story 1: Generating government referrals, creating referrals in Oscar
 fn(state => {
+  const { oscarDecisions, oscarRefs, oscarCases } = state;
   // === AK added the below to assign referrals and nonReferrals
-  state.cases = {
-    referrals: state.oscarDecisions.concat(state.oscarRefs), //Response to getCases #1 and #2 from f1-j1
-    nonReferrals: [...state.oscarCases], //Response to getCases #3 from f1-j1
+  const cases = {
+    referrals: [...oscarDecisions, ...oscarRefs], // Response to getCases #1 and #2 from f1-j1
+    nonReferrals: oscarCases, // Response to getCases #3 from f1-j1
   };
 
   console.log(
-    `Cases with referrals OR decisions for Oscar: ${JSON.stringify(state.cases.referrals, null, 4)}`
+    `Cases with referrals OR decisions for Oscar: ${JSON.stringify(cases.referrals, null, 2)}`
   );
+
   console.log(
-    `nonReferrals to sync external_id only: ${JSON.stringify(state.cases.nonReferrals, null, 4)}`
+    `nonReferrals to sync external_id only: ${JSON.stringify(cases.nonReferrals, null, 2)}`
   );
 
-  // **TODO: REMOVE THIS OLDER CLASSIFICATION OF REFERRALS/ NONREFERRALS
-  // First, we remove all cases without services
-  // console.log('Initial state.data for f1-j2', state.data);
-  // state.data = state.data.filter(c => c.services_section && c.services_section.length > 0); //But if we remove, isReferral is not working as we expect
-  // // console.log('state.data for f1-j2 after filtering', state.data);
-
-  // // ===========================================================================
-
-  // state.cases = { referrals: [], nonReferrals: [] };
-  // const isRefferal = ({ services_section }) => {
-  //   console.log(`services_section to evaluate: ${JSON.stringify(services_section, null, 4)}`);
-  //   const responseTypes = services_section.map(s => s.service_response_type);
-  //    console.log("responsetypes", responseTypes);
-  //    console.log("services section", services_section);
-  //   return (
-  //     responseTypes.includes('referral_to_oscar') || responseTypes.includes('referral_from_oscar')
-  //   );
-  // };
-
-  // //Here we create an array of referrals by analyzing the Services of each case
-  // state.data.forEach(c =>
-  //   isRefferal(c) ? state.cases.referrals.push(c) : state.cases.nonReferrals.push(c)
-  // );
-  //TODO: Test to ensure nonReferrals is not always empty
-
-  state.oscarStrings = value => {
+  const oscarStrings = value => {
     // NOTE: OSCaR API has unique behavior that requires us to send empty strings for null values.
     if (value) {
       return value;
@@ -50,7 +27,7 @@ fn(state => {
   };
 
   //NOTE FOR AK: To test? And update considering multiple agencies now sending referrals?
-  state.setOrganization = c => {
+  const setOrganization = c => {
     // NOTE: This assumes the first referral will tell us which is the referring organization.
     // The "business" stipulates that all "oscar_referring_organization"
     // values will be the SAME for an array including any "referral_from_oscar"
@@ -80,21 +57,13 @@ fn(state => {
     }
   };
 
-  return state;
+  return { ...state, cases, oscarStrings, setOrganization };
 });
 // =========================================== //
 
 fn(state => {
-  console.log('nonReferrals', state.cases.nonReferrals.length);
-  console.log('referrals', state.cases.referrals.length);
-  // state.cases.referrals.map(({ case_id, name, oscar_number, services_section }) =>
-  //   console.log({
-  //     case_id,
-  //     name,
-  //     oscar_number,
-  //     srt: services_section.map(s => s.service_response_type),
-  //   })
-  // );
+  console.log('nonReferrals length:', state.cases.nonReferrals.length);
+  console.log('referrals length:', state.cases.referrals.length);
   return state;
 });
 
