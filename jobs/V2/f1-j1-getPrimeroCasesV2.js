@@ -100,7 +100,7 @@ getCases(
     last_updated_at: state => `${state.cursor}..`,
     //oscar_number: 'range||*.*', //NOTE: This does NOT work; checking with Quoin
   },
-  {},
+  { withReferrals: true },
   state => {
     console.log();
     // Do not include any cases that have a 'referral_to_oscar' service, bc we handle those in the steps above
