@@ -15,10 +15,11 @@ fn(state => {
   // ===========================================================================
 
   state.cases = { referrals: [], nonReferrals: [] };
-
   const isRefferal = ({ services_section }) => {
     console.log(`services_section to evaluate: ${JSON.stringify(services_section, null, 4)}`);
     const responseTypes = services_section.map(s => s.service_response_type);
+     console.log("responsetypes", responseTypes);
+     console.log("services section", services_section);
     return (
       responseTypes.includes('referral_to_oscar') || responseTypes.includes('referral_from_oscar')
     );
