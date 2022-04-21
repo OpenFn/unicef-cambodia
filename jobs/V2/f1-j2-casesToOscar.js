@@ -10,7 +10,7 @@ fn(state => {
   // First, we remove all cases without services
   // console.log('Initial state.data for f1-j2', state.data);
   state.data = state.data.filter(c => c.services_section && c.services_section.length > 0); //But if we remove, isReferral is not working as we expect
-  // console.log('state.data for f1-j2 after filtering', state.data);
+  console.log(`state.data for f1-j2 after filtering ${JSON.stringify(state.data, null, 4)}`);
 
   // ===========================================================================
 
