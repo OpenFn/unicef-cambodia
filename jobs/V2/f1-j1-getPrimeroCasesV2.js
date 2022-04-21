@@ -107,8 +107,7 @@ getCases(
     console.log(
       `Oscar cases before filter: ${JSON.stringify(state.data.map(x => x.case_id_display))}`
     );
-    //TODO: @Taylor - Make sure this filter works!
-    state.data.filter(
+    const oscarCases = state.data.filter(
       // only allow if services_section does NOT! have some with service_response_type === 'referral_to_oscar'
       c =>
         c.oscar_number !== null &&
@@ -116,16 +115,17 @@ getCases(
     );
 
     console.log(
-      `Oscar cases AFTER filter: ${JSON.stringify(state.data.map(x => x.case_id_display))}`
+      `Oscar cases AFTER filter: ${JSON.stringify(oscarCases.map(x => x.case_id_display))}`
     );
     //console.log(`Other cases AFTER filter: ${JSON.stringify(state.data, null, 2)}`);
 
     // #3 - Combine cases =====
-    state.data = state.data.concat(state.oscarRefs, state.oscarDecisions);
-    delete state.oscarRefs;
-    delete state.oscarDecisions;
+    //state.data = state.data.concat(state.oscarRefs, state.oscarDecisions);
+    //delete state.oscarRefs;
+    //delete state.oscarDecisions;
+    //return state;
 
-    return state;
+    return { ...state, oscarCases: oscarCases };
   }
 );
 
@@ -141,3 +141,8 @@ fn(state => {
   console.log('Next sync start date:', lastRunDateTime);
   return { ...state, references: [], lastRunDateTime };
 });
+
+//JOB will output 3 arrays to use in the next job
+//state.oscarRefs (new referrals to send to Oscar)
+//state.oscarDecisons (decisions to send back to Oscar)
+//state.oscarCases (no referrals; to sync external_id only)
