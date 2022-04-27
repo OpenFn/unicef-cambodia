@@ -386,7 +386,6 @@ fn(state => {
         oscar_referring_organization: `agency-${c.organization_name}`,
         oscar_case_worker_telephone: c.case_worker_mobile,
         service_implementing_agency: `agency-${c.organization_name}`, //TODO: @Aicha should these be the same?
-        referral_status_edf41f2: 'pending_310366', 
       })),
     };
   }
