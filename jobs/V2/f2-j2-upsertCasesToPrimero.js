@@ -362,7 +362,7 @@ fn(state => {
       location_current: isUpdate ? undefined : locationCode,
       oscar_status: isUpdate ? undefined : c.status,
       protection_status: !isUpdate && c.is_referred == true ? 'oscar_referral' : undefined,
-      owned_by: isUpdate ? undefined : setUser(c), // TODO: @Aicha to update user mapping with Mohan's list
+      owned_by: isUpdate ? undefined : setUser(c),
       oscar_reason_for_exiting: c.reason_for_exiting,
       consent_for_services: true,
       disclosure_other_orgs: true,
@@ -431,8 +431,8 @@ fn(state => {
       delete c.__original_oscar_record;
       return c;
     })
-    // TODO: @Aicha to confirm: if "owned_by" is FALSY, then don't send this record to Primero.
-    .filter(c => c.owned_by);
+    // TODO: @Aleksa to confirm that we can add location-check validation in the job; for 2nd referrals, it's okay if `owned_by` is undefined
+    //.filter(c => c.owned_by);
 
   return { ...state, cases: finalized };
 });
