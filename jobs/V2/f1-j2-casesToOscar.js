@@ -330,7 +330,7 @@ fn(state => {
     return { organization: oscar };
   });
 
-  // console.log('list of mapped referrals', JSON.stringify(mappedReferrals, null, 2));
+  console.log('list of mapped referrals', JSON.stringify(mappedReferrals, null, 2));
 
   return { ...state, cases: { ...cases, referrals: mappedReferrals } };
 });
