@@ -9,16 +9,16 @@ alterState(state => {
 });
 
 // Clear data from previous runs.
-// alterState(state => {
-//   const { lastCaseCreated, lastUpdated, lastCreated } = state;
-//   console.log('The last case creation before this run is:', lastCaseCreated);
-//   console.log('The last transition update before this run is:', lastUpdated);
-//   console.log('The last transition creation before this run is:', lastCreated);
+alterState(state => {
+  const { lastCaseCreated, lastUpdated, lastCreated } = state;
+  console.log('The last case creation before this run is:', lastCaseCreated);
+  console.log('The last transition update before this run is:', lastUpdated);
+  console.log('The last transition creation before this run is:', lastCreated);
 
-//   const initialState = { lastCaseCreated, lastUpdated, lastCreated };
+  const initialState = { lastCaseCreated, lastUpdated, lastCreated };
 
-//   return { ...state, data: {}, references: [], initialState };
-// });
+  return { ...state, data: {}, references: [], initialState };
+});
 
 // GET Primero cases with oscar referrals
 // User Story 1: Generating government referrals
