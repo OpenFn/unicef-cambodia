@@ -30,10 +30,12 @@ getCases(
       or: {
         // Two case date fields we must check for updates
         transitions_created_at: `or_op||date_range||${
-          state.lastCreated || '05-01-2021' // TEST CURSOR
+        state.lastCreated || '28-04-2022'
+          //state.lastCreated || '05-01-2021' // TEST CURSOR
         }.01-01-4020`,
         transitions_changed_at: `or_op||date_range||${
-          state.lastUpdated || '15-12-2020 00:00' // TEST CURSOR
+        state.lastUpdated || '28-04-2022 00:00'
+          //state.lastUpdated || '15-12-2020 00:00' // TEST CURSOR
         }.01-01-4020 00:00`,
       },
       service_response_types: 'list||referral_to_oscar', // only cases with referral services
