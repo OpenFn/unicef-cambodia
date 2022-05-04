@@ -113,7 +113,12 @@ _Agency/Organization Ids should follow the below naming conventions, otherwise t
 OpenFn updated the IO Solution between the Primero and OSCaR systems to work with Primero V2. The changes listed below were also added to the solution: 
 - **Syncing of 2nd referrals** to enable caseworkers to send multiple referrals over time for 1 child
 - **Syncing referral decisions** to “accept”/”reject” referrals and notify source systems
-- **New field mapping:** ‘risk level’
+- **New field mappings:** ‘risk level’ & `date of referral`
+- Primero Focal Point user for the `Banteay Meanchey` province configured for locations so that Oscar case referrals can be received in Primero  
+- Primero Service `Referral Status` field now has a default `Pending` value when creating services for outbound referrals
+- Implemented change to not group Services in Primero by `service_type` and ensure 1 Primero Service record will exist for every new OSCaR service referred 
+
+
 
 
 See links to the updated documentation below: 
