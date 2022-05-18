@@ -46,6 +46,21 @@ fn(state => {
       return null;
     }
   }
+  
+      function calcAge(str) {
+      if (!str) return 0;
+      var today = new Date();
+      var birthDate = new Date(str);
+      var age = today.getFullYear() - birthDate.getFullYear();
+
+      if (age > 30 || age < 1) return 0;
+
+      var m = today.getMonth() - birthDate.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      return age;
+    }
 
   function setUser(c) {
     if (c.is_referred) return setProvinceUser(c);
@@ -355,7 +370,7 @@ fn(state => {
       name_first: isUpdate ? undefined : createName(c.given_name, c.local_given_name),
       name_last: isUpdate ? undefined : createName(c.family_name, c.local_family_name),
       sex: isUpdate ? undefined : setGender(c.gender),
-      age: isUpdate ? undefined : calculateAge(c.age),
+      age: isUpdate ? undefined : calcAge(c.date_of_birth),
       date_of_birth: isUpdate ? undefined : c.date_of_birth,
       // date_of_birth: convertToPrimeroDate(c.date_of_birth), // TODO: @Aicha confirm formatting incorrect?
       address_current: isUpdate ? undefined : c.address_current_village_code,
