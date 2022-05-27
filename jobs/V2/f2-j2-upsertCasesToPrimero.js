@@ -500,10 +500,12 @@ each(
 
     if (data.length > 1) throw new Error('Duplicate case_id on Primero');
     const parentCase = data[0];
-
-    const oscarReferredServiceId = decision.__original_oscar_record.services.find(
+    
+    const NewDecision = decision.__original_oscar_record.services.find(
       s => s.enrollment_date === null
-    ).uuid;
+    ); 
+
+    const oscarReferredServiceId = NewDecision.uuid;
 
     console.log('oscarReferredServiceId ::', oscarReferredServiceId);
 
