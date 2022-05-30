@@ -46,21 +46,21 @@ fn(state => {
       return null;
     }
   }
-  
-      function calcAge(str) {
-      if (!str) return 0;
-      var today = new Date();
-      var birthDate = new Date(str);
-      var age = today.getFullYear() - birthDate.getFullYear();
 
-      if (age > 30 || age < 1) return 0;
+  function calcAge(str) {
+    if (!str) return 0;
+    var today = new Date();
+    var birthDate = new Date(str);
+    var age = today.getFullYear() - birthDate.getFullYear();
 
-      var m = today.getMonth() - birthDate.getMonth();
-      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-        age--;
-      }
-      return age;
+    if (age > 30 || age < 1) return 0;
+
+    var m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
     }
+    return age;
+  }
 
   function setUser(c) {
     if (c.is_referred) return setProvinceUser(c);
@@ -440,14 +440,12 @@ fn(state => {
 fn(state => {
   const { cases, buildCaseRecord } = state;
 
-  const finalized = cases
-    .map(buildCaseRecord)
-    .map(c => {
-      delete c.__original_oscar_record;
-      return c;
-    })
-    // TODO: @Aleksa to confirm that we can add location-check validation in the job; for 2nd referrals, it's okay if `owned_by` is undefined
-    //.filter(c => c.owned_by);
+  const finalized = cases.map(buildCaseRecord).map(c => {
+    delete c.__original_oscar_record;
+    return c;
+  });
+  // TODO: @Aleksa to confirm that we can add location-check validation in the job; for 2nd referrals, it's okay if `owned_by` is undefined
+  //.filter(c => c.owned_by);
 
   return { ...state, cases: finalized };
 });
@@ -500,12 +498,24 @@ each(
 
     if (data.length > 1) throw new Error('Duplicate case_id on Primero');
     const parentCase = data[0];
-    
-    const NewDecision = decision.__original_oscar_record.services.find(
-      s => s.enrollment_date === null
-    ); 
 
-    const oscarReferredServiceId = NewDecision.uuid;
+    const newDecision = decision.__original_oscar_record.services.find(
+      s => s.enrollment_date === null
+    );
+
+    console.log('The "newDecision" is', newDecision); // undefined
+
+    if (!newDecision) {
+      console.log(
+        'Skipping dropping this decision from the array; no services with enrollment_date === null'
+      );
+      return {
+        ...nextState,
+        decisions: decisions.filter(d => d.case_id !== decision.case_id),
+      };
+    }
+
+    const oscarReferredServiceId = newDecision.uuid;
 
     console.log('oscarReferredServiceId ::', oscarReferredServiceId);
 
@@ -595,6 +605,12 @@ each(
     },
   })
 );
+
+// log matching decisions
+fn(state => {
+  console.log('Decisions to update:', JSON.stringify(state.decisions, null, 2));
+  return state;
+});
 
 // for EACH decision, we upsert the primero case record
 each(
