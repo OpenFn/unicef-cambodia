@@ -221,7 +221,7 @@ fn(state => {
 
     //Here we only map the referral status of the Most Recent service from Primero
     const referral_status = primeroService
-      ? statusMap[oscarStrings(primeroService[primeroLastService].referral_status_edf41f2)]
+      ? statusMap[oscarStrings(primeroService[primeroLastService].referral_status_edf41f2)] || 'Referred'
       : 'Referred';
 
     // Mappings for posting cases to Oscar
