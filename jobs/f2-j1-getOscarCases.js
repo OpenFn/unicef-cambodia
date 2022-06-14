@@ -5,6 +5,7 @@ fn(state => {
     const { lastQueryDate } = state.data.initialState;
     return { ...state, lastQueryDate };
   }
+
   return state;
 });
 
