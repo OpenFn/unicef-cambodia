@@ -1,6 +1,6 @@
 // Primero cases --> OSCaR
 // User Story 1: Generating government referrals, creating referrals in Oscar
-alterState(state => {
+fn(state => {
   // ===========================================================================
   // NOTE: As of September 25, 2020, Primero has changed the structure of this
   // payload for a subset of cases, depending on whether or not data exists in
@@ -16,7 +16,7 @@ alterState(state => {
   state.cases = { referrals: [], nonReferrals: [] };
 
   state.data.forEach(c =>
-    c.services_section.map(s => s.service_response_type).includes('referral_to_oscar') 
+    c.services_section.map(s => s.service_response_type).includes('referral_to_oscar')
       ? state.cases.referrals.push(c)
       : state.cases.nonReferrals.push(c)
   );
@@ -239,7 +239,7 @@ post(
               organization: {
                 external_id: oscar.external_id,
                 external_id_display: oscar.external_id_display,
-                oscar_id: oscar.oscar_short_id, 
+                oscar_id: oscar.oscar_short_id,
                 global_id: oscar.global_id,
                 mosvy_number: oscar.mosvy_number,
                 location_current_village_code: oscar.location_current_village_code,
@@ -263,7 +263,7 @@ post(
   )
 );
 
-alterState(state => {
+fn(state => {
   // Update links for non-referrals
   if (state.cases.nonReferrals.length > 0)
     return post(

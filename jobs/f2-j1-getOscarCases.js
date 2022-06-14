@@ -1,6 +1,6 @@
 // If the job was executed from a message in the inbox with a specific cursor,
 // use that. If not, use the cursor from the previous final state.
-alterState(state => {
+fn(state => {
   if (state.data && state.data.initialState) {
     const { lastQueryDate } = state.data.initialState;
     return { ...state, lastQueryDate };
@@ -9,7 +9,7 @@ alterState(state => {
 });
 
 // Clear data from previous runs.
-alterState(state => { //Primero Adaptor V1 does NOT support fn(..)
+fn(state => {
   const { lastQueryDate, thisQueryDate } = state;
   state.data = {};
   state.references = [];
