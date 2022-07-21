@@ -398,9 +398,10 @@ fn(state => {
           : undefined,
         service_response_type: setServiceResponseType(c, s),
         oscar_case_worker_name: c.case_worker_name,
-        oscar_referring_organization: `agency-${c.organization_name}`,
         oscar_case_worker_telephone: c.case_worker_mobile,
+        oscar_referring_organization: `agency-${c.organization_name}`,
         service_implementing_agency: `agency-${c.organization_name}`, //TODO: @Aicha should these be the same?
+        oscar_referral_id_a4ac8a5: s.referral_id
       })),
     };
   }
