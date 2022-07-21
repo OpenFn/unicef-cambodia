@@ -254,8 +254,9 @@ fn(state => {
         .map(s => {
           return s.service_subtype.map(st => {
             return {
-              uuid: oscarStrings(s.unique_id), //NOTE: To revisit after Kiry confirms service uuid uniqueness
+              uuid: oscarStrings(s.unique_id), 
               name: serviceMap[st] || 'Other',
+              referral_id: oscarStrings(s.oscar_referral_id_a4ac8a5)
             };
           });
         })
