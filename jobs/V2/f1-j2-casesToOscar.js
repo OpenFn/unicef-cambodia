@@ -265,6 +265,7 @@ fn(state => {
     //   primeroService[primeroLastService]
     // );
 
+    //TODO: @Aleksa - Remove if we have a default mapping for referral_status?
     //Here we only map the referral status of the Most Recent service from Primero
     const referral_status = primeroService
       ? statusMap[oscarStrings(primeroService[primeroLastService].referral_status_edf41f2)] ||
@@ -399,7 +400,32 @@ each(
   })
 );
 
-//==== NEW POST request added for updating decisions ======///
+//==== NEW POST requests added for updating decisions ======///
+post(
+  // Oscar authentication, once per run
+  '/api/v1/admin_auth/sign_in',
+  {
+    keepCookie: true,
+    body: {
+      email: state.configuration.username,
+      password: state.configuration.password,
+    },
+  },
+  state => {
+    console.log('Authenticating again with OSCaR...');
+    return {
+      ...state,
+      oscarHeaders: {
+        'Content-Type': 'application/json',
+        uid: state.configuration.username,
+        client: state.data.__headers.client,
+        'access-token': state.data.__headers['access-token'],
+      },
+    };
+  }
+);
+
+//NOTE: @Aleksa - This step can be in bulk?
 each(
   '$.cases.decisions[*]',
   post('/api/v1/organizations/referrals/update_statuses/', {
