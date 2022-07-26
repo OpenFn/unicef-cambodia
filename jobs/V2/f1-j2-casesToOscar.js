@@ -211,7 +211,7 @@ fn(state => {
   );
 
   const confirmedDecisions = mappedDecisions.filter(
-    d => d.referral_status === 'Accepted' || d.referral_status === 'Exited'
+    d => d.data.referral_status === 'Accepted' || d.data.referral_status === 'Exited'
   );
 
   console.log('Finding oscar_referrals with confirmed decisions...');
