@@ -207,7 +207,7 @@ fn(state => {
 
   console.log(
     'list of oscar_referrals that MIGHT have decisions',
-    JSON.stringify(updatedDecisions, null, 2)
+    JSON.stringify(mappedDecisions, null, 2)
   );
 
   const confirmedDecisions = mappedDecisions.filter(
