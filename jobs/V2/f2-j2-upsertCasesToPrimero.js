@@ -354,7 +354,7 @@ fn(state => {
       c.location_current_village_code || c.address_current_village_code
     );
 
-    const locationCode = c.location_current_village_code
+    const locationCode = c.location_current_village_code || c.address_current_village_code
       ? parseInt(currentLocation, 10).toString()
       : null;
 
