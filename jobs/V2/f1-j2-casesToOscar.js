@@ -291,6 +291,7 @@ fn(state => {
       external_case_worker_mobile: c.owned_by_phone || '000000000',
       resource: c.workflow === 'referral_to_oscar' ? 'Primero' : undefined,
       is_referred: true,
+      referral_status: 'Referred', //Default value when sending new referral
       //referral_status, //TODO: @Aleksa - remove now that we send decisions separately?
       organization_name: 'cif', //TODO: Hardcoded for staging testing only; replaces lines below.
       organization_id: 'cif', //TODO: Hardcoded, replace with below
