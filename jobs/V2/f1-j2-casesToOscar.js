@@ -179,10 +179,10 @@ fn(state => {
 
     //Here we want to find only the MOST RECENT service, taking the last item in the service_section array
     const primeroLastService = primeroService.length > 1 ? primeroService.length - 1 : 0;
-    // console.log(
-    //   'Most recent Primero service to sync to Oscar: ',
-    //   primeroService[primeroLastService]
-    // );
+    console.log(
+      'Most recent Primero service to sync to Oscar: ',
+      primeroService[primeroLastService]
+    );
 
     //Here we only map the referral status of the Most Recent service from Primero
     const referral_status = primeroService
@@ -191,7 +191,7 @@ fn(state => {
       : 'Referred';
 
     const referralId = primeroService
-      ? oscarStrings(primeroLastService.oscar_referral_id_a4ac8a5)
+      ? oscarStrings(primeroService[primeroLastService].oscar_referral_id_a4ac8a5)
       : undefined;
 
     const oscarDecision = {
