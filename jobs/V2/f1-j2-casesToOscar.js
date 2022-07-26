@@ -191,7 +191,7 @@ fn(state => {
       : 'Referred';
 
     const referralId = primeroService
-      ? oscarStrings(primeroService[primeroLastService].oscar_referral_id_a4ac8a5)
+      ? primeroService[primeroLastService].oscar_referral_id_a4ac8a5
       : undefined;
 
     const oscarDecision = {
@@ -205,7 +205,21 @@ fn(state => {
     return { data: oscarDecision };
   });
 
-  console.log('list of mapped decisions', JSON.stringify(mappedDecisions, null, 2));
+  console.log(
+    'list of oscar_referrals that MIGHT have decisions',
+    JSON.stringify(updatedDecisions, null, 2)
+  );
+
+  const confirmedDecisions = mappedDecisions.filter(
+    d => d.referral_status === 'Accepted' || d.referral_status === 'Exited'
+  );
+
+  console.log('Finding oscar_referrals with confirmed decisions...');
+
+  console.log(
+    'list of oscar_referrals with mapped decisions',
+    JSON.stringify(confirmedDecisions, null, 2)
+  );
   //=================================================================================//
 
   const mappedReferrals = cases.referrals.map(c => {
@@ -382,7 +396,10 @@ fn(state => {
 
   console.log('list of mapped referrals', JSON.stringify(mappedReferrals, null, 2));
 
-  return { ...state, cases: { ...cases, referrals: mappedReferrals, decisions: mappedDecisions } };
+  return {
+    ...state,
+    cases: { ...cases, referrals: mappedReferrals, decisions: confirmedDecisions },
+  };
 });
 
 // User Story 1.8b: Create referrals in Oscar
