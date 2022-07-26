@@ -2,18 +2,23 @@
 // User Story 1: Generating government referrals, creating referrals in Oscar
 fn(state => {
   const { oscarDecisions, oscarRefs, oscarCases } = state;
-  // === AK added the below to assign referrals and nonReferrals
   const cases = {
-    referrals: [...oscarDecisions, ...oscarRefs], // Response to getCases #1 and #2 from f1-j1
+    decisions: oscarDecisions,
+    referrals: oscarRefs, //NOTE: AK removed decisions from referrals array, and created new 'decisions' variable above
+    //referrals: [...oscarDecisions, ...oscarRefs], // Response to getCases #1 and #2 from f1-j1 //TODO: Delete? Confirm adter testing
     nonReferrals: oscarCases, // Response to getCases #3 from f1-j1
   };
 
-  console.log(
-    `Cases with referrals OR decisions for Oscar: ${JSON.stringify(cases.referrals, null, 2)}`
-  );
+  console.log(`Cases with DECISIONS for Oscar: ${JSON.stringify(cases.decisions, null, 2)}`);
+
+  console.log(`Cases with REFERRALS for Oscar: ${JSON.stringify(cases.referrals, null, 2)}`);
+
+  // console.log(
+  //   `Cases with referrals OR decisions for Oscar: ${JSON.stringify(cases.referrals, null, 2)}`
+  // );
 
   console.log(
-    `nonReferrals to sync external_id only: ${JSON.stringify(cases.nonReferrals, null, 2)}`
+    `NONreferrals to sync external_id only: ${JSON.stringify(cases.nonReferrals, null, 2)}`
   );
 
   const oscarStrings = value => {
@@ -64,6 +69,7 @@ fn(state => {
 fn(state => {
   console.log('nonReferrals length:', state.cases.nonReferrals.length);
   console.log('referrals length:', state.cases.referrals.length);
+  console.log('decisions length:', state.cases.decisions.length);
   return state;
 });
 
@@ -162,6 +168,46 @@ fn(state => {
     other_other_service: 'Other Service',
   };
 
+  //======================================================================================//
+  //=== NOTE: This is the new mapping for Oscar decisions - added July 2022 ==============//
+  const mappedDecisions = cases.decisions.map(c => {
+    //find Primero services with decisions
+    const primeroService = c.services_section.filter(
+      s => s.service_response_type === 'referral_from_oscar'
+    );
+    //console.log('primero filtered services: ', primeroService);
+
+    //Here we want to find only the MOST RECENT service, taking the last item in the service_section array
+    const primeroLastService = primeroService.length > 1 ? primeroService.length - 1 : 0;
+    // console.log(
+    //   'Most recent Primero service to sync to Oscar: ',
+    //   primeroService[primeroLastService]
+    // );
+
+    //Here we only map the referral status of the Most Recent service from Primero
+    const referral_status = primeroService
+      ? statusMap[oscarStrings(primeroService[primeroLastService].referral_status_edf41f2)] ||
+        'Referred'
+      : 'Referred';
+
+    const referralId = primeroService
+      ? oscarStrings(primeroLastService.oscar_referral_id_a4ac8a5)
+      : undefined;
+
+    const oscarDecision = {
+      external_id: oscarStrings(c.case_id),
+      external_id_display: oscarStrings(c.case_id_display),
+      client_global_id: oscarStrings(c.oscar_number),
+      referral_status,
+      referral_id: referralId,
+    };
+
+    return { data: oscarDecision };
+  });
+
+  console.log('list of mapped decisions', JSON.stringify(mappedDecisions, null, 2));
+  //=================================================================================//
+
   const mappedReferrals = cases.referrals.map(c => {
     const lastTransitionNote =
       c.transitions &&
@@ -208,7 +254,7 @@ fn(state => {
     const primeroService = c.services_section.filter(
       s =>
         s.service_response_type === 'referral_to_oscar' ||
-        s.service_response_type === 'referral_from_oscar'
+        s.service_response_type === 'referral_from_oscar' //TODO: @Aleksa - remove now that we have decisions above?
     );
     //console.log('primero filtered services: ', primeroService);
 
@@ -221,7 +267,8 @@ fn(state => {
 
     //Here we only map the referral status of the Most Recent service from Primero
     const referral_status = primeroService
-      ? statusMap[oscarStrings(primeroService[primeroLastService].referral_status_edf41f2)] || 'Referred'
+      ? statusMap[oscarStrings(primeroService[primeroLastService].referral_status_edf41f2)] ||
+        'Referred'
       : 'Referred';
 
     // Mappings for posting cases to Oscar
@@ -243,20 +290,20 @@ fn(state => {
       external_case_worker_id: oscarStrings(c.owned_by_id),
       external_case_worker_mobile: c.owned_by_phone || '000000000',
       resource: c.workflow === 'referral_to_oscar' ? 'Primero' : undefined,
-      is_referred: true, //NOTE: OSCaR wants us to send this even for decisions
-      referral_status,
-      organization_name: 'cif', //NOTE: Hardcoded for staging testing only; replaces lines below.
-      organization_id: 'cif', //NOTE: Hardcoded
-      //organization_name: setOrganization(c), //NOTE: Add mappings back before go-live
+      is_referred: true,
+      //referral_status, //TODO: @Aleksa - remove now that we send decisions separately?
+      organization_name: 'cif', //TODO: Hardcoded for staging testing only; replaces lines below.
+      organization_id: 'cif', //TODO: Hardcoded, replace with below
+      //organization_name: setOrganization(c), //TODO: Add mappings back before go-live
       //organization_id: oscarStrings(c.owned_by_agency_id),
       services: c.services_section
         .filter(s => s.service_subtype)
         .map(s => {
           return s.service_subtype.map(st => {
             return {
-              uuid: oscarStrings(s.unique_id), 
+              uuid: oscarStrings(s.unique_id),
               name: serviceMap[st] || 'Other',
-              referral_id: oscarStrings(s.oscar_referral_id_a4ac8a5)
+              //referral_id: oscarStrings(s.oscar_referral_id_a4ac8a5), //TODO: @Aleksa - remove now that we send decisions separately?
             };
           });
         })
@@ -333,7 +380,7 @@ fn(state => {
 
   console.log('list of mapped referrals', JSON.stringify(mappedReferrals, null, 2));
 
-  return { ...state, cases: { ...cases, referrals: mappedReferrals } };
+  return { ...state, cases: { ...cases, referrals: mappedReferrals, decisions: mappedDecisions } };
 });
 
 // User Story 1.8b: Create referrals in Oscar
@@ -344,7 +391,22 @@ each(
     body: state => state.data,
     transformResponse: [
       data => {
-        console.log('Oscar says', JSON.stringify(data, null, 2));
+        console.log('Uploading referrals... Oscar says', JSON.stringify(data, null, 2));
+        return data;
+      },
+    ],
+  })
+);
+
+//==== NEW POST request added for updating decisions ======///
+each(
+  '$.cases.decisions[*]',
+  post('/api/v1/organizations/referrals/update_statuses/', {
+    headers: state => state.oscarHeaders,
+    body: state => state.data,
+    transformResponse: [
+      data => {
+        console.log('Uploading decisions...Oscar says', JSON.stringify(data, null, 2));
         return data;
       },
     ],
