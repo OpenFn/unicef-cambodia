@@ -400,7 +400,7 @@ fn(state => {
 
   return {
     ...state,
-    cases: { ...cases, referrals: mappedReferrals, decisions: confirmedDecisions },
+    cases: { ...cases, referrals: mappedReferrals, decisions: [confirmedDecisions] },
   };
 });
 
