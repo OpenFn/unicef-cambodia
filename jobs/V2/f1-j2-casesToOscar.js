@@ -212,7 +212,7 @@ fn(state => {
     JSON.stringify(mappedDecisions, null, 2)
   );
 
-  const confirmedDecisions = mappedDecisions[0].filter(
+  const confirmedDecisions = mappedDecisions.filter(
     d => d.data.referral_status === 'Accepted' || d.data.referral_status === 'Exited'
   );
 
@@ -400,7 +400,7 @@ fn(state => {
 
   return {
     ...state,
-    cases: { ...cases, referrals: mappedReferrals, decisions: [confirmedDecisions] },
+    cases: { ...cases, referrals: mappedReferrals, decisions: confirmedDecisions },
   };
 });
 
