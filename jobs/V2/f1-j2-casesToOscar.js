@@ -194,6 +194,8 @@ fn(state => {
       ? primeroService[primeroLastService].oscar_referral_id_a4ac8a5
       : undefined;
 
+
+
     const oscarDecision = {
       external_id: oscarStrings(c.case_id),
       external_id_display: oscarStrings(c.case_id_display),
@@ -202,7 +204,7 @@ fn(state => {
       referral_id: referralId,
     };
 
-    return { data: oscarDecision };
+    return { data: [oscarDecision] };
   });
 
   console.log(
