@@ -1,0 +1,32 @@
+{
+    "organization": {
+      "external_id": "cf579546-49fc-4352-afc6-6c2636392077",
+      "external_id_display": "6392077",
+      "global_id": "01GA9PSXKEMHVWH7HQZ7XXCRJC",
+      "level_of_risk": "medium",
+      "mosvy_number": "",
+      "given_name": "Aicha",
+      "family_name": "Diallo",
+      "gender": "female",
+      "date_of_birth": "2016-01-01",
+      "location_current_village_code": "01070101",
+      "address_current_village_code": "01070101",
+      "reason_for_referral": "",
+      "external_case_worker_name": "",
+      "external_case_worker_id": "",
+      "external_case_worker_mobile": "000000000",
+      "is_referred": true,
+      "organization_name": "cif",
+      "organization_id": "cif",
+      "services": [
+        {
+          "uuid": "0f0a3165-baf3-4b2d-b931-e002cb447df6",
+          "name": "Long term foster care",
+          "referral_status": "Accepted",
+          "referral_id": "1193"
+
+        }
+      ],
+      "date_of_referral": "2022-05-1"
+    }
+  }
