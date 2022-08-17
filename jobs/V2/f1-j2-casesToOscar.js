@@ -103,6 +103,7 @@ fn(state => {
   const statusMap = {
     accepted_340953: 'Accepted',
     rejected_936484: 'Exited',
+    pending_310366: 'Referred',
   };
 
   function checkValue(data) {
@@ -170,56 +171,86 @@ fn(state => {
 
   //======================================================================================//
   //=== NOTE: This is the new mapping for Oscar decisions - added July 2022 ==============//
-  const mappedDecisions = cases.decisions.map(c => {
-    //find Primero services with decisions
-    const primeroService = c.services_section.filter(
-      s => s.service_response_type === 'referral_from_oscar'
-    );
-    //console.log('primero filtered services: ', primeroService);
+  console.log('decisions', JSON.stringify(cases.decisions, null, 2));
+  const mappedDecisions = cases.decisions
+    .map(c => {
+      const external_id = oscarStrings(c.case_id);
+      const external_id_display = oscarStrings(c.case_id_display);
+      const client_global_id = oscarStrings(c.oscar_number);
 
-    //Here we want to find only the MOST RECENT service, taking the last item in the service_section array
-    const primeroLastService = primeroService.length > 1 ? primeroService.length - 1 : 0;
-    console.log(
-      'Most recent Primero service to sync to Oscar: ',
-      primeroService[primeroLastService]
-    );
+      const referralMap = c.services_section
+        .filter(s => s.service_response_type === 'referral_from_oscar')
+        .map(s => {
+          return {
+            external_id,
+            external_id_display,
+            client_global_id,
+            referral_status: statusMap[s.referral_status_edf41f2] || 'Referred',
+            referral_id: parseInt(s.oscar_referral_id_a4ac8a5),
+          };
+        });
 
-    //Here we only map the referral status of the Most Recent service from Primero
-    const referral_status = primeroService
-      ? statusMap[oscarStrings(primeroService[primeroLastService].referral_status_edf41f2)] ||
-        'Referred'
-      : 'Referred';
+      //console.log('referralMap', JSON.stringify(referralMap, null, 2));
+      return referralMap;
+    })
+    .flat(); //to de-nest array - e.g, convert [[data]] --> [data]
 
-    const referralId = primeroService
-      ? primeroService[primeroLastService].oscar_referral_id_a4ac8a5
-      : undefined;
+  //===== OLD mappedDecisions logic that only mapped the most recent Primero service =====//
+  // const mappedDecisions = cases.decisions.map(c => {
+  //   //find Primero services with decisions
+  //   const primeroService = c.services_section.filter(
+  //     s => s.service_response_type === 'referral_from_oscar'
+  //   );
+  //   console.log('primero filtered services: ', primeroService);
 
+  //   //Here we want to find only the MOST RECENT service, taking the last item in the service_section array
+  //   const primeroLastService = primeroService.length > 1 ? primeroService.length - 1 : 0;
+  //   console.log(
+  //     'Most recent Primero service to sync to Oscar: ',
+  //     primeroService[primeroLastService]
+  //   );
 
+  //   //Here we only map the referral status of the Most Recent service from Primero
+  //   const referral_status = primeroService
+  //     ? statusMap[oscarStrings(primeroService[primeroLastService].referral_status_edf41f2)] ||
+  //       'Referred'
+  //     : 'Referred';
 
-    const oscarDecision = {
-      external_id: oscarStrings(c.case_id),
-      external_id_display: oscarStrings(c.case_id_display),
-      client_global_id: oscarStrings(c.oscar_number),
-      referral_status,
-      referral_id: referralId,
-    };
+  //   const referralId = primeroService
+  //     ? primeroService[primeroLastService].oscar_referral_id_a4ac8a5
+  //     : undefined;
 
-    return { data: [oscarDecision] };
-  });
+  //   const oscarDecision = {
+  //     external_id: oscarStrings(c.case_id),
+  //     external_id_display: oscarStrings(c.case_id_display),
+  //     client_global_id: oscarStrings(c.oscar_number),
+  //     referral_status,
+  //     referral_id: referralId,
+  //   };
+
+  //   return { data: oscarDecision };
+  // });
 
   console.log(
-    'list of oscar_referrals that MIGHT have decisions',
+    'mappedDecisions - list of oscar_referrals that MIGHT have decisions',
     JSON.stringify(mappedDecisions, null, 2)
   );
 
-  const confirmedDecisions = mappedDecisions.filter(
-    d => d.data.referral_status === 'Accepted' || d.data.referral_status === 'Exited'
-  );
+  //Check if decision is accepted/rejected before sending...
+  function checkDecision(d) {
+    return d.referral_status !== 'Referred';
+  }
+
+  const confirmedDecisions = mappedDecisions.filter(checkDecision);
+  //TO REMOVE - replaced with above filter & function checkDecision
+  // const confirmedDecisions = mappedDecisions.filter(
+  //   d => d.data.referral_status === 'Accepted' || d.data.referral_status === 'Exited'
+  // );
 
   console.log('Finding oscar_referrals with confirmed decisions...');
 
   console.log(
-    'list of oscar_referrals with mapped decisions',
+    'confirmedDecisions - list of oscar_referrals with decisions to sync',
     JSON.stringify(confirmedDecisions, null, 2)
   );
   //=================================================================================//
@@ -404,7 +435,9 @@ fn(state => {
   };
 });
 
-// User Story 1.8b: Create referrals in Oscar
+//NOW that data is transforemed, we start to map to Oscar...
+
+//User Story 1.8b: Create referrals in Oscar
 each(
   '$.cases.referrals[*]',
   post('/api/v1/organizations/clients/upsert/', {
@@ -419,45 +452,53 @@ each(
   })
 );
 
-//==== NEW POST requests added for updating decisions ======///
-post(
-  // Oscar authentication, once per run
-  '/api/v1/admin_auth/sign_in',
-  {
-    keepCookie: true,
-    body: {
-      email: state.configuration.username,
-      password: state.configuration.password,
-    },
-  },
-  state => {
-    console.log('Authenticating again with OSCaR...');
-    return {
-      ...state,
-      oscarHeaders: {
-        'Content-Type': 'application/json',
-        uid: state.configuration.username,
-        client: state.data.__headers.client,
-        'access-token': state.data.__headers['access-token'],
-      },
-    };
-  }
-);
+//LOGS FOR TESTING - TO REMOVE
+// fn(state => {
+//   console.log('state', JSON.stringify(state.cases.decisions, null, 2));
+//   return state;
+// });
 
-//NOTE: @Aleksa - This step can be in bulk?
-each(
-  '$.cases.decisions[*]',
-  post('/api/v1/organizations/referrals/update_statuses/', {
-    headers: state => state.oscarHeaders,
-    body: state => state.data,
-    transformResponse: [
-      data => {
-        console.log('Uploading decisions...Oscar says', JSON.stringify(data, null, 2));
-        return data;
-      },
-    ],
-  })
-);
+//== NEW PUT request that sends all decisions in bulk to this new endpoint ==//
+put('/api/v1/organizations/referrals/update_statuses/', {
+  headers: state => state.oscarHeaders,
+  body: state => {
+    const body = { data: state.cases.decisions };
+    console.log('Decisions sent in final PUT request', JSON.stringify(body, null, 2));
+    return body;
+  },
+  transformResponse: [
+    data => {
+      console.log('Uploading decisions...Oscar says', JSON.stringify(data, null, 2));
+      return data;
+    },
+  ],
+});
+
+// //==== TO REMOVE AFTER TESTING NEW PUT ======///
+// //==== OLD POST request previously added for updating decisions; not bulkified ======///
+// post(
+//   // Oscar authentication, once per run
+//   '/api/v1/admin_auth/sign_in',
+//   {
+//     keepCookie: true,
+//     body: {
+//       email: state.configuration.username,
+//       password: state.configuration.password,
+//     },
+//   },
+//   state => {
+//     console.log('Authenticating again with OSCaR...');
+//     return {
+//       ...state,
+//       oscarHeaders: {
+//         'Content-Type': 'application/json',
+//         uid: state.configuration.username,
+//         client: state.data.__headers.client,
+//         'access-token': state.data.__headers['access-token'],
+//       },
+//     };
+//   }
+// );
 
 fn(state => {
   // Here we update links in OSCaR for non-referrals
