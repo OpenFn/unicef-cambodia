@@ -354,9 +354,10 @@ fn(state => {
       c.location_current_village_code || c.address_current_village_code
     );
 
-    const locationCode = c.location_current_village_code || c.address_current_village_code
-      ? parseInt(currentLocation, 10).toString()
-      : null;
+    const locationCode =
+      c.location_current_village_code || c.address_current_village_code
+        ? parseInt(currentLocation, 10).toString()
+        : null;
 
     const isUpdate = c.external_id;
 
@@ -402,6 +403,7 @@ fn(state => {
         oscar_referring_organization: `agency-${c.organization_name}`,
         service_implementing_agency: `agency-${c.organization_name}`, //TODO: @Aicha should these be the same?
         oscar_referral_id_a4ac8a5: s.referral_id ? s.referral_id.toString() : undefined,
+        referral_status_edf41f2: serviceStatusMap[s.referral_status],
       })),
     };
   }
@@ -470,16 +472,15 @@ each(
 fn(state => {
   const { decisions, buildCaseRecord, serviceStatusMap } = state;
 
-  const finalized = decisions
-    .map(buildCaseRecord)
-    // add status to each service in the service section
-    .map(d => ({
-      ...d,
-      services_section: d.services_section.map(s => ({
-        ...s,
-        referral_status_edf41f2: serviceStatusMap[d.__original_oscar_record.status],
-      })),
-    }));
+  const finalized = decisions.map(buildCaseRecord).map(d => ({
+    ...d,
+    //TODO: Remove the below because now we map referral_status above ...?
+    //Here we add status to each service in the service section
+    //   services_section: d.services_section.map(s => ({
+    //     ...s,
+    //     referral_status_edf41f2: serviceStatusMap[d.__original_oscar_record.status],
+    //   })),
+  }));
 
   return { ...state, decisions: finalized, referrals: [] };
 });
