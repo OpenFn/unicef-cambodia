@@ -461,26 +461,23 @@ each(
 //== NEW PUT request that sends all decisions in bulk to this new endpoint ==//
 fn(state => {
   if (state.cases.decisions.length > 0)
-    return put(
-      '/api/v1/organizations/referrals/update_statuses/', 
-      {
-        headers: state => state.oscarHeaders,
-        body: state => {
-          const body = { data: state.cases.decisions };
-          console.log('Decisions sent in final PUT request', JSON.stringify(body, null, 2));
-          return body;
+    return put('/api/v1/organizations/referrals/update_statuses/', {
+      headers: state => state.oscarHeaders,
+      body: state => {
+        const body = { data: state.cases.decisions };
+        console.log('Decisions sent in final PUT request', JSON.stringify(body, null, 2));
+        return body;
+      },
+      transformResponse: [
+        data => {
+          console.log('Uploading decisions...Oscar says', JSON.stringify(data, null, 2));
+          return data;
         },
-        transformResponse: [
-          data => {
-            console.log('Uploading decisions...Oscar says', JSON.stringify(data, null, 2));
-            return data;
-          },
       ],
     })(state);
-    console.log('No non-referral cases to update.');
-    return state;
+  console.log('No decisions to sync to Oscar.');
+  return state;
 });
-    
 
 // //==== TO REMOVE AFTER TESTING NEW PUT ======///
 // //==== OLD POST request previously added for updating decisions; not bulkified ======///
