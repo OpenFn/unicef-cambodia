@@ -343,6 +343,7 @@ fn(state => {
       organization_id: 'cif', //TODO: Hardcoded, replace with below
       //organization_name: setOrganization(c), //TODO: Add mappings back before go-live
       //organization_id: oscarStrings(c.owned_by_agency_id),
+      referral_status: 'Referred',
       services: c.services_section
         .filter(s => s.service_subtype)
         .map(s => {
@@ -350,8 +351,7 @@ fn(state => {
             return {
               uuid: oscarStrings(s.unique_id),
               name: serviceMap[st] || 'Other',
-              referral_status: 'Referred'
-              //referral_id: oscarStrings(s.oscar_referral_id_a4ac8a5), //TODO: @Aleksa - remove now that we send decisions separately?
+              //referral_status: 'Referred' //not needed
             };
           });
         })
