@@ -429,7 +429,13 @@ fn(state => {
 fn(state => {
   const { originalCases } = state;
 
-  const isDecision = c => c.resource == 'primero' && c.status !== 'Referred';
+  //AUG 19 CHANGED to check for Oscar decisions on service-, not case-level ==============///
+  //const isDecision = c => c.resource == 'primero' && c.status !== 'Referred';
+  const isDecision = c =>
+    c.resource == 'primero' &&
+    //Added below to check service-level for decisions
+    c.services.find(s => s.referral_status === 'Accepted' || s.referral_status === 'Exited');
+  //======================================================================================//
 
   const cases = originalCases.filter(c => !isDecision(c));
   const decisions = originalCases.filter(c => isDecision(c));
