@@ -461,9 +461,9 @@ fn(state => {
 
 // we log cases before sending to primero
 fn(state => {
-  console.log('Prepared cases:', JSON.stringify(state.cases, null, 2));
+  //console.log('Prepared cases:', JSON.stringify(state.cases, null, 2));
   const caseIds = state.cases.map(c => ({case_id: c.case_id})); 
-  console.log('case_id externalIds:', JSON.stringify(caseIds, null, 2));
+  console.log('ExternalIds for prepared cases:', JSON.stringify(caseIds, null, 2));
   return state;
 });
 
@@ -473,7 +473,7 @@ each(
   upsertCase({
     externalIds: state => (!!state.data.case_id ? ['case_id'] : ['oscar_number']),
     data: state => { 
-      console.log('dataUploading', state.data); 
+      console.log('Syncing prepared case & checking if exists...', state.data); 
       return state.data; 
     }, 
   })
