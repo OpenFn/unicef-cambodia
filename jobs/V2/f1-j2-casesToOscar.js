@@ -343,7 +343,7 @@ fn(state => {
       organization_id: 'cif', //TODO: Hardcoded, replace with below
       //organization_name: setOrganization(c), //TODO: Add mappings back before go-live
       //organization_id: oscarStrings(c.owned_by_agency_id),
-      referral_status: 'Referred',
+      referral_status: 'Referred', //TODO: TO REMOVE! This overwrites decisions for ALL referrals, but API throws error is not here
       services: c.services_section
         .filter(s => s.service_subtype)
         .map(s => {
