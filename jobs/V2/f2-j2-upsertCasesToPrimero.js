@@ -1,3 +1,9 @@
+fn(state => {
+  console.log('Test 1 with state.cases...');
+  return state;
+});
+
+
 // we create dataClips and functions for later use
 fn(state => {
   // Saving original cases, creating Case:Service ID map =======================
@@ -465,7 +471,7 @@ fn(state => {
 each(
   '$.cases[*]', 
   upsertCase({
-    externalIds: state => (!!state.data.case_id ? ['case_id'] : ['oscar_number']),
+    externalIds: state => (!!state.cases.case_id ? ['case_id'] : ['oscar_number']),
     data: state => { 
       console.log('dataUploading', state.cases); 
       return state.cases; 
