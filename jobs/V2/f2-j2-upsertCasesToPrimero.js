@@ -461,6 +461,7 @@ fn(state => {
 
 fn(state => {
   console.log('Cases to sync to Primero...:', JSON.stringify(state.data, null, 2));
+  console.log('external_id :', JSON.stringify(state.data.external_id, null, 2));
   return state;
 });
 
