@@ -3,7 +3,7 @@ fn(state => {
   const currentAttempt = new Date().toISOString();
   console.log('Current attempt time:', currentAttempt);
   console.log('Last sync end date:', state.lastRunDateTime || 'undefined; using manual cursor...');
-  const manualCursor = '2022-08-19T00:31:58.341Z';
+  const manualCursor = '022-08-19T13:45:46.278Z';
   const cursor = state.lastRunDateTime || manualCursor;
   console.log('Cursor:', cursor);
   return { ...state, cursor, currentAttempt };
