@@ -1,5 +1,5 @@
 fn(state => {
-  console.log('Test 1 with state.cases...');
+  console.log('Test 1 with state.data...');
   return state;
 });
 
@@ -471,10 +471,10 @@ fn(state => {
 each(
   '$.cases[*]', 
   upsertCase({
-    externalIds: state => (!!state.cases.case_id ? ['case_id'] : ['oscar_number']),
+    externalIds: state => (!!state.data.case_id ? ['case_id'] : ['oscar_number']),
     data: state => { 
-      console.log('dataUploading', state.cases); 
-      return state.cases; 
+      console.log('dataUploading', state.data); 
+      return state.data; 
     }, 
   })
 );
