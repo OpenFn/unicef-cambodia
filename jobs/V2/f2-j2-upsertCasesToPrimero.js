@@ -458,15 +458,15 @@ fn(state => {
 fn(state => {
   //console.log('Prepared cases:', JSON.stringify(state.cases, null, 2));
   const caseIds = state.cases.map(c => ({case_id: c.case_id})); 
-  console.log('ExternalIds for prepared cases:', JSON.stringify(caseIds, null, 2));
+  console.log('External Ids for prepared cases:', JSON.stringify(caseIds, null, 2));
   return state;
 });
 
 // we upsert Primero cases based on matching 'oscar_number' OR 'case_id'
 each(
-  '$.cases[*]', 
+  '$.cases[*]', //use each() here returns state.data for each case record
   upsertCase({
-    externalIds: state => (!!state.data.case_id ? ['case_id'] : ['oscar_number']),
+    externalIds: state => (!!state.data.case_id ? ['case_id'] : ['oscar_number']), //changed from state.data.external_id
     data: state => { 
       console.log('Syncing prepared case & checking if exists...', state.data); 
       return state.data; 
