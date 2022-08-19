@@ -461,18 +461,15 @@ fn(state => {
   return state;
 });
 
-// fn(state => {
-//   console.log('Cases to sync to Primero...:', JSON.stringify(state.data, null, 2));
-//   console.log('external_id :', JSON.stringify(state.data.external_id, null, 2));
-//   return state;
-// });
-
 // we upsert Primero cases based on matching 'oscar_number' OR 'case_id'
 each(
-  '$.cases[*]',
+  '$.cases[*]', 
   upsertCase({
     externalIds: state => (!!state.data.case_id ? ['case_id'] : ['oscar_number']),
-    data: state => state.cases,
+    data: state => { 
+      console.log('dataUploading', state.data); 
+      return state.data; 
+    }, 
   })
 );
 
