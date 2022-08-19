@@ -460,7 +460,7 @@ fn(state => {
 // });
 
 fn(state => {
-  console.log('Cases to sync to Primero...:', JSON.stringify(state.cases, null, 2));
+  console.log('Cases to sync to Primero...:', JSON.stringify(state.data, null, 2));
   return state;
 });
 
