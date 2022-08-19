@@ -118,13 +118,8 @@ getCases(
       .filter(c => c.oscar_number)
       .filter(c => {
         if (c.services_section) {
-          // if it has a services section, ensure no services include a referral
-          // for this step, we only want to sync Oscar cases with no referral (assume referrals handled in flow above)
-          return !c.services_section.some(
-            s =>
-              s.service_response_type === 'referral_to_oscar' ||
-              s.service_response_type === 'referral_from_oscar'
-          );
+          // if it has a services section, ensure no services include "referral_to_oscar"
+          return !c.services_section.some(s => s.service_response_type === 'referral_to_oscar');
         }
         return true;
       })

@@ -350,7 +350,6 @@ fn(state => {
             return {
               uuid: oscarStrings(s.unique_id),
               name: serviceMap[st] || 'Other',
-              referral_status: 'Referred',
               //referral_id: oscarStrings(s.oscar_referral_id_a4ac8a5), //TODO: @Aleksa - remove now that we send decisions separately?
             };
           });
