@@ -1,11 +1,6 @@
-fn(state => {
-  console.log('Test 1 with state.data...');
-  return state;
-});
-
-
 // we create dataClips and functions for later use
 fn(state => {
+  console.log('Preparing cases and decisions for upload to Primero...');
   // Saving original cases, creating Case:Service ID map =======================
   state.originalCases = state.data.data;
   state.serviceRecordIds = {};
