@@ -467,8 +467,8 @@ each(
   upsertCase({
     externalIds: state => (!!state.data.case_id ? ['case_id'] : ['oscar_number']),
     data: state => { 
-      console.log('dataUploading', state.data); 
-      return state.data; 
+      console.log('dataUploading', state.cases); 
+      return state.cases; 
     }, 
   })
 );
