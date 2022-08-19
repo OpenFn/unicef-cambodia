@@ -538,9 +538,12 @@ each(
     // There's a service on the parentCase with subtype[0] that
     // matches the oscarRefferedService subtype[0] (only one for each)
     const matchingService = parentCase.services_section.find(s => {
-      //CHANGE - 19 Aug 2022. NOW we want to match referrals based on oscar_referral_id
+      //CHANGE - 19 Aug 2022. NOW we want to match referrals based on service subtype AND oscar_referral_id
       console.log('parentCase service oscar_referral_id_a4ac8a5 ::', s.oscar_referral_id_a4ac8a5);
-      return s.oscar_referral_id_a4ac8a5 === oscarReferredService.oscar_referral_id_a4ac8a5;
+      return (
+        s.service_subtype[0] === oscarReferredService.service_subtype[0] &&
+        s.oscar_referral_id_a4ac8a5 === oscarReferredService.oscar_referral_id_a4ac8a5
+      );
       //==TODO: Remove once the above is confirmed to work =============//
       // BEFORE... we would match services based on subtype
       // console.log('parentCase services subtype ::', s.service_subtype);
