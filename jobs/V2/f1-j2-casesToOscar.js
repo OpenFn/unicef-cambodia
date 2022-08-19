@@ -324,7 +324,7 @@ fn(state => {
       // oscar_field, primero_field,
       external_id: oscarStrings(c.case_id),
       external_id_display: oscarStrings(c.case_id_display),
-      global_id: oscarStrings(c.oscar_number),
+      global_id: c.oscar_number ? oscarStrings(c.oscar_number) : undefined,
       level_of_risk: c.risk_level,
       mosvy_number: oscarStrings(c.mosvy_number),
       given_name: oscarStrings(c.name_first),
@@ -339,8 +339,6 @@ fn(state => {
       external_case_worker_mobile: c.owned_by_phone || '000000000',
       resource: c.workflow === 'referral_to_oscar' ? 'Primero' : undefined,
       is_referred: true,
-      referral_status: 'Referred', //Default value when sending new referral
-      //referral_status, //TODO: @Aleksa - remove now that we send decisions separately?
       organization_name: 'cif', //TODO: Hardcoded for staging testing only; replaces lines below.
       organization_id: 'cif', //TODO: Hardcoded, replace with below
       //organization_name: setOrganization(c), //TODO: Add mappings back before go-live
@@ -352,6 +350,7 @@ fn(state => {
             return {
               uuid: oscarStrings(s.unique_id),
               name: serviceMap[st] || 'Other',
+              referral_status: 'Referred',
               //referral_id: oscarStrings(s.oscar_referral_id_a4ac8a5), //TODO: @Aleksa - remove now that we send decisions separately?
             };
           });
