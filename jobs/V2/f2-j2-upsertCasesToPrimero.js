@@ -454,23 +454,24 @@ fn(state => {
 });
 
 // we log cases before sending to primero
-// fn(state => {
-//   console.log('Prepared cases:', JSON.stringify(state.cases, null, 2));
-//   return state;
-// });
-
 fn(state => {
-  console.log('Cases to sync to Primero...:', JSON.stringify(state.data, null, 2));
-  console.log('external_id :', JSON.stringify(state.data.external_id, null, 2));
+  console.log('Prepared cases:', JSON.stringify(state.cases, null, 2));
+  console.log('external_id :', JSON.stringify(state.cases.case_id, null, 2));
   return state;
 });
+
+// fn(state => {
+//   console.log('Cases to sync to Primero...:', JSON.stringify(state.data, null, 2));
+//   console.log('external_id :', JSON.stringify(state.data.external_id, null, 2));
+//   return state;
+// });
 
 // we upsert Primero cases based on matching 'oscar_number' OR 'case_id'
 each(
   '$.cases[*]',
   upsertCase({
-    externalIds: state => (!!state.data.external_id ? ['case_id'] : ['oscar_number']),
-    data: state => state.data,
+    externalIds: state => (!!state.cases.case_id ? ['case_id'] : ['oscar_number']),
+    data: state => state.cases,
   })
 );
 
