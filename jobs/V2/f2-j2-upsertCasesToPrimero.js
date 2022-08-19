@@ -457,7 +457,7 @@ fn(state => {
 // we log cases before sending to primero
 fn(state => {
   //console.log('Prepared cases:', JSON.stringify(state.cases, null, 2));
-  const caseIds = state.cases.map(c => ({case_id: c.case_id})); 
+  const caseIds = state.cases.map(c => ({ case_id: c.case_id }));
   console.log('External Ids for prepared cases:', JSON.stringify(caseIds, null, 2));
   return state;
 });
@@ -467,10 +467,10 @@ each(
   '$.cases[*]', //using each() here returns state.data for each item in the prepared "cases" array
   upsertCase({
     externalIds: state => (!!state.data.case_id ? ['case_id'] : ['oscar_number']), //changed from state.data.external_id
-    data: state => { 
-      console.log('Syncing prepared case & checking if exists...', state.data); 
-      return state.data; 
-    }, 
+    data: state => {
+      console.log('Syncing prepared case & checking if exists...', state.data);
+      return state.data;
+    },
   })
 );
 
@@ -538,8 +538,14 @@ each(
     // There's a service on the parentCase with subtype[0] that
     // matches the oscarRefferedService subtype[0] (only one for each)
     const matchingService = parentCase.services_section.find(s => {
-      console.log('parentCase services subtype ::', s.service_subtype);
-      return s.service_subtype[0] === oscarReferredService.service_subtype[0];
+      //CHANGE - 19 Aug 2022. NOW we want to match referrals based on oscar_referral_id
+      console.log('parentCase service oscar_referral_id_a4ac8a5 ::', s.oscar_referral_id_a4ac8a5);
+      return s.oscar_referral_id_a4ac8a5 === oscarReferredService.oscar_referral_id_a4ac8a5;
+      //==TODO: Remove once the above is confirmed to work =============//
+      // BEFORE... we would match services based on subtype
+      // console.log('parentCase services subtype ::', s.service_subtype);
+      // return s.service_subtype[0] === oscarReferredService.service_subtype[0];
+      //==============++============================================//
     });
 
     console.log('matchingService ::', matchingService);
