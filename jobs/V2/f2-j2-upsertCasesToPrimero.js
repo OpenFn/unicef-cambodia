@@ -464,7 +464,7 @@ fn(state => {
 
 // we upsert Primero cases based on matching 'oscar_number' OR 'case_id'
 each(
-  '$.cases[*]', //use each() here returns state.data for each case record
+  '$.cases[*]', //using each() here returns state.data for each item in the prepared "cases" array
   upsertCase({
     externalIds: state => (!!state.data.case_id ? ['case_id'] : ['oscar_number']), //changed from state.data.external_id
     data: state => { 
