@@ -454,8 +454,13 @@ fn(state => {
 });
 
 // we log cases before sending to primero
+// fn(state => {
+//   console.log('Prepared cases:', JSON.stringify(state.cases, null, 2));
+//   return state;
+// });
+
 fn(state => {
-  console.log('Prepared cases:', JSON.stringify(state.cases, null, 2));
+  console.log('Cases to sync to Primero...:', JSON.stringify(state.cases, null, 2));
   return state;
 });
 
