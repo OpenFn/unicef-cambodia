@@ -598,18 +598,19 @@ each(
           return {
             ...d,
             services_section: d.services_section.map(s => {
-              // and find the right service...
+              // and find the right service, matching by subtype..
               decisionServiceType = s.service_subtype[0];
               matchingService = parentServices.find(
                 s =>
                   s.service_subtype[0] === decisionServiceType &&
                   s.referral_status_edf41f2 === 'pending_310366' //TODO: TEST WHEN STATUS NOT SET
+                //looking for Primero services where decision is 'pending' & has not yet been updated...
               );
               matchingServiceId = matchingService ? matchingService.unique_id : undefined;
 
-              console.log('decisionServiceType ::', decisionServiceType);
-              console.log('matchingService ::', matchingService);
-              console.log('matchingServiceId ::', matchingServiceId);
+              console.log('Oscar decisionServiceType to match on::', decisionServiceType);
+              console.log('matchingService in Primero found ::', matchingService);
+              console.log('matchingServiceId in Primero found::', matchingServiceId);
 
               return {
                 ...s,
@@ -622,6 +623,7 @@ each(
         return d;
       });
 
+      //Now let's find the service's parent referral to update
       const matchingReferral = parentCase.referrals.find(
         r =>
           // where status is in_progress...
@@ -668,7 +670,7 @@ each(
   })
 );
 
-// clean decision payload & only send those with services
+// Now let's clean decision payload & only sync cases with decisions for services...
 fn(state => {
   const cleanedDecisions = state.decisions
     .map(d => {
@@ -678,7 +680,7 @@ fn(state => {
     })
     .filter(d => d.services_section.length > 0);
 
-  console.log('cleanedDecisions to update:', JSON.stringify(cleanedDecisions, null, 2));
+  console.log('cleanedDecisions to sync to Primero:', JSON.stringify(cleanedDecisions, null, 2));
   return { ...state, decisions: cleanedDecisions };
 });
 
