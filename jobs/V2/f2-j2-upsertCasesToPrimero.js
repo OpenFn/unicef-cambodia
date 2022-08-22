@@ -427,21 +427,21 @@ fn(state => {
 
 // we separate cases from decisions
 fn(state => {
-  const { originalCases } = state;
+  const { originalCases, serviceMap } = state;
 
   //AUG 19 CHANGED to check for Oscar decisions on service-, not case-level ==============///
   //const isDecision = c => c.resource == 'primero' && c.status !== 'Referred';
   const isDecision = c =>
     c.resource == 'primero' &&
     //Added below to check service-level for decisions
-    c.services.find(s => s.referral_status === 'Accepted' || s.referral_status === 'Exited');
+    c.services.filter(s => s.referral_status !== 'Referred');
   //======================================================================================//
 
   const cases = originalCases.filter(c => !isDecision(c));
   const decisions = originalCases.filter(c => isDecision(c));
 
-  console.log('Cases:', cases.length);
-  console.log('Decisions:', decisions.length);
+  console.log('Standard Cases:', cases.length);
+  console.log('Cases with Decisions:', decisions.length);
 
   return { ...state, cases, decisions };
 });
@@ -466,7 +466,7 @@ fn(state => {
   });
 
   console.log(
-    'Prepared cases with filtered services:',
+    'Prepared cases to sync back to Primero:',
     JSON.stringify(finalizedNoRefsFromPrimero, null, 2)
   );
   // TODO: @Aleksa to confirm that we can add location-check validation in the job; for 2nd referrals, it's okay if `owned_by` is undefined
@@ -497,24 +497,25 @@ each(
 
 // we build decisions for primero, add array for referrals to update
 fn(state => {
-  const { decisions, buildCaseRecord, serviceStatusMap } = state;
+  const { decisions, buildCaseRecord, serviceMap } = state;
 
-  const finalized = decisions.map(buildCaseRecord).map(d => ({
-    ...d,
-    //TODO: Remove the below because now we map referral_status above ...?
-    //Here we add status to each service in the service section
-    //   services_section: d.services_section.map(s => ({
-    //     ...s,
-    //     referral_status_edf41f2: serviceStatusMap[d.__original_oscar_record.status],
-    //   })),
-  }));
+  const finalized = decisions.map(buildCaseRecord);
+  //  AUG 19: Removed the below because now we map referral_status above =====//
+  // .map(d => ({
+  //   ...d,
+  //   //Here we add status to each service in the service section
+  //   //   services_section: d.services_section.map(s => ({
+  //   //     ...s,
+  //   //     referral_status_edf41f2: serviceStatusMap[d.__original_oscar_record.status],
+  //   //   })),
+  // }));
 
   return { ...state, decisions: finalized, referrals: [] };
 });
 
 // we log decisions before sending to primero
 fn(state => {
-  console.log('Prepared decisions:', JSON.stringify(state.decisions, null, 2));
+  console.log('Prepared decisions:', JSON.stringify(state.decisions.data, null, 2));
   return state;
 });
 
@@ -522,19 +523,19 @@ fn(state => {
 each(
   '$.decisions[*]',
   getCases({ case_id: dataValue('case_id') }, { withReferrals: true }, nextState => {
-    const { decisions, references, data } = nextState;
+    const { decisions, references, data, serviceMap } = nextState;
     const decision = references[references.length - 1];
 
     if (data.length > 1) throw new Error('Duplicate case_id on Primero');
     const parentCase = data[0];
 
-    const newDecision = decision.__original_oscar_record.services.find(
+    const newDecisions = decision.__original_oscar_record.services.filter(
       s => s.enrollment_date === null
     );
 
-    console.log('The "newDecision" is', newDecision); // undefined
+    console.log('The "newDecisions" are', newDecisions); // undefined
 
-    if (!newDecision) {
+    if (!newDecisions) {
       console.log(
         'Skipping dropping this decision from the array; no services with enrollment_date === null'
       );
@@ -544,56 +545,101 @@ each(
       };
     }
 
-    const oscarReferredServiceId = newDecision.uuid;
+    const oscarReferredServices = newDecisions;
+    const oscarReferredReferralIds = newDecisions.map(d => d.referral_id);
 
-    console.log('oscarReferredServiceId ::', oscarReferredServiceId);
+    console.log('oscarReferredServices ::', oscarReferredServices);
+    //=====================================================================//
+    //== AUG 22 CHANGE: Match services based on Oscar referral_id, not service uuid ==//
+    console.log('oscar referral_ids ::', oscarReferredReferralIds);
 
-    const oscarReferredService = decision.services_section.find(
-      s => s.unique_id === oscarReferredServiceId
-    );
+    // const oscarReferredService = decision.services_section.filter(
+    //   //s => s.unique_id === oscarReferredServiceId
+    //   s => s.oscar_referral_id_a4ac8a5 == oscarReferredReferralId
+    // );
 
-    console.log('oscarReferredService ::', oscarReferredService);
+    // console.log('oscarReferredService ::', oscarReferredService);
 
     console.log('parentCase ::', parentCase);
 
     // There's a service on the parentCase with subtype[0] that
     // matches the oscarRefferedService subtype[0] (only one for each)
-    const matchingService = parentCase.services_section.find(s => {
-      // //CHANGE TO CONSIDER - 19 Aug 2022. NOW we want to match referrals based on service subtype AND oscar_referral_id
-      // console.log('parentCase service oscar_referral_id_a4ac8a5 ::', s.oscar_referral_id_a4ac8a5);
-      // return (
-      //   s.service_subtype[0] === oscarReferredService.service_subtype[0] &&
-      //   s.oscar_referral_id_a4ac8a5 === oscarReferredService.oscar_referral_id_a4ac8a5
-      // );
+    //const matchingServices = parentCase.services_section
+    // .find(s => {
+    //   // //CHANGE TO CONSIDER - 19 Aug 2022. NOW we want to match referrals based on service subtype AND oscar_referral_id
+    //   // console.log('parentCase service oscar_referral_id_a4ac8a5 ::', s.oscar_referral_id_a4ac8a5);
+    //   // return (
+    //   //   s.service_subtype[0] === oscarReferredService.service_subtype[0] &&
+    //   //   s.oscar_referral_id_a4ac8a5 === oscarReferredService.oscar_referral_id_a4ac8a5
+    //   // );
 
-      // RN... we would match services based on subtype
-      console.log('parentCase services subtype ::', s.service_subtype);
-      return s.service_subtype[0] === oscarReferredService.service_subtype[0];
-      //==============++============================================//
-    });
+    //   // RN... we would match services based on subtype
+    //   console.log('parentCase services subtype ::', s.service_subtype);
+    //   return s.service_subtype[0] === oscarReferredService.service_subtype[0];
+    //   //==============++============================================//
+    // });
 
-    console.log('matchingService ::', matchingService);
+    //  console.log('matchingServices ::', matchingServices);
 
     // NOTE: Once we've found the matching service, overwrite its Oscar-generated
     // uuid with the Primero Unique ID so that we can update this service in
     // Primero.
     // TODO: Confirm that this is really the logic we want to apply.
-    if (matchingService) {
+
+    const parentServices = parentCase.services_section;
+
+    console.log('parentServices ::', parentServices);
+
+    if (parentServices) {
       const updatedDecisions = decisions.map(d => {
         // find the right case...
+        //console.log('oscar decision payload ::', d);
         if (d.case_id === decision.case_id) {
           return {
             ...d,
             services_section: d.services_section.map(s => {
               // and find the right service...
-              if (s.unique_id === oscarReferredServiceId)
-                console.log('matching services via unique_id');
+              decisionServiceType = s.service_subtype[0];
+              matchingService = parentServices.find(
+                s => s.service_subtype[0] === decisionServiceType
+              );
+              matchingServiceId = matchingService.unique_id;
+
+              console.log('decisionServiceType ::', decisionServiceType);
+              console.log('matchingService ::', matchingService);
+              console.log('matchingServiceId ::', matchingServiceId);
+
               return {
                 ...s,
+                //referral_status_edf41f2: matchingServiceStatus,
                 // Update the unique_id when we've got our needle in the haystack
-                unique_id: matchingService.unique_id,
+                unique_id: matchingServiceId,
               };
-              return s;
+
+              // // const serviceUid = s.unique_id;
+              // // console.log('serviceUid ::', serviceUid);
+
+              // const decisionServiceSubtype = serviceMap[oscarReferredServices.name].subtype;
+
+              // const serviceType = s.service_subtype[0];
+              // console.log('parent service subtype ::', serviceType);
+              // console.log('decisionServiceSubtype ::', decisionServiceSubtype);
+
+              // if (oscarReferredServices) console.log('matching services via service subtype...');
+
+              // const matchingService = s.find(s => decisionServiceSubtype === serviceType);
+              // const matchingServiceUuid = matchingService.unique_id;
+              // //const matchingServiceStatus = matchingService.referral_status_edf41f2;
+
+              // console.log('matchingService ::', matchingService);
+              // console.log('matchingServiceUuid ::', matchingServiceUuid);
+              // //console.log('matchingServiceStatus ::', matchingServiceStatus);
+              // return {
+              //   ...s,
+              //   //referral_status_edf41f2: matchingServiceStatus,
+              //   // Update the unique_id when we've got our needle in the haystack
+              //   unique_id: matchingServiceUuid,
+              // };
             }),
           };
         }
@@ -618,6 +664,7 @@ each(
       return { ...nextState, decisions: updatedDecisions };
     }
     // TODO: @Aicha, please confirm that we don't update decisions if no matching services are found.
+
     return { ...nextState };
   })
 );
