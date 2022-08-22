@@ -452,8 +452,13 @@ fn(state => {
 
   const finalized = cases.map(buildCaseRecord).map(c => {
     delete c.__original_oscar_record;
-    return c;
+    const newCases = c.services_section.filter(
+      s => s.service_response_type !== 'referral_to_oscar'
+    );
+    return newCases;
   });
+
+  console.log('Prepared cases with filtered services:', JSON.stringify(finalized, null, 2));
   // TODO: @Aleksa to confirm that we can add location-check validation in the job; for 2nd referrals, it's okay if `owned_by` is undefined
   //.filter(c => c.owned_by);
 
