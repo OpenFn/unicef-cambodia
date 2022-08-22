@@ -350,6 +350,12 @@ fn(state => {
     Exited: 'rejected',
   };
 
+  const PrimeroServiceToReferralStatusMap = {
+    accepted_340953: 'accepted',
+    rejected_936484: 'rejected',
+    pending_310366: 'in_progress',
+  };
+
   function buildCaseRecord(c) {
     const currentLocation = setLocationCode(
       c.location_current_village_code || c.address_current_village_code
@@ -523,7 +529,7 @@ fn(state => {
 each(
   '$.decisions[*]',
   getCases({ case_id: dataValue('case_id') }, { withReferrals: true }, nextState => {
-    const { decisions, references, data, serviceMap } = nextState;
+    const { decisions, references, data, PrimeroServiceToReferralStatusMap } = nextState;
     const decision = references[references.length - 1];
 
     if (data.length > 1) throw new Error('Duplicate case_id on Primero');
@@ -607,10 +613,14 @@ each(
                 //looking for Primero services where decision is 'pending' & has not yet been updated...
               );
               matchingServiceId = matchingService ? matchingService.unique_id : undefined;
+              matchingServiceDecision = matchingService
+                ? PrimeroServiceToReferralStatusMap[matchingService.referral_status_edf41f2]
+                : undefined;
 
               console.log('Oscar decisionServiceType to match on::', decisionServiceType);
               console.log('matchingService in Primero found ::', matchingService);
               console.log('matchingServiceId in Primero found::', matchingServiceId);
+              console.log('matchingServiceDecision in Primero found::', matchingServiceDecision);
 
               return {
                 ...s,
@@ -636,7 +646,8 @@ each(
       if (matchingReferral)
         nextState.referrals.push({
           ...matchingReferral,
-          status: nextState.referralStatusMap[decision.__original_oscar_record.status],
+          status: matchingServiceDecision,
+          //status: nextState.referralStatusMap[decision.__original_oscar_record.status],
           case_id: decision.case_id,
         });
 
