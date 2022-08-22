@@ -452,6 +452,7 @@ fn(state => {
 
   const finalized = cases.map(buildCaseRecord).map(c => {
     delete c.__original_oscar_record;
+    return c;
   });
   console.log('finalized:', JSON.stringify(finalized, null, 2));
 
