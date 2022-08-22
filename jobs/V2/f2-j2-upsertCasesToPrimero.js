@@ -618,14 +618,12 @@ each(
                 //looking for Primero services where decision is 'pending' & has not yet been updated...
               );
               matchingServiceId = matchingService ? matchingService.unique_id : undefined;
-              matchingServiceDecision = matchingService
-                ? PrimeroServiceToReferralStatusMap[matchingService.referral_status_edf41f2]
-                : undefined;
+              decisionStatus = s.referral_status_edf41f2;
 
               console.log('Oscar decisionServiceType to match on::', decisionServiceType);
               console.log('matchingService in Primero found ::', matchingService);
               console.log('matchingServiceId in Primero found::', matchingServiceId);
-              console.log('matchingServiceDecision for Referral found::', matchingServiceDecision);
+              console.log('decisionStatus for Referral found::', decisionStatus);
 
               return {
                 ...s,
@@ -651,7 +649,7 @@ each(
       if (matchingReferral)
         nextState.referrals.push({
           ...matchingReferral,
-          status: matchingServiceDecision,
+          status: decisionStatus,
           //status: nextState.referralStatusMap[decision.__original_oscar_record.status],
           case_id: decision.case_id,
         });
