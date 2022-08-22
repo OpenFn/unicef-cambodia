@@ -606,10 +606,14 @@ each(
             services_section: d.services_section.map(s => {
               // and find the right service, matching by subtype..
               decisionServiceType = s.service_subtype[0];
+              referralId = s.oscar_referral_id_a4ac8a5;
               matchingService = parentServices.find(
                 s =>
-                  s.service_subtype[0] === decisionServiceType &&
-                  s.referral_status_edf41f2 === 'pending_310366' //TODO: TEST WHEN STATUS NOT SET
+                  s.oscar_referral_id_a4ac8a5 === referralId ||
+                  s.service_subtype[0] === decisionServiceType
+                // (s.service_subtype[0] === decisionServiceType &&
+                //   s.referral_status_edf41f2 === 'pending_310366') //TODO: FIX; throws errors when no pending service found
+                //== ERROR: TypeError: Cannot read property 'pending_310366' of undefined =========//
                 //looking for Primero services where decision is 'pending' & has not yet been updated...
               );
               matchingServiceId = matchingService ? matchingService.unique_id : undefined;
@@ -620,7 +624,7 @@ each(
               console.log('Oscar decisionServiceType to match on::', decisionServiceType);
               console.log('matchingService in Primero found ::', matchingService);
               console.log('matchingServiceId in Primero found::', matchingServiceId);
-              console.log('matchingServiceDecision in Primero found::', matchingServiceDecision);
+              console.log('matchingServiceDecision for Referral found::', matchingServiceDecision);
 
               return {
                 ...s,
