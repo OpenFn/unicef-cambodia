@@ -428,6 +428,7 @@ fn(state => {
     serviceMap,
     setServiceResponseType,
     buildCaseRecord,
+    PrimeroServiceToReferralStatusMap,
   };
 });
 
