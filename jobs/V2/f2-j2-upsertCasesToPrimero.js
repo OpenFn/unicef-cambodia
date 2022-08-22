@@ -675,7 +675,10 @@ fn(state => {
   const cleanedDecisions = state.decisions
     .map(d => {
       delete d.__original_oscar_record;
-      const filteredServices = d.services_section.filter(s => s.unique_id);
+      //only sync decisions with a matching Primero service_id and a decision update
+      const filteredServices = d.services_section.filter(
+        s => s.unique_id && s.referral_status_edf41f2
+      );
       return { ...d, services_section: filteredServices };
     })
     .filter(d => d.services_section.length > 0);
