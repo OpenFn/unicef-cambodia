@@ -601,9 +601,11 @@ each(
               // and find the right service...
               decisionServiceType = s.service_subtype[0];
               matchingService = parentServices.find(
-                s => s.service_subtype[0] === decisionServiceType
+                s =>
+                  s.service_subtype[0] === decisionServiceType &&
+                  s.referral_status_edf41f2 === 'pending_310366' //TODO: TEST WHEN STATUS NOT SET
               );
-              matchingServiceId = matchingService.unique_id;
+              matchingServiceId = matchingService ? matchingService.unique_id : undefined;
 
               console.log('decisionServiceType ::', decisionServiceType);
               console.log('matchingService ::', matchingService);
@@ -611,35 +613,9 @@ each(
 
               return {
                 ...s,
-                //referral_status_edf41f2: matchingServiceStatus,
                 // Update the unique_id when we've got our needle in the haystack
                 unique_id: matchingServiceId,
               };
-
-              // // const serviceUid = s.unique_id;
-              // // console.log('serviceUid ::', serviceUid);
-
-              // const decisionServiceSubtype = serviceMap[oscarReferredServices.name].subtype;
-
-              // const serviceType = s.service_subtype[0];
-              // console.log('parent service subtype ::', serviceType);
-              // console.log('decisionServiceSubtype ::', decisionServiceSubtype);
-
-              // if (oscarReferredServices) console.log('matching services via service subtype...');
-
-              // const matchingService = s.find(s => decisionServiceSubtype === serviceType);
-              // const matchingServiceUuid = matchingService.unique_id;
-              // //const matchingServiceStatus = matchingService.referral_status_edf41f2;
-
-              // console.log('matchingService ::', matchingService);
-              // console.log('matchingServiceUuid ::', matchingServiceUuid);
-              // //console.log('matchingServiceStatus ::', matchingServiceStatus);
-              // return {
-              //   ...s,
-              //   //referral_status_edf41f2: matchingServiceStatus,
-              //   // Update the unique_id when we've got our needle in the haystack
-              //   unique_id: matchingServiceUuid,
-              // };
             }),
           };
         }
@@ -649,7 +625,8 @@ each(
       const matchingReferral = parentCase.referrals.find(
         r =>
           // where status is in_progress...
-          r.status === 'in_progress' && matchingService
+          r.status === 'in_progress' && //TODO: TEST MATCHING REF
+          r.service_record_id === matchingServiceId
       );
 
       if (matchingReferral) console.log('Matching referral found:', matchingReferral);
@@ -663,7 +640,6 @@ each(
 
       return { ...nextState, decisions: updatedDecisions };
     }
-    // TODO: @Aicha, please confirm that we don't update decisions if no matching services are found.
 
     return { ...nextState };
   })
@@ -692,10 +668,18 @@ each(
   })
 );
 
-// log matching decisions
+// clean decision payload & only send those with services
 fn(state => {
-  console.log('Decisions to update:', JSON.stringify(state.decisions, null, 2));
-  return state;
+  const cleanedDecisions = state.decisions
+    .map(d => {
+      delete d.__original_oscar_record;
+      const filteredServices = d.services_section.filter(s => s.unique_id);
+      return { ...d, services_section: filteredServices };
+    })
+    .filter(d => d.services_section.length > 0);
+
+  console.log('cleanedDecisions to update:', JSON.stringify(cleanedDecisions, null, 2));
+  return { ...state, decisions: cleanedDecisions };
 });
 
 // for EACH decision, we upsert the primero case record
@@ -703,9 +687,10 @@ each(
   '$.decisions[*]',
   upsertCase({
     externalIds: ['case_id'],
+
     data: state => {
       const decision = state.data;
-      delete decision.__original_oscar_record;
+      console.log('Syncing decision... ::', decision);
       return decision;
     },
   })
