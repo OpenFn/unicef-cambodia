@@ -450,7 +450,11 @@ fn(state => {
 fn(state => {
   const { cases, buildCaseRecord } = state;
 
-  const newCases = cases.map(c => {
+  const finalized = newCases.map(buildCaseRecord).map(c => {
+    delete c.__original_oscar_record;
+  });
+
+  const finalizedNoRefsFromPrimero = finalized.map(c => {
     return {
       ...c,
       services_section: c.services_section
@@ -461,17 +465,14 @@ fn(state => {
     };
   });
 
-  console.log('newCases:', JSON.stringify(newCases, null, 2));
-
-  const finalized = newCases.map(buildCaseRecord).map(c => {
-    delete c.__original_oscar_record;
-  });
-
-  console.log('Prepared cases with filtered services:', JSON.stringify(finalized, null, 2));
+  console.log(
+    'Prepared cases with filtered services:',
+    JSON.stringify(finalizedNoRefsFromPrimero, null, 2)
+  );
   // TODO: @Aleksa to confirm that we can add location-check validation in the job; for 2nd referrals, it's okay if `owned_by` is undefined
   //.filter(c => c.owned_by);
 
-  return { ...state, cases: finalized };
+  return { ...state, cases: finalizedNoRefsFromPrimero };
 });
 
 // we log cases before sending to primero
