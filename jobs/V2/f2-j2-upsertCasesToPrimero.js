@@ -460,9 +460,7 @@ fn(state => {
     return {
       ...c,
       services_section: c.services_section
-        ? c.services_section.map(s => {
-            s.filter(serv => serv.service_response_type !== 'referral_to_oscar');
-          })
+        ? c.services_section.filter(s => s.service_response_type !== 'referral_to_oscar')
         : undefined,
     };
   });
