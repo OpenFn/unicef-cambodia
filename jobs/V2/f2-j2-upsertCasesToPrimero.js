@@ -453,11 +453,15 @@ fn(state => {
   const newCases = cases.map(c => {
     return {
       ...c,
-      services_section: c.services_section.map(s => {
-        s.filter(serv => serv.service_response_type !== 'referral_to_oscar');
-      }),
+      services_section: c.services_section
+        ? services_section.map(s => {
+            s.filter(serv => serv.service_response_type !== 'referral_to_oscar');
+          })
+        : [],
     };
   });
+
+  console.log('newCases:', JSON.stringify(newCases, null, 2));
 
   const finalized = newCases.map(buildCaseRecord).map(c => {
     delete c.__original_oscar_record;
