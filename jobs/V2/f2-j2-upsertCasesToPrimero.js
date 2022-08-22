@@ -572,11 +572,12 @@ each(
             services_section: d.services_section.map(s => {
               // and find the right service...
               if (s.unique_id === oscarReferredServiceId)
-                return {
-                  ...s,
-                  // Update the unique_id when we've got our needle in the haystack
-                  unique_id: matchingService.unique_id,
-                };
+                console.log('matching services via unique_id');
+              return {
+                ...s,
+                // Update the unique_id when we've got our needle in the haystack
+                unique_id: matchingService.unique_id,
+              };
               return s;
             }),
           };
