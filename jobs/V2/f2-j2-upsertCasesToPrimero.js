@@ -605,6 +605,8 @@ each(
           return {
             ...d,
             services_section: d.services_section.map(s => {
+              console.log('Oscar decision s ::', s);
+
               // and find the right service, matching by subtype..
               decisionServiceType = s.service_subtype[0];
               referralId = s.oscar_referral_id_a4ac8a5;
