@@ -450,7 +450,7 @@ fn(state => {
 fn(state => {
   const { cases, buildCaseRecord } = state;
 
-  const finalized = newCases.map(buildCaseRecord).map(c => {
+  const finalized = cases.map(buildCaseRecord).map(c => {
     delete c.__original_oscar_record;
   });
 
