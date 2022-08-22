@@ -521,10 +521,10 @@ fn(state => {
 });
 
 // we log decisions before sending to primero
-fn(state => {
-  console.log('Prepared decisions:', JSON.stringify(state.decisions.data, null, 2));
-  return state;
-});
+// fn(state => {
+//   console.log('Prepared decisions:', JSON.stringify(state.decisions.data, null, 2));
+//   return state;
+// });
 
 // for EACH decision, we get its referrals and then we update a single referral
 each(
@@ -567,7 +567,7 @@ each(
 
     // console.log('oscarReferredService ::', oscarReferredService);
 
-    console.log('parentCase ::', parentCase);
+    console.log('parentCase in Primero ::', parentCase);
 
     // There's a service on the parentCase with subtype[0] that
     // matches the oscarRefferedService subtype[0] (only one for each)
@@ -595,7 +595,7 @@ each(
 
     const parentServices = parentCase.services_section;
 
-    console.log('parentServices ::', parentServices);
+    //console.log('parentServices in Primero::', parentServices);
 
     if (parentServices) {
       const updatedDecisions = decisions.map(d => {
@@ -605,7 +605,7 @@ each(
           return {
             ...d,
             services_section: d.services_section.map(s => {
-              console.log('Oscar decision s ::', s);
+              console.log('Oscar decision to map to Primero service ::', s);
 
               // and find the right service, matching by subtype..
               decisionServiceType = s.service_subtype[0];
