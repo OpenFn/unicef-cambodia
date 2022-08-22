@@ -450,12 +450,17 @@ fn(state => {
 fn(state => {
   const { cases, buildCaseRecord } = state;
 
-  const finalized = cases.map(buildCaseRecord).map(c => {
+  const newCases = cases.map(c => {
+    return {
+      ...c,
+      services_section: c.services_section.map(s => {
+        s.filter(serv => serv.service_response_type !== 'referral_to_oscar');
+      }),
+    };
+  });
+
+  const finalized = newCases.map(buildCaseRecord).map(c => {
     delete c.__original_oscar_record;
-    const newCases = c.services_section.filter(
-      s => s.service_response_type !== 'referral_to_oscar'
-    );
-    return newCases;
   });
 
   console.log('Prepared cases with filtered services:', JSON.stringify(finalized, null, 2));
