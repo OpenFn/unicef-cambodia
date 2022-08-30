@@ -343,6 +343,7 @@ fn(state => {
     Active: 'accepted_340953',
     Rejected: 'rejected_936484',
     Exited: 'rejected_936484',
+    Referred: 'pending_310366',
   };
 
   const referralStatusMap = {
