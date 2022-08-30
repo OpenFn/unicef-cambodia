@@ -339,6 +339,7 @@ fn(state => {
 
   const serviceStatusMap = {
     Accepted: 'accepted_340953',
+    Accetped: 'accepted_340953',
     Active: 'accepted_340953',
     Rejected: 'rejected_936484',
     Exited: 'rejected_936484',
@@ -346,6 +347,7 @@ fn(state => {
 
   const referralStatusMap = {
     Accepted: 'accepted',
+    Accetped: 'accepted',
     Active: 'accepted',
     Exited: 'rejected',
   };
