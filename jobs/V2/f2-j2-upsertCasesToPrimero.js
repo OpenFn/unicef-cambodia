@@ -373,6 +373,8 @@ fn(state => {
 
     const isUpdate = c.external_id;
 
+    const referralReason = c.reason_for_referral;
+
     return {
       __original_oscar_record: c,
       oscar_number: c.global_id,
@@ -397,10 +399,10 @@ fn(state => {
       interview_subject: isUpdate || c.is_referred !== true ? undefined : 'other',
       module_id: 'primeromodule-cp',
       risk_level: c.is_referred === true ? c.level_of_risk : null,
-      referral_notes_oscar: c.reason_for_referral,
+      //referral_notes_oscar: c.reason_for_referral, //moved down to service-level; see referral_notes_from_oscar_2e787b8
       services_section: c.services.map(s => ({
-        // TODO: @Aicha, decide if we'd like to write anything for unique_id
         unique_id: s.uuid,
+        referral_notes_from_oscar_2e787b8: referralReason,
         service_referral_notes: s.reason_for_referral,
         service_type: (serviceMap[s.name] && serviceMap[s.name].type) || 'Other',
         service_subtype: [(serviceMap[s.name] && serviceMap[s.name].subtype) || 'Other'],
