@@ -75,7 +75,9 @@ fn(state => {
 
     if (source) {
       const subCode = source.slice(0, 2);
+      console.log('Province code:: ', subCode);
       user = provinceUserMap[subCode];
+      console.log('Province username located:: ', user);
       if (user) {
         return user;
       } else {
