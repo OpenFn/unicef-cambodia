@@ -71,10 +71,11 @@ fn(state => {
   function setProvinceUser(c) {
     const { location_current_village_code, organization_address_code } = c;
     const source = location_current_village_code || organization_address_code;
-
+    console.log('Location code sent by Oscar :: ', source);
     if (source) {
-      const subCode = source.slice(0, 2);
-      console.log('Province code:: ', subCode);
+      //const subCode = source.slice(0, 2); //replaced with below to handle scenarios where village not specified
+      const subCode = source.length === 6 ? source.slice(2, 4) : source.slice(0, 2);
+      console.log('Matching province code:: ', subCode);
       user = provinceUserMap[subCode];
       console.log('Province username located:: ', user);
       if (user) {
