@@ -64,9 +64,8 @@ fn(state => {
   }
 
   function setUser(c) {
-    return setProvinceUser(c);
-    // if (c.is_referred) return setProvinceUser(c);
-    // return setAgencyUser(c);
+    if (c.is_referred) return setProvinceUser(c);
+    return setAgencyUser(c);
   }
 
   function setProvinceUser(c) {
@@ -392,7 +391,8 @@ fn(state => {
       location_current: isUpdate ? undefined : locationCode,
       oscar_status: isUpdate ? undefined : c.status,
       protection_status: !isUpdate && c.is_referred == true ? 'oscar_referral' : undefined,
-      owned_by: isUpdate ? undefined : setUser(c),
+      owned_by: setUser(c),
+      //owned_by: isUpdate ? undefined : setUser(c),
       oscar_reason_for_exiting: c.reason_for_exiting,
       consent_for_services: true,
       disclosure_other_orgs: true,
