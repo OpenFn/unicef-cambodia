@@ -64,9 +64,9 @@ fn(state => {
   }
 
   function setUser(c) {
-    if (c.is_referred) return setProvinceUser(c);
-
-    return setAgencyUser(c);
+    return setProvinceUser(c);
+    // if (c.is_referred) return setProvinceUser(c);
+    // return setAgencyUser(c);
   }
 
   function setProvinceUser(c) {
