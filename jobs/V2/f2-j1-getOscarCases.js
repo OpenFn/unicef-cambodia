@@ -53,7 +53,7 @@ post(
       }),
       query: {
         // NOTE: since_date must be rounded to 00:00:00 to work with Oscar API.
-        since_date: state.lastQueryDate || '2022-08-26 00:00:00',
+        since_date: state.lastQueryDate || '2022-08-31 00:00:00',
         //referred_external: true, //old query parameter - to remove to pull ALL cases, not just referrals
       },
     },
