@@ -74,7 +74,7 @@ fn(state => {
     console.log('Location code sent by Oscar :: ', source);
     if (source) {
       //const subCode = source.slice(0, 2); //replaced with below to handle scenarios where village not specified
-      const subCode = source.length === 6 ? source.slice(2, 4) : source.slice(0, 2);
+      const subCode = source.slice(0, 2) === '00' ? source.slice(2, 4) : source.slice(0, 2);
       console.log('Matching province code:: ', subCode);
       user = provinceUserMap[subCode];
       console.log('Province username located:: ', user);
@@ -390,7 +390,8 @@ fn(state => {
       // date_of_birth: convertToPrimeroDate(c.date_of_birth), // TODO: @Aicha confirm formatting incorrect?
       address_current: isUpdate ? undefined : c.address_current_village_code,
       location_current: isUpdate ? undefined : locationCode,
-      oscar_status: isUpdate ? undefined : c.status,
+      oscar_status: c.status, //Bc we always want to sync oscar_status ?
+      //oscar_status: isUpdate ? undefined : c.status,
       protection_status: !isUpdate && c.is_referred == true ? 'oscar_referral' : undefined,
       owned_by: setUser(c),
       //owned_by: isUpdate ? undefined : setUser(c),
