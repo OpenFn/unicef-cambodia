@@ -242,7 +242,7 @@ fn(state => {
 
   //Check if decision is accepted/rejected before sending...
   function checkDecision(d) {
-    return d.referral_status !== 'Referred' && d.oscar_referral_id_a4ac8a5;
+    return d.referral_status !== 'Referred' && d.referral_id !== null;
   }
 
   const confirmedDecisions = mappedDecisions.filter(checkDecision);
