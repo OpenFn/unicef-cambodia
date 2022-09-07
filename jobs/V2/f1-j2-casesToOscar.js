@@ -108,7 +108,9 @@ fn(state => {
 
   function checkValue(data) {
     if (data !== 'NaN' && data) {
-      return data.length === 7 ? '0' + data : data; //change to; only if 7 characters add leading 0
+      return data.length === 7 || data.length === 1 || data.length === 3 || data.length === 5
+        ? '0' + data
+        : data; //if 1, 3, 5, or 7 char, add leading 0
       //return '0'.repeat(8 - data.length) + data; //REMOVE once tested
     } else {
       console.log('Converting location null values to OSCAR empty string.');
