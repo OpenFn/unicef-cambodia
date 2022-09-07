@@ -387,11 +387,9 @@ fn(state => {
       sex: isUpdate ? undefined : setGender(c.gender),
       age: isUpdate ? undefined : calcAge(c.date_of_birth),
       date_of_birth: isUpdate ? undefined : c.date_of_birth,
-      // date_of_birth: convertToPrimeroDate(c.date_of_birth), // TODO: @Aicha confirm formatting incorrect?
       address_current: isUpdate ? undefined : c.address_current_village_code,
       location_current: isUpdate ? undefined : locationCode,
-      oscar_status: c.status, //Bc we always want to sync oscar_status ?
-      //oscar_status: isUpdate ? undefined : c.status,
+      oscar_status: c.status,
       protection_status: !isUpdate && c.is_referred == true ? 'oscar_referral' : undefined,
       owned_by:
         !isUpdate || //if NOT an update to a case already synced...
@@ -402,12 +400,14 @@ fn(state => {
       oscar_reason_for_exiting: c.reason_for_exiting,
       consent_for_services: true,
       disclosure_other_orgs: true,
+      risk_level: c.is_referred === true ? c.level_of_risk : null, //TODO: SET TO 'undefined' if NOT referred
       interview_subject: isUpdate || c.is_referred !== true ? undefined : 'other',
       module_id: 'primeromodule-cp',
-      risk_level: c.is_referred === true ? c.level_of_risk : null,
       //referral_notes_oscar: c.reason_for_referral, //moved down to service-level; see referral_notes_from_oscar_2e787b8
       services_section: c.services.map(s => ({
+        //===== TODO - can uuid include the oscar_referral_id to ensure uniqueness? If yes, can we match to services based on this ===//
         unique_id: s.uuid,
+        //===========================================================================//
         referral_notes_from_oscar_2e787b8: referralReason,
         service_referral_notes: s.reason_for_referral,
         service_type: (serviceMap[s.name] && serviceMap[s.name].type) || 'Other',
@@ -423,7 +423,10 @@ fn(state => {
         oscar_referring_organization: `agency-${c.organization_name}`,
         service_implementing_agency: `agency-${c.organization_name}`, //TODO: @Aicha should these be the same?
         oscar_referral_id_a4ac8a5: s.referral_id ? s.referral_id.toString() : undefined,
+        //===== TODO - To foolproof not overwrite decisions in Primero, we will need to check if this case already exists in Primero...
+        //... and not overwrite any Primero decisions if the Oscar status is still set to 'Referred'
         referral_status_edf41f2: serviceStatusMap[s.referral_status],
+        //===================================================================================//
       })),
     };
   }
@@ -625,6 +628,8 @@ each(
               referralId = s.oscar_referral_id_a4ac8a5;
               matchingService = parentServices.find(
                 s =>
+                  // === TODO - ensure service matching is based on oscar_referral_id for decisions
+                  // Consider checking both BOTH crtieria (changing to AND, instead of OR) ============//
                   s.oscar_referral_id_a4ac8a5 === referralId ||
                   s.service_subtype[0] === decisionServiceType
                 // (s.service_subtype[0] === decisionServiceType &&
