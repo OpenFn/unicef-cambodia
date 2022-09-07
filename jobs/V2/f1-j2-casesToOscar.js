@@ -245,9 +245,11 @@ fn(state => {
     return d.referral_status !== 'Referred';
   }
 
-  const confirmedDecisions = mappedDecisions
-    .filter(checkDecision)
-    .filter(d => d.referral_id !== null);
+  function checkNull(d) {
+    return d.referral_id && d.referral_id !== null && d.referral_id !== undefined;
+  }
+
+  const confirmedDecisions = mappedDecisions.filter(checkDecision).filter(checkNull);
   //TO REMOVE - replaced with above filter & function checkDecision
   // const confirmedDecisions = mappedDecisions.filter(
   //   d => d.data.referral_status === 'Accepted' || d.data.referral_status === 'Exited'
