@@ -393,7 +393,11 @@ fn(state => {
       oscar_status: c.status, //Bc we always want to sync oscar_status ?
       //oscar_status: isUpdate ? undefined : c.status,
       protection_status: !isUpdate && c.is_referred == true ? 'oscar_referral' : undefined,
-      owned_by: c.is_referred == true || !isUpdate ? setUser(c) : undefined,
+      owned_by:
+        !isUpdate || //if NOT an update to a case already synced...
+        c.resource !== 'primero' //or if case didn't originate in Primero...
+          ? setUser(c) //set 'owned_by' user
+          : undefined, //otherwise do not overwrite user
       //owned_by: isUpdate ? undefined : setUser(c),
       oscar_reason_for_exiting: c.reason_for_exiting,
       consent_for_services: true,
