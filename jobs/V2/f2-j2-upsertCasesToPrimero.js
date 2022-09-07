@@ -506,6 +506,21 @@ fn(state => {
   return state;
 });
 
+// TO CONSIDER - querying for existing case to not overwrite decision?
+// each(
+//   '$.cases[*]',
+//   getCases({ case_id: dataValue('case_id') }, { withReferrals: true }, nextState => {
+//     const { cases, references, data, PrimeroServiceToReferralStatusMap } = nextState;
+//     const existingCases = references[references.length - 1];
+
+//     if (data.length > 1) throw new Error('Duplicate case_id on Primero');
+//     const parentCase = data[0];
+
+//     console.log('parentCase in Primero ::', parentCase);
+
+//     ... now check the parentCase for existing services with decisions?
+// );
+
 // we upsert Primero cases based on matching 'oscar_number' OR 'case_id'
 each(
   '$.cases[*]', //using each() here returns state.data for each item in the prepared "cases" array
