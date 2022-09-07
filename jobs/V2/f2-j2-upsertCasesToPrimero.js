@@ -450,7 +450,7 @@ fn(state => {
 
 // we separate cases from decisions
 fn(state => {
-  const { originalCases, serviceMap } = state;
+  const { originalCases } = state;
 
   //AUG 19 CHANGED to check for Oscar decisions on service-, not case-level ==============///
   //const isDecision = c => c.resource == 'primero' && c.status !== 'Referred';
@@ -520,7 +520,7 @@ each(
 
 // we build decisions for primero, add array for referrals to update
 fn(state => {
-  const { decisions, buildCaseRecord, serviceMap } = state;
+  const { decisions, buildCaseRecord } = state;
 
   const finalized = decisions.map(buildCaseRecord);
   //  AUG 19: Removed the below because now we map referral_status above =====//
