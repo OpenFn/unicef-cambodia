@@ -345,7 +345,7 @@ fn(state => {
     Active: 'accepted_340953',
     Rejected: 'rejected_936484',
     Exited: 'rejected_936484',
-    Referred: 'pending_310366',
+    //Referred: 'pending_310366',
   };
 
   const referralStatusMap = {
@@ -425,7 +425,7 @@ fn(state => {
         oscar_referral_id_a4ac8a5: s.referral_id ? s.referral_id.toString() : undefined,
         //===== TODO - To foolproof not overwrite decisions in Primero, we will need to check if this case already exists in Primero...
         //... and not overwrite any Primero decisions if the Oscar status is still set to 'Referred'
-        referral_status_edf41f2: serviceStatusMap[s.referral_status],
+        referral_status_edf41f2: serviceStatusMap[s.referral_status] || undefined,
         //===================================================================================//
       })),
     };
@@ -505,21 +505,6 @@ fn(state => {
   console.log('External Ids for prepared cases:', JSON.stringify(caseIds, null, 2));
   return state;
 });
-
-// TO CONSIDER - querying for existing case to not overwrite decision?
-// each(
-//   '$.cases[*]',
-//   getCases({ case_id: dataValue('case_id') }, { withReferrals: true }, nextState => {
-//     const { cases, references, data, PrimeroServiceToReferralStatusMap } = nextState;
-//     const existingCases = references[references.length - 1];
-
-//     if (data.length > 1) throw new Error('Duplicate case_id on Primero');
-//     const parentCase = data[0];
-
-//     console.log('parentCase in Primero ::', parentCase);
-
-//     ... now check the parentCase for existing services with decisions?
-// );
 
 // we upsert Primero cases based on matching 'oscar_number' OR 'case_id'
 each(
