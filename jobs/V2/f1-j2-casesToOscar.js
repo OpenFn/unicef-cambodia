@@ -550,5 +550,6 @@ fn(state => {
     )(state);
 
   console.log('No non-referral cases to update.');
+  console.log('cursor', state.cursor);
   return state;
 });
