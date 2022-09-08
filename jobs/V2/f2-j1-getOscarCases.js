@@ -2,7 +2,7 @@
 // use that. If not, use the cursor from the previous final state.
 alterState(state => {
   if (state.data && state.data.initialState) {
-    const { lastQueryDate } = state.data.initialState;
+    const { lastQueryDate } = state.data.initialState || state.cursor;
     return { ...state, lastQueryDate };
   }
   return state;
@@ -16,7 +16,7 @@ alterState(state => {
   console.log(`lastQueryDate (from the previous run): ${lastQueryDate}`);
 
   const now = new Date().toISOString().replace('T', ' ').slice(0, 10);
-  
+
   state.thisQueryDate = `${now} 00:00:00`;
 
   console.log(
@@ -58,11 +58,7 @@ post(
       },
     },
     state => {
-      console.log(
-        `Oscar API responded with cases: ${JSON.stringify(
-          state.data.data, null, 2
-        )}`
-      );
+      console.log(`Oscar API responded with cases: ${JSON.stringify(state.data.data, null, 2)}`);
       /*console.log(
         `Oscar API responded with cases with global_ids: ${JSON.stringify(
           state.data.data ? state.data.data.map(c => c.global_id) : ''
