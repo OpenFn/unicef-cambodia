@@ -2,9 +2,11 @@
 // use that. If not, use the cursor from the previous final state.
 alterState(state => {
   if (state.data && state.data.initialState) {
-    const { lastQueryDate } = state.data.initialState || state.cursor;
+    const lastQueryDate = state.cursor || state.data.initialState.lastQueryDate;
+    console.log('Setting cursor...');
     return { ...state, lastQueryDate };
   }
+  state.lastQueryDate = state.cursor;
   return state;
 });
 
@@ -53,7 +55,7 @@ post(
       }),
       query: {
         // NOTE: since_date must be rounded to 00:00:00 to work with Oscar API.
-        since_date: state.lastQueryDate || '2022-08-26 00:00:00',
+        since_date: state.lastQueryDate || '2022-09-07 00:00:00',
         //referred_external: true, //old query parameter - to remove to pull ALL cases, not just referrals
       },
     },
