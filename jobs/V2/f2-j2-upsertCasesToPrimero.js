@@ -1,7 +1,7 @@
-// we create dataClips and functions for later use
 fn(state => {
   console.log('Preparing cases and decisions for upload to Primero...');
   // Saving original cases, creating Case:Service ID map =======================
+  state.cursor = state.cursor;
   state.originalCases = state.data.data;
   state.serviceRecordIds = {};
   // ===========================================================================
@@ -506,24 +506,97 @@ fn(state => {
   return state;
 });
 
-// TO CONSIDER - querying for existing case to not overwrite decision?
+fn(state => {
+  const { data, cases } = state;
+  const oscarData = data.data;
+  // console.log('oscar data::', JSON.stringify(oscarData, null, 2));
+  // console.log('primero cases to sync::', JSON.stringify(cases, null, 2));
+
+  const { url, token } = state.configuration;
+
+  //== Fetching Primero existing cases
+  return http
+    .get({
+      url: `${url}/api/v2/cases`, //show ALL users
+      headers: {
+        Authorization: `Basic ${token}`,
+      },
+      body: {
+        remote: true,
+        last_updated_at: '2022-09-07T15:57:24.777Z..', //TODO: change to dynamically filter on cursor
+      },
+    })(state)
+    .then(({ data }) => {
+      const existingCases = data.data;
+      return { ...state, existingCases };
+    });
+});
+
+fn(state => {
+  console.log('current state :: ', state);
+  return state;
+});
+
+// // TO CONSIDER - querying for existing case to not overwrite decision?
 // each(
 //   '$.cases[*]',
-//   getCases({ case_id: dataValue('case_id') }, { withReferrals: true }, nextState => {
-//     const { cases, references, data, PrimeroServiceToReferralStatusMap } = nextState;
-//     const existingCases = references[references.length - 1];
+//   fn(
 
-//     if (data.length > 1) throw new Error('Duplicate case_id on Primero');
-//     const parentCase = data[0];
+//   )
+//   getCases(
+//     {
+//       remote: true,
+//       last_updated_at: '2022-09-07T15:57:24.777Z..',
+//       case_id: dataValue('case_id'),
+//       //last_updated_at: state => `${state.cursor}..`,
+//     },
+//     { withReferrals: true },
+//     nextState => {
+//       const { cases, references, data, PrimeroServiceToReferralStatusMap } = nextState;
+//       //const references = references[references.length - 1];
+//       // console.log('references', references);
+//       // console.log('data response', data);
 
-//     console.log('parentCase in Primero ::', parentCase);
+//       if (data.length > 1) throw new Error('Duplicate case_id on Primero');
+//       const existingCase = data.length === 1 ? data[0] : undefined;
 
-//     ... now check the parentCase for existing services with decisions?
+//       console.log('looking for existingCase in Primero ::', existingCase);
+
+//       console.log('cases to sync ::', JSON.stringify(cases, null, 2));
+
+//       const pendingService = cases[0].services_section;
+
+//       // cases.map(c => ({
+//       //   ...c,
+//       //   services_section: c.services_section.filter(s => {
+//       //     s.referral_status_edf41f2 === 'pending_310366';
+//       //   }),
+//       // }));
+
+//       console.log('pending service to sync ::', JSON.stringify(pendingService, null, 2));
+
+//       return { ...nextState, parentCase: parentCase };
+//     }
+//   )
 // );
 
 // we upsert Primero cases based on matching 'oscar_number' OR 'case_id'
 each(
   '$.cases[*]', //using each() here returns state.data for each item in the prepared "cases" array
+  fn(state => {
+    const { data, existingCases } = state;
+
+    function checkMatch(c) {
+      return c.case_id === data.case_id;
+    }
+
+    const matchingCases = existingCases.filter(checkMatch);
+    const matchingCase = matchingCases.length === 1 ? matchingCases[0] : undefined;
+
+    console.log('Now!', matchingCase);
+
+    return state;
+  }),
   upsertCase({
     externalIds: state => (!!state.data.case_id ? ['case_id'] : ['oscar_number']), //changed from state.data.external_id
     data: state => {
