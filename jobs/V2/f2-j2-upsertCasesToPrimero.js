@@ -609,7 +609,7 @@ each(
     // Primero.
     // TODO: Confirm that this is really the logic we want to apply.
 
-    const parentServices = parentCase.services_section;
+    const parentServices = parentCase ? parentCase.services_section : undefined;
 
     //console.log('parentServices in Primero::', parentServices);
 
@@ -739,7 +739,7 @@ getCases(
   {
     remote: true,
     //last_updated_at: state => `${state.cursor}..`,
-    last_updated_at: '2022-09-07T15:57:24.777Z..', //TODO: dynamically set cursor
+    last_updated_at: '2022-09-08T00:57:24.777Z..', //TODO: dynamically set cursor
     workflow: 'referral_from_oscar',
   },
   { withReferrals: false },
