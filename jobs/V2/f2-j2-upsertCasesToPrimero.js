@@ -762,7 +762,7 @@ getCases(
       };
     });
 
-    //console.log('casesWithPending', JSON.stringify(casesWithPending, null, 2));
+    console.log('casesWithPending', JSON.stringify(casesWithPending, null, 2));
 
     ///return only cases with services
     function checkServices(c) {
