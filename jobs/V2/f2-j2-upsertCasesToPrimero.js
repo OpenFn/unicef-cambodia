@@ -639,8 +639,8 @@ each(
                 s =>
                   // === TODO - ensure service matching is based on oscar_referral_id for decisions
                   // Consider checking both BOTH crtieria (changing to AND, instead of OR) ============//
-                  s.oscar_referral_id_a4ac8a5 === referralId ||
-                  s.service_subtype[0] === decisionServiceType
+                  s.oscar_referral_id_a4ac8a5 === referralId
+                //|| s.service_subtype[0] === decisionServiceType //Sept 13 removed
                 // (s.service_subtype[0] === decisionServiceType &&
                 //   s.referral_status_edf41f2 === 'pending_310366') //TODO: FIX; throws errors when no pending service found
                 //== ERROR: TypeError: Cannot read property 'pending_310366' of undefined =========//
