@@ -11,7 +11,10 @@ fn(state => {
 });
 
 // Clear data from previous runs and add a referralIds array.
-fn(state => ({ ...state, data: {}, references: [], referralIds: [] }));
+fn(state => (
+  console.log(state.cursor); 
+  return { ...state, data: {}, references: [], referralIds: [] }
+  ));
 
 // GET Primero cases with oscar referrals
 // User Story 1: Generating government referrals
