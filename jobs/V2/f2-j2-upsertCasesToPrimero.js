@@ -695,12 +695,12 @@ each(
         };
       });
 
-      console.log('mappedReferrals ::', mappedReferrals);
+      console.log('# of mappedReferrals ::', mappedReferrals.length);
+      //console.log('mappedReferrals ::', mappedReferrals);
 
-      nextState.referrals = mappedReferrals;
       //console.log('nextState.referrals', nextState.referrals);
 
-      return { ...nextState, decisions: updatedDecisions };
+      return { ...nextState, decisions: updatedDecisions, referrals: mappedReferrals };
     }
 
     return { ...nextState };
@@ -709,7 +709,7 @@ each(
 
 // log matching referrals
 fn(state => {
-  console.log('Referrals to update:', JSON.stringify(state.referrals, null, 2));
+  console.log('mappedReferrals to update:', JSON.stringify(state.referrals, null, 2));
   return state;
 });
 
