@@ -696,7 +696,7 @@ each(
       });
 
       console.log('# of mappedReferrals ::', mappedReferrals.length);
-      //console.log('mappedReferrals ::', mappedReferrals);
+      console.log('mappedReferrals ::', mappedReferrals);
 
       //console.log('nextState.referrals', nextState.referrals);
 
