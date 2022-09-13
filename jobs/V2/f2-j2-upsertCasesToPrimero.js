@@ -633,16 +633,16 @@ each(
                   s.oscar_referral_id_a4ac8a5 === referralId ||
                   (s.service_subtype[0] === decisionServiceType &&
                     s.referral_status_edf41f2 === 'pending_310366')
-                // (s.service_subtype[0] === decisionServiceType &&
-                //   s.referral_status_edf41f2 === 'pending_310366') //TODO: FIX; throws errors when no pending service found
+                //|| s.service_subtype[0] === decisionServiceType //Sept 13 removed
                 //== ERROR: TypeError: Cannot read property 'pending_310366' of undefined =========//
                 //looking for Primero services where decision is 'pending' & has not yet been updated...
               );
+              console.log('matchingService', matchingService);
               matchingServiceId = matchingService ? matchingService.unique_id : undefined;
               decisionStatus = PrimeroServiceToReferralStatusMap[s.referral_status_edf41f2];
 
               console.log('Oscar decisionServiceType to match on::', decisionServiceType);
-              console.log('matchingService in Primero found ::', matchingService);
+              //console.log('matchingService in Primero found ::', matchingService);
               console.log('matchingServiceId in Primero found::', matchingServiceId);
               console.log('decisionStatus for Referral found::', decisionStatus);
 
@@ -656,24 +656,49 @@ each(
         }
         return d;
       });
-
+      // console.log('updatedDecisions:', JSON.stringify(updatedDecisions, null, 2));
       //Now let's find the service's parent referral to update
-      const matchingReferral = parentCase.referrals.find(
+      const referralServiceUuids = updatedDecisions
+        .map(d => {
+          return d.services_section.map(s => {
+            return s.unique_id;
+          });
+        })
+        .flat();
+
+      console.log('referralServiceUuids:', referralServiceUuids);
+      // console.log('Searching referrals:', parentCase.referrals);
+      const matchingReferrals = parentCase.referrals.filter(
         r =>
           // where status is in_progress...
-          r.status === 'in_progress' && //TODO: TEST MATCHING REF
-          r.service_record_id === matchingServiceId
+          r.status === 'in_progress' && referralServiceUuids.includes(r.service_record_id)
+        //r.status === 'in_progress' && r.service_record_id === matchingServiceId
       );
 
-      if (matchingReferral) console.log('Matching referral found:', matchingReferral);
+      if (matchingReferrals) console.log('Matching referrals found:', matchingReferrals);
 
-      if (matchingReferral)
-        nextState.referrals.push({
-          ...matchingReferral,
-          status: decisionStatus,
-          //status: nextState.referralStatusMap[decision.__original_oscar_record.status],
+      const mappedReferrals = matchingReferrals.map(r => {
+        const serviceId = r.service_record_id;
+        const matchingCase = updatedDecisions.filter(d => d.case_id === decision.case_id);
+
+        //console.log('Matching case found:', matchingCase);
+
+        const matchingService = matchingCase
+          ? matchingCase[0].services_section.find(s => s.unique_id === serviceId)
+          : undefined;
+
+        //console.log('Matching referred service found:', matchingService);
+        return {
+          ...r,
+          status: PrimeroServiceToReferralStatusMap[matchingService.referral_status_edf41f2], //WILL THIS ASSIGN
           case_id: decision.case_id,
-        });
+        };
+      });
+
+      console.log('mappedReferrals ::', mappedReferrals);
+
+      nextState.referrals = mappedReferrals;
+      //console.log('nextState.referrals', nextState.referrals);
 
       return { ...nextState, decisions: updatedDecisions };
     }
