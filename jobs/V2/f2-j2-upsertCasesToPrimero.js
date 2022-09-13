@@ -1,6 +1,15 @@
 // we create dataClips and functions for later use
 fn(state => {
   console.log('Preparing cases and decisions for upload to Primero...');
+
+  const lastRunTime = state.lastQueryDate ? state.lastQueryDate.substring(0, 10) : undefined;
+
+  console.log('Last sync end date:', lastRunTime || 'undefined; using manual cursor...');
+  const manualCursor = '2022-09-13T00:00:00.000Z..'; //'2022-08-31T00:00:07.288Z';
+
+  state.cursor = `${lastRunTime}T00:00:00.000Z..` || manualCursor;
+  console.log('Cursor:', state.cursor);
+
   // Saving original cases, creating Case:Service ID map =======================
   state.originalCases = state.data.data;
   state.serviceRecordIds = {};
@@ -637,6 +646,7 @@ each(
                 //== ERROR: TypeError: Cannot read property 'pending_310366' of undefined =========//
                 //looking for Primero services where decision is 'pending' & has not yet been updated...
               );
+              console.log('matchingService', matchingService);
               matchingServiceId = matchingService ? matchingService.unique_id : undefined;
               decisionStatus = PrimeroServiceToReferralStatusMap[s.referral_status_edf41f2];
 
@@ -655,24 +665,49 @@ each(
         }
         return d;
       });
-
+      // console.log('updatedDecisions:', JSON.stringify(updatedDecisions, null, 2));
       //Now let's find the service's parent referral to update
-      const matchingReferral = parentCase.referrals.find(
+      const referralServiceUuids = updatedDecisions
+        .map(d => {
+          return d.services_section.map(s => {
+            return s.unique_id;
+          });
+        })
+        .flat();
+
+      console.log('referralServiceUuids:', referralServiceUuids);
+      // console.log('Searching referrals:', parentCase.referrals);
+      const matchingReferrals = parentCase.referrals.filter(
         r =>
           // where status is in_progress...
-          r.status === 'in_progress' && //TODO: TEST MATCHING REF
-          r.service_record_id === matchingServiceId
+          r.status === 'in_progress' && referralServiceUuids.includes(r.service_record_id)
+        //r.status === 'in_progress' && r.service_record_id === matchingServiceId
       );
 
-      if (matchingReferral) console.log('Matching referral found:', matchingReferral);
+      if (matchingReferrals) console.log('Matching referrals found:', matchingReferrals);
 
-      if (matchingReferral)
-        nextState.referrals.push({
-          ...matchingReferral,
-          status: decisionStatus,
-          //status: nextState.referralStatusMap[decision.__original_oscar_record.status],
+      const mappedReferrals = matchingReferrals.map(r => {
+        const serviceId = r.service_record_id;
+        const matchingCase = updatedDecisions.filter(d => d.case_id === decision.case_id);
+
+        //console.log('Matching case found:', matchingCase);
+
+        const matchingService = matchingCase
+          ? matchingCase[0].services_section.find(s => s.unique_id === serviceId)
+          : undefined;
+
+        //console.log('Matching referred service found:', matchingService);
+        return {
+          ...r,
+          status: PrimeroServiceToReferralStatusMap[matchingService.referral_status_edf41f2], //WILL THIS ASSIGN
           case_id: decision.case_id,
-        });
+        };
+      });
+
+      console.log('mappedReferrals ::', mappedReferrals);
+
+      nextState.referrals = mappedReferrals;
+      //console.log('nextState.referrals', nextState.referrals);
 
       return { ...nextState, decisions: updatedDecisions };
     }
@@ -737,8 +772,8 @@ each(
 getCases(
   {
     remote: true,
-    //last_updated_at: state => `${state.cursor}..`,
-    last_updated_at: '2022-09-08T00:57:24.777Z..', //TODO: dynamically set cursor
+    last_updated_at: state.cursor,
+    //last_updated_at: '2022-09-08T00:57:24.777Z..', //TODO: dynamically set cursor
     workflow: 'referral_from_oscar',
   },
   { withReferrals: false },
@@ -748,9 +783,8 @@ getCases(
 
     function checkPending(s) {
       return (
-        s.referral_status_edf41f2 === 'pending_310366' ||
-        s.referral_status_edf41f2 === undefined ||
-        s.referral_status_edf41f2 === null
+        //s.referral_status_edf41f2 === 'pending_310366' ||
+        s.referral_status_edf41f2 === undefined || s.referral_status_edf41f2 === null
       );
     }
 
@@ -761,7 +795,7 @@ getCases(
       };
     });
 
-    console.log('casesWithPending', JSON.stringify(casesWithPending, null, 2));
+    console.log('cases with referral_from_oscar and no decision ::', casesWithPending.length);
 
     ///return only cases with services
     function checkServices(c) {
@@ -770,6 +804,7 @@ getCases(
     }
 
     const casesToUpdate = casesWithPending.filter(checkServices);
+    console.log('cases to update with Pending referral status ::', casesToUpdate.length);
 
     //console.log('casesToUpdate', JSON.stringify(casesToUpdate, null, 2));
 
