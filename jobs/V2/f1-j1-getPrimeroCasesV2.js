@@ -3,18 +3,19 @@ fn(state => {
   const currentAttempt = new Date().toISOString();
   console.log('Current attempt time:', currentAttempt);
   console.log('Last sync end date:', state.lastRunDateTime || 'undefined; using manual cursor...');
-  const manualCursor = '2022-09-07T15:57:24.777Z'; //'2022-08-31T00:00:07.288Z';
-  
+  const manualCursor = '2022-09-07T08:57:24.777Z'; //'2022-08-31T00:00:07.288Z';
+
   const cursor = state.lastRunDateTime || manualCursor;
   console.log('Cursor:', cursor);
   return { ...state, cursor, currentAttempt };
 });
 
 // Clear data from previous runs and add a referralIds array.
-fn(state => (
-  console.log(state.cursor); 
-  return { ...state, data: {}, references: [], referralIds: [] }
-  ));
+fn(state => {
+  console.log('Cursor:', state.cursor);
+  return state;
+});
+fn(state => ({ ...state, data: {}, references: [], referralIds: [] }));
 
 // GET Primero cases with oscar referrals
 // User Story 1: Generating government referrals
