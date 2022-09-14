@@ -492,8 +492,6 @@ fn(state => {
     'Prepared cases to sync back to Primero:',
     JSON.stringify(finalizedNoRefsFromPrimero, null, 2)
   );
-  // TODO: @Aleksa to confirm that we can add location-check validation in the job; for 2nd referrals, it's okay if `owned_by` is undefined
-  //.filter(c => c.owned_by);
 
   return { ...state, cases: finalizedNoRefsFromPrimero };
 });
@@ -512,7 +510,7 @@ each(
   upsertCase({
     externalIds: state => (!!state.data.case_id ? ['case_id'] : ['oscar_number']), //changed from state.data.external_id
     data: state => {
-      console.log('Syncing prepared case & checking if exists...', state.data);
+      //console.log('Syncing prepared case & checking if exists...', state.data);
       return state.data;
     },
   })
@@ -523,15 +521,6 @@ fn(state => {
   const { decisions, buildCaseRecord } = state;
 
   const finalized = decisions.map(buildCaseRecord);
-  //  AUG 19: Removed the below because now we map referral_status above =====//
-  // .map(d => ({
-  //   ...d,
-  //   //Here we add status to each service in the service section
-  //   //   services_section: d.services_section.map(s => ({
-  //   //     ...s,
-  //   //     referral_status_edf41f2: serviceStatusMap[d.__original_oscar_record.status],
-  //   //   })),
-  // }));
 
   return { ...state, decisions: finalized, referrals: [] };
 });
@@ -575,42 +564,9 @@ each(
     //=====================================================================//
     //== AUG 22 CHANGE: Match services based on Oscar referral_id, not service uuid ==//
     console.log('oscar referral_ids ::', oscarReferredReferralIds);
-
-    // const oscarReferredService = decision.services_section.filter(
-    //   //s => s.unique_id === oscarReferredServiceId
-    //   s => s.oscar_referral_id_a4ac8a5 == oscarReferredReferralId
-    // );
-
-    // console.log('oscarReferredService ::', oscarReferredService);
-
     console.log('parentCase in Primero ::', parentCase);
 
-    // There's a service on the parentCase with subtype[0] that
-    // matches the oscarRefferedService subtype[0] (only one for each)
-    //const matchingServices = parentCase.services_section
-    // .find(s => {
-    //   // //CHANGE TO CONSIDER - 19 Aug 2022. NOW we want to match referrals based on service subtype AND oscar_referral_id
-    //   // console.log('parentCase service oscar_referral_id_a4ac8a5 ::', s.oscar_referral_id_a4ac8a5);
-    //   // return (
-    //   //   s.service_subtype[0] === oscarReferredService.service_subtype[0] &&
-    //   //   s.oscar_referral_id_a4ac8a5 === oscarReferredService.oscar_referral_id_a4ac8a5
-    //   // );
-
-    //   // RN... we would match services based on subtype
-    //   console.log('parentCase services subtype ::', s.service_subtype);
-    //   return s.service_subtype[0] === oscarReferredService.service_subtype[0];
-    //   //==============++============================================//
-    // });
-
-    //  console.log('matchingServices ::', matchingServices);
-
-    // NOTE: Once we've found the matching service, overwrite its Oscar-generated
-    // uuid with the Primero Unique ID so that we can update this service in
-    // Primero.
-    // TODO: Confirm that this is really the logic we want to apply.
-
     const parentServices = parentCase ? parentCase.services_section : undefined;
-
     //console.log('parentServices in Primero::', parentServices);
 
     if (parentServices) {
@@ -675,12 +631,12 @@ each(
         //r.status === 'in_progress' && r.service_record_id === matchingServiceId
       );
 
-      if (matchingReferrals) console.log('Matching referrals found:', matchingReferrals);
+      if (matchingReferrals) console.log('Matching referrals found...');
+      //if (matchingReferrals) console.log('Matching referrals found:', matchingReferrals);
 
       const mappedReferrals = matchingReferrals.map(r => {
         const serviceId = r.service_record_id;
         const matchingCase = updatedDecisions.filter(d => d.case_id === decision.case_id);
-
         //console.log('Matching case found:', matchingCase);
 
         const matchingService = matchingCase
@@ -695,14 +651,16 @@ each(
         };
       });
 
+      console.log('Building referrals array...');
       console.log('# of mappedReferrals ::', mappedReferrals.length);
-      //console.log('mappedReferrals ::', mappedReferrals);
+      console.log('mappedReferrals ::', mappedReferrals);
 
-      //console.log('nextState.referrals', nextState.referrals);
+      if (mappedReferrals) nextState.referrals.push(mappedReferrals.flat());
+      console.log('mappedReferrals array ::', nextState.referrals);
 
-      return { ...nextState, decisions: updatedDecisions, referrals: mappedReferrals };
+      return { ...nextState, decisions: updatedDecisions };
     }
-    //console.log('nextState ::', nextState);
+    console.log('referrals array 2', nextState.referrals);
 
     return { ...nextState };
   })
@@ -710,18 +668,12 @@ each(
 
 // log matching referrals
 fn(state => {
-  //console.log('mappReferrals state ::', JSON.stringify(state, null, 2));
+  //console.log('mappedReferrals state ::', JSON.stringify(state, null, 2));
+  state.referrals = state.referrals.flat();
+
   console.log('mappedReferrals to update:', JSON.stringify(state.referrals, null, 2));
   return state;
 });
-
-// each(
-//   '$.referrals[*]',
-//   fn(state => {
-//     console.log('eachReferral', JSON.stringify(state.data, null, 2));
-//     return state;
-//   })
-// );
 
 // for each referral, we update its service status
 each(
@@ -770,75 +722,3 @@ each(
     },
   })
 );
-
-// getCases(
-//   {
-//     remote: true,
-//     //last_updated_at: state => `${state.cursor}..`,
-//     last_updated_at: '2022-09-08T00:57:24.777Z..', //TODO: dynamically set cursor
-//     workflow: 'referral_from_oscar',
-//   },
-//   { withReferrals: false },
-//   state => {
-//     const cases = state.data;
-//     //console.log('referrals fromOscar', JSON.stringify(cases, null, 2));
-
-//     function checkPending(s) {
-//       return (
-//         s.referral_status_edf41f2 === 'pending_310366' ||
-//         s.referral_status_edf41f2 === undefined ||
-//         s.referral_status_edf41f2 === null
-//       );
-//     }
-
-//     const casesWithPending = cases.map(c => {
-//       return {
-//         ...c,
-//         services_section: c.services_section.filter(checkPending),
-//       };
-//     });
-
-//     console.log('casesWithPending', JSON.stringify(casesWithPending, null, 2));
-
-//     ///return only cases with services
-//     function checkServices(c) {
-//       const length = c.services_section.length;
-//       return length > 0 ? true : false;
-//     }
-
-//     const casesToUpdate = casesWithPending.filter(checkServices);
-
-//     //console.log('casesToUpdate', JSON.stringify(casesToUpdate, null, 2));
-
-//     modifiedCases = casesToUpdate
-//       ? casesToUpdate.map(c => {
-//           return {
-//             id: c.id,
-//             case_id: c.case_id,
-//             module_id: 'primeromodule-cp',
-//             services_section: c.services_section.map(s => {
-//               return {
-//                 ...s,
-//                 referral_status_edf41f2: 'pending_310366',
-//               };
-//             }),
-//           };
-//         })
-//       : undefined;
-
-//     //console.log('modifiedCases', JSON.stringify(modifiedCases, null, 2));
-
-//     return { ...state, cases: modifiedCases };
-//   }
-// );
-
-// each(
-//   '$.cases[*]', //using each() here returns state.data for each item in the prepared "cases" array
-//   upsertCase({
-//     externalIds: ['id'],
-//     data: state => {
-//       console.log('Updating pending status for new referrals...', state.data);
-//       return state.data;
-//     },
-//   })
-// );
