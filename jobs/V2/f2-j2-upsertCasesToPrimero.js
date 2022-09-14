@@ -671,6 +671,7 @@ fn(state => {
   //console.log('mappedReferrals state ::', JSON.stringify(state, null, 2));
   state.referrals = state.referrals.flat();
 
+  console.log('Preparing referrals to sync...');
   console.log('mappedReferrals to update:', JSON.stringify(state.referrals, null, 2));
   return state;
 });
@@ -688,6 +689,37 @@ each(
       type: 'Referral',
       record_id: dataValue('record_id'),
       record_type: dataValue('case'),
+    },
+  })
+);
+
+// Now let's clean decision payload & only sync cases with decisions for services...
+fn(state => {
+  console.log('Preparing decisions to sync...');
+  const cleanedDecisions = state.decisions
+    .map(d => {
+      delete d.__original_oscar_record;
+      //only sync decisions with a matching Primero service_id and a decision update
+      const filteredServices = d.services_section.filter(
+        s => s.unique_id && s.referral_status_edf41f2
+      );
+      return { ...d, services_section: filteredServices };
+    })
+    .filter(d => d.services_section.length > 0);
+  //console.log('cleanedDecisions to sync to Primero:', JSON.stringify(cleanedDecisions, null, 2));
+  return { ...state, decisions: cleanedDecisions };
+});
+
+// for EACH decision, we upsert the primero case record
+each(
+  '$.decisions[*]',
+  upsertCase({
+    externalIds: ['case_id'],
+
+    data: state => {
+      const decision = state.data;
+      console.log('Syncing decision... ::', decision);
+      return decision;
     },
   })
 );
