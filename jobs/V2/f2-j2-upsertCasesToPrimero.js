@@ -702,6 +702,7 @@ each(
 
       return { ...nextState, decisions: updatedDecisions, referrals: mappedReferrals };
     }
+    console.log('nextState ::', nextState);
 
     return { ...nextState };
   })
