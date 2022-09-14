@@ -696,13 +696,13 @@ each(
       });
 
       console.log('# of mappedReferrals ::', mappedReferrals.length);
-      console.log('mappedReferrals ::', mappedReferrals);
+      //console.log('mappedReferrals ::', mappedReferrals);
 
       //console.log('nextState.referrals', nextState.referrals);
 
       return { ...nextState, decisions: updatedDecisions, referrals: mappedReferrals };
     }
-    console.log('nextState ::', nextState);
+    //console.log('nextState ::', nextState);
 
     return { ...nextState };
   })
@@ -710,9 +710,18 @@ each(
 
 // log matching referrals
 fn(state => {
+  //console.log('mappReferrals state ::', JSON.stringify(state, null, 2));
   console.log('mappedReferrals to update:', JSON.stringify(state.referrals, null, 2));
   return state;
 });
+
+// each(
+//   '$.referrals[*]',
+//   fn(state => {
+//     console.log('eachReferral', JSON.stringify(state.data, null, 2));
+//     return state;
+//   })
+// );
 
 // for each referral, we update its service status
 each(
