@@ -589,7 +589,12 @@ each(
                   // Consider checking both BOTH crtieria (changing to AND, instead of OR) ============//
                   s.oscar_referral_id_a4ac8a5 === referralId ||
                   (s.service_subtype[0] === decisionServiceType &&
-                    s.referral_status_edf41f2 === 'pending_310366')
+                    s.referral_status_edf41f2 === 'pending_310366') ||
+                  (s.service_subtype[0] === '' && //for rejected 'Not Specified' referrals
+                    decisionServiceType === 'Other')
+                // &&
+                // s.referral_status_edf41f2 === 'rejected_936484')
+
                 //|| s.service_subtype[0] === decisionServiceType //Sept 13 removed
                 //== ERROR: TypeError: Cannot read property 'pending_310366' of undefined =========//
                 //looking for Primero services where decision is 'pending' & has not yet been updated...
