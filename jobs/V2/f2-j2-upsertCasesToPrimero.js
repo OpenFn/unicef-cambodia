@@ -337,7 +337,7 @@ fn(state => {
     },
     'Residential Care Institution': { subtype: 'residential_care_gov_only_other', type: 'other' },
     'Other Service': { subtype: 'other_other_service', type: 'other' },
-    'Not Specified': { subtype: 'other_other_service', type: 'other' },
+    //'Not Specified': { subtype: 'other_other_service', type: 'other' },
   };
 
   const serviceStatusMap = {
