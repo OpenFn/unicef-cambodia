@@ -1,3 +1,23 @@
+// we log cases before sending to primero
+fn(state => {
+  //console.log('Prepared cases:', JSON.stringify(state.cases, null, 2));
+  const caseIds = state.cases.map(c => ({ case_id: c.case_id }));
+  console.log('External Ids for prepared cases:', JSON.stringify(caseIds, null, 2));
+  return state;
+});
+
+// we upsert Primero cases based on matching 'oscar_number' OR 'case_id'
+each(
+  '$.cases[*]', //using each() here returns state.data for each item in the prepared "cases" array
+  upsertCase({
+    externalIds: state => (!!state.data.case_id ? ['case_id'] : ['oscar_number']), //changed from state.data.external_id
+    data: state => {
+      //console.log('Syncing prepared case & checking if exists...', state.data);
+      return state.data;
+    },
+  })
+);
+//We then get cases to check which have pending status
 getCases(
   {
     remote: true,
@@ -8,7 +28,8 @@ getCases(
   { withReferrals: false },
   state => {
     const cases = state.data;
-    //console.log('referrals fromOscar', JSON.stringify(cases, null, 2));
+    console.log('preparedCases ::', JSON.stringify(state.cases, null, 2));
+    console.log('referrals fromOscar', JSON.stringify(cases, null, 2));
 
     function checkPending(s) {
       return (
@@ -55,12 +76,12 @@ getCases(
 
     //console.log('modifiedCases', JSON.stringify(modifiedCases, null, 2));
 
-    return { ...state, cases: modifiedCases };
+    return { ...state, pendingCases: modifiedCases };
   }
 );
 
 each(
-  '$.cases[*]', //using each() here returns state.data for each item in the prepared "cases" array
+  '$.pendingCases[*]', //using each() here returns state.data for each item in the prepared "cases" array
   upsertCase({
     externalIds: ['id'],
     data: state => {

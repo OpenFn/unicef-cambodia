@@ -497,25 +497,27 @@ fn(state => {
   return { ...state, cases: finalizedNoRefsFromPrimero };
 });
 
-// we log cases before sending to primero
-fn(state => {
-  //console.log('Prepared cases:', JSON.stringify(state.cases, null, 2));
-  const caseIds = state.cases.map(c => ({ case_id: c.case_id }));
-  console.log('External Ids for prepared cases:', JSON.stringify(caseIds, null, 2));
-  return state;
-});
+//============= Moved to f2-j3 job ======================================//
+// // we log cases before sending to primero
+// fn(state => {
+//   //console.log('Prepared cases:', JSON.stringify(state.cases, null, 2));
+//   const caseIds = state.cases.map(c => ({ case_id: c.case_id }));
+//   console.log('External Ids for prepared cases:', JSON.stringify(caseIds, null, 2));
+//   return state;
+// });
 
-// we upsert Primero cases based on matching 'oscar_number' OR 'case_id'
-each(
-  '$.cases[*]', //using each() here returns state.data for each item in the prepared "cases" array
-  upsertCase({
-    externalIds: state => (!!state.data.case_id ? ['case_id'] : ['oscar_number']), //changed from state.data.external_id
-    data: state => {
-      //console.log('Syncing prepared case & checking if exists...', state.data);
-      return state.data;
-    },
-  })
-);
+// // we upsert Primero cases based on matching 'oscar_number' OR 'case_id'
+// each(
+//   '$.cases[*]', //using each() here returns state.data for each item in the prepared "cases" array
+//   upsertCase({
+//     externalIds: state => (!!state.data.case_id ? ['case_id'] : ['oscar_number']), //changed from state.data.external_id
+//     data: state => {
+//       //console.log('Syncing prepared case & checking if exists...', state.data);
+//       return state.data;
+//     },
+//   })
+// );
+//=====================================================================//
 
 // we build decisions for primero, add array for referrals to update
 fn(state => {
