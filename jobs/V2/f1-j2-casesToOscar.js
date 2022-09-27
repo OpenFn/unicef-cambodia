@@ -356,13 +356,14 @@ fn(state => {
       services: c.services_section
         .filter(s => s.service_type)
         .map(s => {
-          return s.service_subtype.map(st => {
-            return {
-              uuid: oscarStrings(s.unique_id),
-              name: st ? serviceMap[st] || 'Not Specified' : 'Not Specified',
-              //referral_status: 'Referred' //not needed
-            };
-          });
+          return s.service_subtype.length > 0
+            ? s.service_subtype.map(st => {
+                return {
+                  uuid: oscarStrings(s.unique_id),
+                  name: st ? serviceMap[st] || 'Not Specified' : 'Not Specified',
+                };
+              })
+            : { uuid: oscarStrings(s.unique_id), name: 'Not Specified' };
         })
         .flat(),
       transaction_id:
