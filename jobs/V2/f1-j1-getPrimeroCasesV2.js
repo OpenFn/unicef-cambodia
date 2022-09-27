@@ -1,9 +1,9 @@
 // Either use a manual cursor, or take the cursor from the last run.
 fn(state => {
-  const currentAttempt = new Date().toISOString();
-  console.log('Current attempt time:', currentAttempt);
   console.log('Last sync end date:', state.lastRunDateTime || 'undefined; using manual cursor...');
   const manualCursor = '2022-09-26T09:05:04.470Z'; //'2022-09-07T08:57:24.777Z'; 
+  const currentAttempt = new Date().toISOString();
+  console.log('Current attempt time:', currentAttempt);
 
   const cursor = state.lastRunDateTime || manualCursor;
   console.log('Cursor:', cursor);
@@ -11,10 +11,6 @@ fn(state => {
 });
 
 // Clear data from previous runs and add a referralIds array.
-fn(state => {
-  console.log('Cursor:', state.cursor);
-  return state;
-});
 fn(state => ({ ...state, data: {}, references: [], referralIds: [] }));
 
 // GET Primero cases with oscar referrals
@@ -148,10 +144,16 @@ getCases(
 
 // After job completes successfully, update cursor
 fn(state => {
-  const { lastRunDateTime, currentAttempt } = state;
-
-  console.log(`Updating lastRunDateTime from ${lastRunDateTime} to ${currentAttempt}.`);
-  return { ...state, lastRunDateTime: currentAttempt };
+  const { lastRunDateTime, currentAttempt, cursor } = state;
+  
+  const cursorTime = new Date(cursor); 
+  console.log('1: ', cursorTime); 
+  const cursorPlus5 = cursorTime.setMinutes(cursorTime.getMinutes()+5); 
+  console.log(`Updating lastRunDateTime from ${lastRunDateTime} to ${cursorPlus5}.`);
+  return { ...state, lastRunDateTime: cursorPlus5 };
+  //console.log('Current attempt time:', currentAttempt);
+  //console.log(`Updating lastRunDateTime from ${lastRunDateTime} to ${currentAttempt}.`);
+  //return { ...state, lastRunDateTime: currentAttempt };
 });
 
 //JOB will output 3 arrays to use in the next job
