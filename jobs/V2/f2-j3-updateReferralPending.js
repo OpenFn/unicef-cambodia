@@ -1,7 +1,7 @@
 // we log cases before sending to primero
 fn(state => {
   //console.log('Prepared cases:', JSON.stringify(state.cases, null, 2));
-  const caseIds = state.cases.map(c => ({ case_id: c.case_id, address_current: c.address_current }));
+  const caseIds = state.cases.map(c => ({ case_id: c.case_id,  oscar_number: c.oscar_number, address_current: c.address_current }));
   console.log('External Ids for prepared cases:', JSON.stringify(caseIds, null, 2));
   return state;
 });
