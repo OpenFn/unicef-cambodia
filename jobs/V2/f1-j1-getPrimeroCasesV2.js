@@ -3,7 +3,7 @@ fn(state => {
   const currentAttempt = new Date().toISOString();
   console.log('Current attempt time:', currentAttempt);
   console.log('Last sync end date:', state.lastRunDateTime || 'undefined; using manual cursor...');
-  const manualCursor = '2022-09-07T08:57:24.777Z'; //'2022-08-31T00:00:07.288Z';
+  const manualCursor = '2022-09-26T09:05:04.470Z'; //'2022-09-07T08:57:24.777Z'; 
 
   const cursor = state.lastRunDateTime || manualCursor;
   console.log('Cursor:', cursor);
@@ -32,13 +32,12 @@ getCases(
   { withReferrals: true },
   state => {
     const oscarRefs = state.data;
-    // console.log(`oscarRefs: ${JSON.stringify(oscarRefs, null, 2)}`);
+    console.log(`oscarRefs found before filter: ${JSON.stringify(oscarRefs, null, 2)}`);
     const referralIds = oscarRefs
       .map(c =>
         c.referrals
-          // TO-DO Aleksa & Aicha - Aicha commented this line out because if a sync fails the caseworker would need to recreate the referral
           .map(x => {
-            console.log('referral:', x.status, x.created_at, x.service_record_id);
+            console.log('referral:', 'id:', x.id, x.status, x.created_at, x.service_record_id);
             return x;
           })
           .filter(r => new Date(r.created_at) >= new Date(state.cursor))
