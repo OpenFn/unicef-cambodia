@@ -147,9 +147,7 @@ fn(state => {
   const { lastRunDateTime, currentAttempt, cursor } = state;
   console.log('cursor', cursor); 
   const cursorTime = new Date(cursor); 
-  console.log('cursor at the start of this run: ', cursorTime); 
   const cursorPlus5 = new Date(cursorTime.getTime() + 5*60000).toISOString();
-  //const cursorPlus5 = cursorTime.setMinutes(cursorTime.getMinutes()+5).toISOString(); 
   console.log(`Updating lastRunDateTime from ${cursor} to ${cursorPlus5}.`);
   return { ...state, lastRunDateTime: cursorPlus5 };
   //console.log('Current attempt time:', currentAttempt);
