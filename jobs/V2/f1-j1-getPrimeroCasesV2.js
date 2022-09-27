@@ -28,7 +28,7 @@ getCases(
   { withReferrals: true },
   state => {
     const oscarRefs = state.data;
-    console.log(`oscarRefs found before filter: ${JSON.stringify(oscarRefs, null, 2)}`);
+    //console.log(`oscarRefs found before filter: ${JSON.stringify(oscarRefs, null, 2)}`);
     const referralIds = oscarRefs
       .map(c =>
         c.referrals
@@ -145,11 +145,12 @@ getCases(
 // After job completes successfully, update cursor
 fn(state => {
   const { lastRunDateTime, currentAttempt, cursor } = state;
-  
+  console.log('cursor', cursor); 
   const cursorTime = new Date(cursor); 
-  console.log('1: ', cursorTime); 
-  const cursorPlus5 = cursorTime.setMinutes(cursorTime.getMinutes()+5); 
-  console.log(`Updating lastRunDateTime from ${lastRunDateTime} to ${cursorPlus5}.`);
+  console.log('cursor at the start of this run: ', cursorTime); 
+  const cursorPlus5 = new Date(cursorTime.getTime() + 5*60000).toISOString();
+  //const cursorPlus5 = cursorTime.setMinutes(cursorTime.getMinutes()+5).toISOString(); 
+  console.log(`Updating lastRunDateTime from ${cursor} to ${cursorPlus5}.`);
   return { ...state, lastRunDateTime: cursorPlus5 };
   //console.log('Current attempt time:', currentAttempt);
   //console.log(`Updating lastRunDateTime from ${lastRunDateTime} to ${currentAttempt}.`);
