@@ -397,7 +397,7 @@ fn(state => {
       sex: isUpdate ? undefined : setGender(c.gender),
       age: isUpdate ? undefined : calcAge(c.date_of_birth),
       date_of_birth: isUpdate ? undefined : c.date_of_birth,
-      address_current: isUpdate ? undefined : addressCode,
+      address_current: isUpdate ? undefined : addressCode==='10903' ? '102' : addressCode,
       location_current: isUpdate ? undefined : locationCode,
       oscar_status: c.status,
       protection_status: !isUpdate && c.is_referred == true ? 'oscar_referral' : undefined,
