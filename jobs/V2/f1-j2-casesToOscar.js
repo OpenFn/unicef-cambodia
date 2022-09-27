@@ -353,7 +353,7 @@ fn(state => {
       //organization_id: oscarStrings(c.owned_by_agency_id),
       //referral_status: 'Referred', //TODO: TO REMOVE! This overwrites decisions for ALL referrals, but API throws error is not here
       services: c.services_section
-        .filter(s => s.service_subtype)
+        .filter(s => s.service_type)
         .map(s => {
           return s.service_subtype.map(st => {
             return {
