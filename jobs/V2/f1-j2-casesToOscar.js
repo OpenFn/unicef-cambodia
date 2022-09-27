@@ -171,6 +171,7 @@ fn(state => {
     anti_trafficking_community_reintegration: 'Community Reintegration Support',
     residential_care_gov_only_other: 'Residential Care Institution',
     other_other_service: 'Other Service',
+    other: 'Other Service',
   };
 
   //======================================================================================//
@@ -358,7 +359,7 @@ fn(state => {
           return s.service_subtype.map(st => {
             return {
               uuid: oscarStrings(s.unique_id),
-              name: st ? serviceMap[st] : 'Not Specified',
+              name: st ? serviceMap[st] || 'Not Specified' : 'Not Specified',
               //referral_status: 'Referred' //not needed
             };
           });
