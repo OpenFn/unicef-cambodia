@@ -12,7 +12,7 @@ each(
   upsertCase({
     externalIds: state => (!!state.data.case_id ? ['case_id'] : ['oscar_number']), //changed from state.data.external_id
     data: state => {
-      //console.log('Syncing prepared case & checking if exists...', state.data);
+      console.log('Syncing prepared case & checking if exists...', state.data);
       return state.data;
     },
   })
