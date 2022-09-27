@@ -366,10 +366,19 @@ fn(state => {
     const currentLocation = setLocationCode(
       c.location_current_village_code || c.address_current_village_code
     );
-
+    
+    const currentAddress = setLocationCode(
+      c.address_current_village_code || c.location_current_village_code 
+    );
+    
     const locationCode =
       c.location_current_village_code || c.address_current_village_code
         ? parseInt(currentLocation, 10).toString()
+        : null;
+        
+    const addressCode =
+      c.location_current_village_code || c.address_current_village_code
+        ? parseInt(currentAddress, 10).toString()
         : null;
 
     const isUpdate = c.external_id;
@@ -388,7 +397,7 @@ fn(state => {
       sex: isUpdate ? undefined : setGender(c.gender),
       age: isUpdate ? undefined : calcAge(c.date_of_birth),
       date_of_birth: isUpdate ? undefined : c.date_of_birth,
-      address_current: isUpdate ? undefined : c.address_current_village_code,
+      address_current: isUpdate ? undefined : addressCode,
       location_current: isUpdate ? undefined : locationCode,
       oscar_status: c.status,
       protection_status: !isUpdate && c.is_referred == true ? 'oscar_referral' : undefined,
