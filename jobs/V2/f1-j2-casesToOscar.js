@@ -358,7 +358,7 @@ fn(state => {
           return s.service_subtype.map(st => {
             return {
               uuid: oscarStrings(s.unique_id),
-              name: serviceMap[st] || 'Not Specified',
+              name: st ? serviceMap[st] : 'Not Specified',
               //referral_status: 'Referred' //not needed
             };
           });
