@@ -146,13 +146,13 @@ getCases(
 fn(state => {
   const { lastRunDateTime, currentAttempt, cursor } = state;
   console.log('cursor', cursor); 
-  const cursorTime = new Date(cursor); 
-  const cursorPlus5 = new Date(cursorTime.getTime() + 5*60000).toISOString();
-  console.log(`Updating lastRunDateTime from ${cursor} to ${cursorPlus5}.`);
-  return { ...state, lastRunDateTime: cursorPlus5 };
-  //console.log('Current attempt time:', currentAttempt);
-  //console.log(`Updating lastRunDateTime from ${lastRunDateTime} to ${currentAttempt}.`);
-  //return { ...state, lastRunDateTime: currentAttempt };
+  // const cursorTime = new Date(cursor); 
+  // const cursorPlus5 = new Date(cursorTime.getTime() + 5*60000).toISOString();
+  // console.log(`Updating lastRunDateTime from ${cursor} to ${cursorPlus5}.`);
+  // return { ...state, lastRunDateTime: cursorPlus5 };
+  console.log('Current attempt time:', currentAttempt);
+  console.log(`Updating lastRunDateTime from ${lastRunDateTime} to ${currentAttempt}.`);
+  return { ...state, lastRunDateTime: currentAttempt };
 });
 
 //JOB will output 3 arrays to use in the next job
