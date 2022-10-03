@@ -1,0 +1,33 @@
+{
+    "organization": {
+      "external_id": "e9a7c190-bf1a-4813-8987-d3b8350ea080",
+      "external_id_display": "50ea080",
+      "global_id": "01GDJB46MH0V4KBNR018K2SZ3A",
+      "level_of_risk": "medium",
+      "mosvy_number": "",
+      "given_name": "Aicha",
+      "family_name": "Diallo",
+      "gender": "female",
+      "date_of_birth": "2016-01-01",
+      "location_current_village_code": "01021112",
+      "address_current_village_code": "01021112",
+      "reason_for_referral": "",
+      "external_case_worker_name": "",
+      "external_case_worker_id": "",
+      "external_case_worker_mobile": "000000000",
+      "is_referred": true,
+      "organization_name": "cif",
+      "organization_id": "cif",
+      "services": [
+        {
+        "uuid": "07ac46e9-3725-4ef1-9167-127059cfff2e",
+        "name": "Generalist social work / case work"
+      },
+      {
+        "uuid": "0f0a3165-baf3-4b2d-b931-e002cb447df6",
+        "name": "Emergency foster care"
+      },
+      ],
+      "date_of_referral": "2022-10-03"
+    }
+  }
