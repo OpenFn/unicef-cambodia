@@ -371,7 +371,7 @@ fn(state => {
       // transaction_id: oscarStrings(c.transition_id), //TODO: Confirm mapping; not sure this was ever working
       date_of_referral: oscarStrings(
         c.last_updated_at && c.last_updated_at.replace(/\//g, '-')
-      ).substring(0, 9),
+      ).substring(0, 10),
     };
 
     // NOTE: Logs for enhanced audit trail.
