@@ -366,16 +366,16 @@ fn(state => {
     const currentLocation = setLocationCode(
       c.location_current_village_code || c.address_current_village_code
     );
-    
+
     const currentAddress = setLocationCode(
-      c.address_current_village_code || c.location_current_village_code 
+      c.address_current_village_code || c.location_current_village_code
     );
-    
+
     const locationCode =
       c.location_current_village_code || c.address_current_village_code
         ? parseInt(currentLocation, 10).toString()
         : null;
-        
+
     const addressCode =
       c.location_current_village_code || c.address_current_village_code
         ? parseInt(currentAddress, 10).toString()
@@ -600,9 +600,11 @@ each(
                   // Consider checking both BOTH crtieria (changing to AND, instead of OR) ============//
                   s.oscar_referral_id_a4ac8a5 === referralId ||
                   (s.service_subtype[0] === decisionServiceType &&
-                    s.referral_status_edf41f2 === 'pending_310366') ||
-                  (s.service_subtype[0] === '' && //for rejected 'Not Specified' referrals
-                    decisionServiceType === 'Other')
+                    s.referral_status_edf41f2 === 'pending_310366' &&
+                    s.service_response_type === 'referral_to_oscar') ||
+                  (s.service_subtype.length === 0 && //for rejected 'Not Specified' referrals
+                    s.referral_status_edf41f2 === 'pending_310366' &&
+                    s.service_response_type === 'referral_to_oscar')
                 // &&
                 // s.referral_status_edf41f2 === 'rejected_936484')
 
@@ -614,7 +616,7 @@ each(
               matchingServiceId = matchingService ? matchingService.unique_id : undefined;
               decisionStatus = PrimeroServiceToReferralStatusMap[s.referral_status_edf41f2];
 
-              console.log('Oscar decisionServiceType to match on::', decisionServiceType);
+              console.log('Oscar decisionServiceSubType to match on::', decisionServiceType);
               //console.log('matchingService in Primero found ::', matchingService);
               console.log('matchingServiceId in Primero found::', matchingServiceId);
               console.log('decisionStatus for Referral found::', decisionStatus);
