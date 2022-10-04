@@ -1,33 +1,33 @@
 {
     "organization": {
-      "external_id": "e9a7c190-bf1a-4813-8987-d3b8350ea080",
-      "external_id_display": "50ea080",
-      "global_id": "01GDJB46MH0V4KBNR018K2SZ3A",
+      "external_id": "aac935f2-5e01-450b-8575-423915a04e68",
+      "external_id_display": "5a04e68",
       "level_of_risk": "medium",
       "mosvy_number": "",
-      "given_name": "Aicha",
-      "family_name": "Diallo",
+      "given_name": "Tikwiza",
+      "family_name": "Quin",
       "gender": "female",
-      "date_of_birth": "2016-01-01",
-      "location_current_village_code": "01021112",
-      "address_current_village_code": "01021112",
-      "reason_for_referral": "",
-      "external_case_worker_name": "",
-      "external_case_worker_id": "",
+      "date_of_birth": "2015-01-01",
+      "location_current_village_code": "10060805",
+      "address_current_village_code": "10060805",
+      "reason_for_referral": "sample reason",
+      "external_case_worker_name": "OpenFn",
+      "external_case_worker_id": "openfn_cp_user",
       "external_case_worker_mobile": "000000000",
+      "resource": "Primero",
       "is_referred": true,
       "organization_name": "cif",
       "organization_id": "cif",
       "services": [
         {
-        "uuid": "07ac46e9-3725-4ef1-9167-127059cfff2e",
-        "name": "Generalist social work / case work"
-      },
-      {
-        "uuid": "0f0a3165-baf3-4b2d-b931-e002cb447df6",
-        "name": "Emergency foster care"
-      },
+          "uuid": "00b7078c-f989-4d23-af5c-4712232aab6c",
+          "name": "Community social work"
+        },
+        {
+          "uuid": "024fd924-4010-46d7-a187-f6b289340d07",
+          "name": "Emergency foster care"
+        }
       ],
-      "date_of_referral": "2022-10-03"
+      "date_of_referral": "2022-10-04"
     }
   }
