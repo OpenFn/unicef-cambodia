@@ -602,7 +602,7 @@ each(
                   (s.service_subtype[0] === decisionServiceType &&
                     s.referral_status_edf41f2 === 'pending_310366' &&
                     s.service_response_type === 'referral_to_oscar') ||
-                  (s.service_subtype.length === 0 && //for rejected 'Not Specified' referrals
+                  (s.service_subtype[0] === '' && //for rejected 'Not Specified' referrals
                     s.referral_status_edf41f2 === 'pending_310366' &&
                     s.service_response_type === 'referral_to_oscar')
                 // &&
