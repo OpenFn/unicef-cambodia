@@ -421,8 +421,8 @@ fn(state => {
         referral_notes_from_oscar_2e787b8: referralReason,
         service_referral_notes: s.reason_for_referral,
         service_type: (serviceMap[s.name] && serviceMap[s.name].type) || 'Other',
-        service_subtype: [(serviceMap[s.name] && serviceMap[s.name].subtype) || 'Other'],
-        service_type_text: (serviceMap[s.name] && serviceMap[s.name].type) || 'Other',
+        service_subtype: [serviceMap[s.name] && serviceMap[s.name].subtype],
+        service_type_text: serviceMap[s.name] && serviceMap[s.name].type,
         service_type_details_text: serviceMap[s.name] ? 'n/a' : s.name,
         service_response_day_time: s.enrollment_date
           ? `${s.enrollment_date}T00:00:00.000Z`
