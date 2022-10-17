@@ -436,11 +436,30 @@ fn(state => {
     return { organization: oscar };
   });
 
-  console.log('list of mapped referrals', JSON.stringify(mappedReferrals, null, 2));
+  // console.log(
+  //   'list of mapped referrals to send to Oscar',
+  //   JSON.stringify(mappedReferrals, null, 2)
+  // );
+
+  // NOTE: If Oscar cases have 2+ services, here we split into separate JSON objects so that each
+  // request sent to Oscar only contrains 1 service each (e.g., { c1, services: [s1, s2]} -->
+  // becomes 2 requests: {c1, services: [s1]} AND {c1, services: [s2]}
+  const transformedCases = [];
+
+  mappedReferrals.map(wrapper => {
+    wrapper.organization.services.map(s => {
+      transformedCases.push({
+        ...wrapper,
+        organization: { ...wrapper.organization, services: [s] },
+      });
+    });
+  });
+
+  console.log('Transformed Oscar referrals to sync...', JSON.stringify(transformedCases, null, 2));
 
   return {
     ...state,
-    cases: { ...cases, referrals: mappedReferrals, decisions: confirmedDecisions },
+    cases: { ...cases, referrals: transformedCases, decisions: confirmedDecisions },
   };
 });
 
