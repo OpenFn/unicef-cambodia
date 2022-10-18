@@ -108,9 +108,7 @@ fn(state => {
 
   function checkValue(data) {
     if (data !== 'NaN' && data) {
-      return data.length === 1
-        ? '000' + data
-        : data.length === 7 || data.length === 3 || data.length === 5
+      return data.length === 1 || data.length === 7 || data.length === 3 || data.length === 5
         ? '0' + data
         : data; //if 1, 3, 5, or 7 char, add leading 0s
       //return '0'.repeat(8 - data.length) + data; //REMOVE once tested
