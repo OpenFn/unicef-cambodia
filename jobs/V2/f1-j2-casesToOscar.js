@@ -311,14 +311,26 @@ fn(state => {
       services: c.services_section
         .filter(s => s.service_type)
         .map(s => {
+          // NEW logic to return only 1 serivce subtype if multiple are mistakenly selected by the user
+          const service = {
+            uuid: oscarStrings(s.unique_id),
+            name:
+              s.service_subtype.length > 0
+                ? serviceMap[s.service_subtype[0]] || 'Not Specified'
+                : 'Not Specified',
+          };
           return s.service_subtype.length > 0
-            ? s.service_subtype.map(st => {
-                return {
-                  uuid: oscarStrings(s.unique_id),
-                  name: st ? serviceMap[st] || 'Not Specified' : 'Not Specified',
-                };
-              })
+            ? service
             : { uuid: oscarStrings(s.unique_id), name: 'Not Specified' };
+          // return s.service_subtype.length > 0
+          //   ? s.service_subtype.map(st => {
+
+          //       return {
+          //         uuid: oscarStrings(s.unique_id),
+          //         name: st ? serviceMap[st] || 'Not Specified' : 'Not Specified',
+          //       };
+          //     })
+          //   : { uuid: oscarStrings(s.unique_id), name: 'Not Specified' };
         })
         .flat(),
       transaction_id:
@@ -391,13 +403,13 @@ fn(state => {
     return { organization: oscar };
   });
 
-  // console.log(
-  //   'list of mapped referrals to send to Oscar',
-  //   JSON.stringify(mappedReferrals, null, 2)
-  // );
+  console.log(
+    'list of mapped referrals to send to Oscar',
+    JSON.stringify(mappedReferrals, null, 2)
+  );
 
-  // NOTE: If Oscar cases have 2+ services, here we split into separate JSON objects so that each
-  // request sent to Oscar only contrains 1 service each (e.g., { c1, services: [s1, s2]} -->
+  // NOTE: If Oscar referrals have 2+ services, here we split into separate JSON objects so that each
+  // request sent to Oscar only contains 1 service each (e.g., { c1, services: [s1, s2]} -->
   // becomes 2 requests: {c1, services: [s1]} AND {c1, services: [s2]}
   const transformedCases = [];
 
