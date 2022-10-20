@@ -4,13 +4,11 @@ fn(state => {
   const { oscarDecisions, oscarRefs, oscarCases } = state;
   const cases = {
     decisions: oscarDecisions,
-    referrals: oscarRefs, //NOTE: AK removed decisions from referrals array, and created new 'decisions' variable above
-    //referrals: [...oscarDecisions, ...oscarRefs], // Response to getCases #1 and #2 from f1-j1 //TODO: Delete? Confirm adter testing
-    nonReferrals: oscarCases, // Response to getCases #3 from f1-j1
+    referrals: oscarRefs,
+    nonReferrals: oscarCases,
   };
 
   console.log(`Cases with DECISIONS for Oscar: ${JSON.stringify(cases.decisions, null, 2)}`);
-
   console.log(`Cases with REFERRALS for Oscar: ${JSON.stringify(cases.referrals, null, 2)}`);
 
   // console.log(
@@ -111,7 +109,6 @@ fn(state => {
       return data.length === 1 || data.length === 7 || data.length === 3 || data.length === 5
         ? '0' + data
         : data; //if 1, 3, 5, or 7 char, add leading 0s
-      //return '0'.repeat(8 - data.length) + data; //REMOVE once tested
     } else {
       console.log('Converting location null values to OSCAR empty string.');
       return '';
@@ -198,42 +195,6 @@ fn(state => {
     })
     .flat(); //to de-nest array - e.g, convert [[data]] --> [data]
 
-  //===== OLD mappedDecisions logic that only mapped the most recent Primero service =====//
-  // const mappedDecisions = cases.decisions.map(c => {
-  //   //find Primero services with decisions
-  //   const primeroService = c.services_section.filter(
-  //     s => s.service_response_type === 'referral_from_oscar'
-  //   );
-  //   console.log('primero filtered services: ', primeroService);
-
-  //   //Here we want to find only the MOST RECENT service, taking the last item in the service_section array
-  //   const primeroLastService = primeroService.length > 1 ? primeroService.length - 1 : 0;
-  //   console.log(
-  //     'Most recent Primero service to sync to Oscar: ',
-  //     primeroService[primeroLastService]
-  //   );
-
-  //   //Here we only map the referral status of the Most Recent service from Primero
-  //   const referral_status = primeroService
-  //     ? statusMap[oscarStrings(primeroService[primeroLastService].referral_status_edf41f2)] ||
-  //       'Referred'
-  //     : 'Referred';
-
-  //   const referralId = primeroService
-  //     ? primeroService[primeroLastService].oscar_referral_id_a4ac8a5
-  //     : undefined;
-
-  //   const oscarDecision = {
-  //     external_id: oscarStrings(c.case_id),
-  //     external_id_display: oscarStrings(c.case_id_display),
-  //     client_global_id: oscarStrings(c.oscar_number),
-  //     referral_status,
-  //     referral_id: referralId,
-  //   };
-
-  //   return { data: oscarDecision };
-  // });
-
   console.log(
     'mappedDecisions - list of oscar_referrals that MIGHT have decisions',
     JSON.stringify(mappedDecisions, null, 2)
@@ -249,10 +210,6 @@ fn(state => {
   }
 
   const confirmedDecisions = mappedDecisions.filter(checkDecision).filter(checkNull);
-  //TO REMOVE - replaced with above filter & function checkDecision
-  // const confirmedDecisions = mappedDecisions.filter(
-  //   d => d.data.referral_status === 'Accepted' || d.data.referral_status === 'Exited'
-  // );
 
   console.log('Finding oscar_referrals with confirmed decisions...');
 
@@ -504,32 +461,6 @@ fn(state => {
   console.log('No decisions to sync to Oscar.');
   return state;
 });
-
-// //==== TO REMOVE AFTER TESTING NEW PUT ======///
-// //==== OLD POST request previously added for updating decisions; not bulkified ======///
-// post(
-//   // Oscar authentication, once per run
-//   '/api/v1/admin_auth/sign_in',
-//   {
-//     keepCookie: true,
-//     body: {
-//       email: state.configuration.username,
-//       password: state.configuration.password,
-//     },
-//   },
-//   state => {
-//     console.log('Authenticating again with OSCaR...');
-//     return {
-//       ...state,
-//       oscarHeaders: {
-//         'Content-Type': 'application/json',
-//         uid: state.configuration.username,
-//         client: state.data.__headers.client,
-//         'access-token': state.data.__headers['access-token'],
-//       },
-//     };
-//   }
-// );
 
 fn(state => {
   // Here we update links in OSCaR for non-referrals
