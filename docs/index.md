@@ -164,18 +164,18 @@ This integration is hosted on [OpenFn.org](https://openfn.org/projects) with Pri
 ### Support 
 Contact **support@openfn.org** with any questions or troubleshooting support. 
 
-**MoSVY Primero system administrators will be the primary contacts** responsible for ongoing integration monitoring and management: 
-srychandina@gmail.com
+**MoSVY Primero system administrators will be the primary contacts** responsible for ongoing integration monitoring and management:   
+srychandina@gmail.com  
 sideth@childreninfamilies.org
 
 #### Other Support Contacts
-**UNICEF:**
-mkeng@unicef.org 		
-pkhauv@unicef.org 
+**UNICEF:**  
+mkeng@unicef.org 		  
+pkhauv@unicef.org   
 
 
-**OSCaR:**
-sokly@childreninfamilies.org
+**OSCaR:**  
+sokly@childreninfamilies.org  
 meas.kiry@childreninfamilies.org
 
 ### Training Materials
