@@ -22,7 +22,7 @@ alterState(state => {
   state.thisQueryDate = `${now} 00:00:00`;
 
   console.log(
-    `Current datetime, rounded to 00:00:00, to be used to update lastQueryDate after this query: ${thisQueryDate}`
+    `Current datetime, rounded to 00:00:00, to be used to update lastQueryDate after this query: ${state.thisQueryDate}`
   );
 
   const initialState = { lastQueryDate, thisQueryDate };
