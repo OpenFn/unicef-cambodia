@@ -181,7 +181,7 @@ meas.kiry@childreninfamilies.org
 ### Training Materials
 
 ### V2 Training Materials 
-- See the Nov 2022 [training presentation](https://docs.google.com/presentation/d/1FSCfgd9RUfjmZO_NZ2bsosbYBTn8--KHoR4cefVsmpw/edit#slide=id.g8c9d2ded25_0_193). 
+- See the November 2022 [training presentation](https://docs.google.com/presentation/d/1FSCfgd9RUfjmZO_NZ2bsosbYBTn8--KHoR4cefVsmpw/edit#slide=id.g8c9d2ded25_0_193). 
 
 ### V1 Training Materials 
 - Administrators: [See the video recording](https://youtu.be/-5-Y9ZrK-aQ) and [presentation](https://docs.google.com/presentation/d/1aUprT1CwnEWtIax_PGxsPspXdR3mPy78rj6qt92dxeI/edit?usp=sharing) from the December 2020 System Administrators training. This includes an overview of integration monitoring, error codes, and troubleshooting. 
