@@ -8,7 +8,10 @@ See [this project background](https://docs.google.com/document/d/1zNyWXHhbJ0u_v5
 - [English user guide](https://docs.google.com/document/d/1c2irTpsZaOIEGzQaP1_O6XaREobJPdxV914hoDPJ9Dg/edit?usp=sharing) 
 - [Khmer user guide](https://drive.google.com/file/d/1k3H5ZHgFOQDsA5yQVWSf_5rflH-5lEx5/view?usp=sharing)
 
-Two interoperability workflows have been implemented to facilitate a bi-directional sync between the Primero and OSCaR systems to share relevant case and referral data between systems. This is to support the following functional requirements.
+Three interoperability workflows have been implemented to facilitate a bi-directional sync between the Primero and OSCaR systems to share relevant case and referral data between systems. This is to support the following functional requirements.
+
+_**Flow 0: Oscar ids --> Primero**_
+* Syncing Oscar ids to Primero cases
 
 _**Flow 1: Primero cases --> OSCaR**_
 * Sending MoSVY government referrals to NGO case workers
@@ -32,10 +35,10 @@ To automate the IO workflows, a bi-directional integration has been configured o
 _*Note that these APIs are newly implemented and were developed at the start of this integration implementation._
 
 **OpenFn Adaptors** (API wrappers) implemented: 
-* [language-primero](https://github.com/OpenFn/adaptors/tree/main/packages/primero)
+* [primero](https://github.com/OpenFn/adaptors/tree/main/packages/primero)
 
 ## (3) Interoperability Workflows
-To achieve a bi-directional systems sync, 4 OpenFn jobs have been implemented to automate the IO workflows
+To achieve a bi-directional systems sync, 7 OpenFn jobs have been implemented to automate the IO workflows
 
 _**Flow 0: Oscar ids --> Primero**_ 
 1. [f0-j1-getOscarCases.js](https://github.com/OpenFn/unicef-cambodia/blob/master/jobs/V2/f0-j1-getOscarCases.js) will fetch new Oscar cases 
@@ -110,7 +113,10 @@ OpenFn will perform `upsert()` (update if record exists, create if new) operatio
    - Primero unique id: `case_id` (represented as `external_id` in OSCaR system)
 
 #### 2. Referral Services 
-Service types are mapped between systems as defined in the [Service Map](https://docs.google.com/spreadsheets/d/1Zg9KGkHbh0ptjpj4YX9qFkojz9ydJ9aVT_UtkvE7Wu8/edit#gid=1841308930). _If any services change, this map and OpenFn jobs must be updated._
+- Service types are mapped between systems as defined in the [Service Map](https://docs.google.com/spreadsheets/d/1Zg9KGkHbh0ptjpj4YX9qFkojz9ydJ9aVT_UtkvE7Wu8/edit#gid=1841308930). _If any services change, this map and OpenFn jobs must be updated._
+- For every 1 service created in the source system, 1 referral will be sent to the destination system
+- When a service subtype is not selected in Primero, OpenFn will sync a default "not specified" service type to Oscar. Oscar requires the "service type" field so these services will always be rejected. See [training slides](https://docs.google.com/presentation/d/1FSCfgd9RUfjmZO_NZ2bsosbYBTn8--KHoR4cefVsmpw/edit#slide=id.g170fdd89002_0_123) for details. 
+- Oscar case decision is automatically reflected on the first referral form. See [training slides](https://docs.google.com/presentation/d/1FSCfgd9RUfjmZO_NZ2bsosbYBTn8--KHoR4cefVsmpw/edit#slide=id.g128201f9a7d_0_117) for details. 
 
 #### 3. Primero Case Owner Assignment**
 When cases are synced with Primero, they will be automatically assigned to a Province user case owner by OpenFn (see `owned_by` field in mappings). The Province will be determined by the location code of the child provided by OSCaR. See [Province User Map](https://docs.google.com/spreadsheets/d/1Zg9KGkHbh0ptjpj4YX9qFkojz9ydJ9aVT_UtkvE7Wu8/edit#gid=1502348153) for the list of generic Primero Province users. 
@@ -173,6 +179,11 @@ sokly@childreninfamilies.org
 meas.kiry@childreninfamilies.org
 
 ### Training Materials
+
+### V2 Training Materials 
+- See the Nov 2022 [training presentation](https://docs.google.com/presentation/d/1FSCfgd9RUfjmZO_NZ2bsosbYBTn8--KHoR4cefVsmpw/edit#slide=id.g8c9d2ded25_0_193). 
+
+### V1 Training Materials 
 - Administrators: [See the video recording](https://youtu.be/-5-Y9ZrK-aQ) and [presentation](https://docs.google.com/presentation/d/1aUprT1CwnEWtIax_PGxsPspXdR3mPy78rj6qt92dxeI/edit?usp=sharing) from the December 2020 System Administrators training. This includes an overview of integration monitoring, error codes, and troubleshooting. 
 - Case Workers: [See the training recording](https://youtu.be/9kSiY3Ld2bE) and the [IO User Guide](https://docs.google.com/document/d/1c2irTpsZaOIEGzQaP1_O6XaREobJPdxV914hoDPJ9Dg/edit?usp=sharing). 
 
