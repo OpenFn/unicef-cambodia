@@ -382,6 +382,8 @@ fn(state => {
         : null;
 
     const isUpdate = c.external_id;
+    
+    const riskLevel = c.risk_level==='no action' ? 'no_action' : c.risk_level; 
 
     const referralReason = c.reason_for_referral;
 
@@ -410,7 +412,7 @@ fn(state => {
       oscar_reason_for_exiting: c.reason_for_exiting,
       consent_for_services: true,
       disclosure_other_orgs: true,
-      risk_level: c.is_referred === true ? c.level_of_risk : null, //TODO: SET TO 'undefined' if NOT referred
+      risk_level: c.is_referred === true ? riskLevel : undefined, 
       interview_subject: isUpdate || c.is_referred !== true ? undefined : 'other',
       module_id: 'primeromodule-cp',
       //referral_notes_oscar: c.reason_for_referral, //moved down to service-level; see referral_notes_from_oscar_2e787b8
