@@ -383,7 +383,7 @@ fn(state => {
 
     const isUpdate = c.external_id;
     
-    const riskLevel = c.risk_level==='no action' ? 'no_action' : c.risk_level; 
+    const riskLevel = c.risk_level==='no action' ? 'no_action' : c.risk_level || 'no_action'; 
 
     const referralReason = c.reason_for_referral;
 
