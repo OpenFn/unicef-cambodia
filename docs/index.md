@@ -118,7 +118,7 @@ OpenFn will perform `upsert()` (update if record exists, create if new) operatio
 - When a service subtype is not selected in Primero, OpenFn will sync a default "not specified" service type to Oscar. Oscar requires the "service type" field so these services will always be rejected. See [training slides](https://docs.google.com/presentation/d/1FSCfgd9RUfjmZO_NZ2bsosbYBTn8--KHoR4cefVsmpw/edit#slide=id.g170fdd89002_0_123) for details. 
 - Oscar case decision is automatically reflected on the first referral form. See [training slides](https://docs.google.com/presentation/d/1FSCfgd9RUfjmZO_NZ2bsosbYBTn8--KHoR4cefVsmpw/edit#slide=id.g128201f9a7d_0_117) for details. 
 
-#### 3. Primero Case Owner Assignment**
+#### 3. Primero Case Owner Assignment
 When cases are synced with Primero, they will be automatically assigned to a Province user case owner by OpenFn (see `owned_by` field in mappings). The Province will be determined by the location code of the child provided by OSCaR. See [Province User Map](https://docs.google.com/spreadsheets/d/1Zg9KGkHbh0ptjpj4YX9qFkojz9ydJ9aVT_UtkvE7Wu8/edit#gid=1502348153) for the list of generic Primero Province users. 
 
 #### 4. Organization/ Agency names
