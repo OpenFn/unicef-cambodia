@@ -15,12 +15,12 @@ _**Flow 0: Oscar ids --> Primero**_
 
 _**Flow 1: Primero cases --> OSCaR**_
 * Sending MoSVY government referrals to NGO case workers
-* Syncing referral decisions from Oscar to Primero: When NGO case workers accept/reject a referral the deicsion is sent to the MoSVY case worker.
+* Syncing referral decisions from Oscar to Primero: When NGO case workers accept/reject a referral the decision is sent to the MoSVY case worker.
 
 _**Flow 2: OSCaR cases --> Primero**_
 * Sending NGO referrals to MoSVY case workers
 * Syncing NGO cases to Primero for MoSVY case workers to view (to prevent duplicate work)
-* Syncing referral decisions from Primero to Oscar: When MoSVY case workers accept/reject a referral the deicsion is sent to the NGO case worker.
+* Syncing referral decisions from Primero to Oscar: When MoSVY case workers accept/reject a referral the decision is sent to the NGO case worker.
 
 ### Videos
 [See this video playlist](https://www.youtube.com/playlist?list=PLSnTMDfTYBLj0cLKYgYBAtLU0lyrSG7Zb) for the solution overview & demo of the interoperability workflows. 
@@ -104,7 +104,7 @@ Example Request:
 [See this mapping table](https://docs.google.com/spreadsheets/d/1Zg9KGkHbh0ptjpj4YX9qFkojz9ydJ9aVT_UtkvE7Wu8/edit#gid=744794061) for the data element mappings implemented in the IO solution. This includes detailed integration mappings for **Services** and **Primero Users/Case Owners**. 
 
 ### Data Entry Protocols
-In order for data to be successfully exchanged as expected, users should follow the data entry protocols defined in the training sessions. For an overview of the data entry steps in both the OSCaR and Primero systems (see the below videos). If these data entry steps are _not_ followed and consent is _not_ provided in the Primero system, then these cases may not be eligble for case sharing and referrals between systems. **See the videos (above) for guidance**. 
+In order for data to be successfully exchanged as expected, users should follow the data entry protocols defined in the training sessions. For an overview of the data entry steps in both the OSCaR and Primero systems (see the below videos). If these data entry steps are _not_ followed and consent is _not_ provided in the Primero system, then these cases may not be eligible for case sharing and referrals between systems. **See the videos (above) for guidance**. 
 
 ## (6) Solution Assumptions 
 #### 1. Unique Identifiers
