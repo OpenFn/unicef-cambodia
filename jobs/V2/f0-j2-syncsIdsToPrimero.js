@@ -39,7 +39,7 @@ each(
     externalIds: ['case_id'],
     data: state => {
       const individualCase = state.data;
-      console.log('Syncing decision... ::', individualCase);
+      console.log('Syncing Oscar external IDs to Primero case ::', individualCase);
       return individualCase;
     },
   })

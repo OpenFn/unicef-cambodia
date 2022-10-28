@@ -291,7 +291,7 @@ fn(state => {
       external_id: oscarStrings(c.case_id),
       external_id_display: oscarStrings(c.case_id_display),
       global_id: c.oscar_number ? oscarStrings(c.oscar_number) : undefined,
-      level_of_risk: c.risk_level,
+      level_of_risk: c.risk_level==='no_action' ? 'no action' : c.risk_level,
       mosvy_number: oscarStrings(c.mosvy_number),
       given_name: oscarStrings(c.name_first),
       family_name: oscarStrings(c.name_last),
