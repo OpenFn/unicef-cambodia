@@ -225,6 +225,8 @@ fn(state => {
       c.transitions.length > 0 &&
       c.transitions.sort((a, b) => (a.created_at < b.created_at ? 1 : -1))[0].notes;
 
+    const referralReason = c.referrals.length > 0 ? c.referrals[0].notes : lastTransitionNote;
+
     // NOTE: This can be added back for more verbose logging.
     // console.log(
     //   `Data provided by Primero: ${JSON.stringify(
@@ -297,7 +299,7 @@ fn(state => {
       date_of_birth: oscarStrings(c.date_of_birth && c.date_of_birth.replace(/\//g, '-')),
       location_current_village_code: checkValue(c.location_current),
       address_current_village_code: checkValue(c.location_current), //oscarStrings(c.address_current),
-      reason_for_referral: oscarStrings(lastTransitionNote), //TODO: Check if this is coming through
+      reason_for_referral: oscarStrings(referralReason),
       external_case_worker_name: oscarStrings(c.owned_by),
       external_case_worker_id: oscarStrings(c.owned_by_id),
       external_case_worker_mobile: c.owned_by_phone || '000000000',
