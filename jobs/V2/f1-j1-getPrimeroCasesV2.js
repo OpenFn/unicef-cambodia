@@ -1,7 +1,11 @@
 // Either use a manual cursor, or take the cursor from the last run.
 fn(state => {
+  const { currentCursor, oscarCursor } = state;
+  console.log('Flow 0 currentCursor:: ', currentCursor);
+  console.log('Flow 0 oscarCursor:: ', oscarCursor);
+
   console.log('Last sync end date:', state.lastRunDateTime || 'undefined; using manual cursor...');
-  const manualCursor = '2022-10-25T23:56:07.539Z'; //'2022-09-07T08:57:24.777Z'; 
+  const manualCursor = '2022-10-25T23:56:07.539Z'; //'2022-09-07T08:57:24.777Z';
   const currentAttempt = new Date().toISOString();
   console.log('Current attempt time:', currentAttempt);
 
@@ -145,8 +149,8 @@ getCases(
 // After job completes successfully, update cursor
 fn(state => {
   const { lastRunDateTime, currentAttempt, cursor } = state;
-  console.log('cursor', cursor); 
-  // const cursorTime = new Date(cursor); 
+  console.log('cursor', cursor);
+  // const cursorTime = new Date(cursor);
   // const cursorPlus5 = new Date(cursorTime.getTime() + 5*60000).toISOString();
   // console.log(`Updating lastRunDateTime from ${cursor} to ${cursorPlus5}.`);
   // return { ...state, lastRunDateTime: cursorPlus5 };
