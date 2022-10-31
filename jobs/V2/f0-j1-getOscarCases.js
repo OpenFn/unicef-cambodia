@@ -3,7 +3,7 @@
 alterState(state => {
   if (state.data && state.data.initialState) {
     const lastQueryDate = state.cursor || state.data.initialState.lastQueryDate;
-    console.log('Setting cursor...');
+    console.log('Setting cursor...', lastQueryDate);
     return { ...state, lastQueryDate };
   }
   state.lastQueryDate = state.cursor;
@@ -22,7 +22,7 @@ alterState(state => {
   state.thisQueryDate = `${now} 00:00:00`;
 
   console.log(
-    `Current datetime, rounded to 00:00:00, to be used to update lastQueryDate after this query: ${thisQueryDate}`
+    `Current datetime, rounded to 00:00:00, to be used to update lastQueryDate after this query: ${state.thisQueryDate}`
   );
 
   const initialState = { lastQueryDate, thisQueryDate };
@@ -55,7 +55,7 @@ post(
       }),
       query: {
         // NOTE: since_date must be rounded to 00:00:00 to work with Oscar API.
-        since_date: state.lastQueryDate || '2022-10-21 00:00:00',
+        since_date: state.lastQueryDate || '2022-10-30 00:00:00',
       },
     },
     state => {
