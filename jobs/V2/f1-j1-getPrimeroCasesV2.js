@@ -5,7 +5,7 @@ fn(state => {
   // console.log('Flow 0 oscarCursor:: ', oscarCursor);
 
   console.log('Last sync end date:', state.lastRunDateTime || 'undefined; using manual cursor...');
-  const manualCursor = '2022-11-03T11:00:00.000Z'; //'2022-09-07T08:57:24.777Z';
+  const manualCursor = '2022-11-04T11:00:00.000Z'; //'2022-09-07T08:57:24.777Z';
   const currentAttempt = new Date().toISOString();
   console.log('Current attempt time:', currentAttempt);
 
