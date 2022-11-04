@@ -382,6 +382,7 @@ fn(state => {
         : null;
 
     const isUpdate = c.external_id;
+    const oscarNumber = c.global_id; 
     
     const riskLevel = c.risk_level==='no action' ? 'no_action' : c.risk_level || 'no_action'; 
 
@@ -418,7 +419,7 @@ fn(state => {
       //referral_notes_oscar: c.reason_for_referral, //moved down to service-level; see referral_notes_from_oscar_2e787b8
       services_section: c.services.map(s => ({
         //===== TODO - can uuid include the oscar_referral_id to ensure uniqueness? If yes, can we match to services based on this ===//
-        unique_id: s.uuid,
+        unique_id: s.uuid || undefined ,
         //===========================================================================//
         referral_notes_from_oscar_2e787b8: referralReason,
         service_referral_notes: s.reason_for_referral,
