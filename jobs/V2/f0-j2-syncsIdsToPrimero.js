@@ -1,3 +1,6 @@
+// In case a Primero referral to OSCaR has been accepted in OSCaR (and therefore assigned an oscar_number) since the last sync,
+// we want to sync that OSCaR ID back to Primero before we check Primero for new referrals
+// Otherwise Oscar will throw errors if we send a 2nd referral and do not include the Oscar ID in that referral request
 fn(state => {
   console.log('Preparing cases and decisions for upload to Primero...');
   state.originalCases = state.data.data;
