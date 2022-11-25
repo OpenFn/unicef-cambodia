@@ -10,11 +10,6 @@ fn(state => {
 
   console.log(`Cases with DECISIONS for Oscar: ${JSON.stringify(cases.decisions, null, 2)}`);
   console.log(`Cases with REFERRALS for Oscar: ${JSON.stringify(cases.referrals, null, 2)}`);
-
-  // console.log(
-  //   `Cases with referrals OR decisions for Oscar: ${JSON.stringify(cases.referrals, null, 2)}`
-  // );
-
   console.log(
     `NONreferrals to sync external_id only: ${JSON.stringify(cases.nonReferrals, null, 2)}`
   );
@@ -32,7 +27,7 @@ fn(state => {
   //NOTE FOR AK: To test? And update considering multiple agencies now sending referrals?
   const setOrganization = c => {
     // NOTE: This assumes the first referral will tell us which is the referring organization.
-    // The "business" stipulates that all "oscar_referring_organization"
+    // The client stipulates that all "oscar_referring_organization"
     // values will be the SAME for an array including any "referral_from_oscar"
     // items, and requires that we merely select the first item that matches.
     const fromOrg = c.services_section.find(s => s.service_response_type === 'referral_from_oscar');
@@ -72,7 +67,7 @@ fn(state => {
 });
 
 post(
-  // Oscar authentication, once per run
+  // Oscar authentication step, one request per job run
   '/api/v1/admin_auth/sign_in',
   {
     keepCookie: true,
@@ -108,7 +103,7 @@ fn(state => {
     if (data !== 'NaN' && data) {
       return data.length === 1 || data.length === 7 || data.length === 3 || data.length === 5
         ? '0' + data
-        : data; //if 1, 3, 5, or 7 char, add leading 0s
+        : data; //if 1, 3, 5, or 7 char, add leading 0s to convert location code to Oscar format
     } else {
       console.log('Converting location null values to OSCAR empty string.');
       return '';
@@ -190,10 +185,9 @@ fn(state => {
           };
         });
 
-      //console.log('referralMap', JSON.stringify(referralMap, null, 2));
       return referralMap;
     })
-    .flat(); //to de-nest array - e.g, convert [[data]] --> [data]
+    .flat(); //Here we de-nest array - e.g, convert [[data]] --> [data]
 
   console.log(
     'mappedDecisions - list of oscar_referrals that MIGHT have decisions',
@@ -261,7 +255,6 @@ fn(state => {
     // );
     // console.log(`Data provided by Primero:${JSON.stringify(c, null, 4)}`);
 
-    //AK NOTE: Changed below from services_section.find() to FILTER() bc we expect >1 service from Primero
     //Historically assumed would only send 1 service per case, but this is no longer true bc we want to sync decisions
     //This will return ALL Primero services marked as 'referrals'
     const primeroService = c.services_section.filter(
@@ -269,14 +262,9 @@ fn(state => {
         s.service_response_type === 'referral_to_oscar' ||
         s.service_response_type === 'referral_from_oscar' //TODO: @Aleksa - remove now that we have decisions above?
     );
-    //console.log('primero filtered services: ', primeroService);
 
     //Here we want to find only the MOST RECENT service, taking the last item in the service_section array
     const primeroLastService = primeroService.length > 1 ? primeroService.length - 1 : 0;
-    // console.log(
-    //   'Most recent Primero service to sync to Oscar: ',
-    //   primeroService[primeroLastService]
-    // );
 
     //TODO: @Aleksa - Remove if we have a default mapping for referral_status?
     //Here we only map the referral status of the Most Recent service from Primero
@@ -291,14 +279,14 @@ fn(state => {
       external_id: oscarStrings(c.case_id),
       external_id_display: oscarStrings(c.case_id_display),
       global_id: c.oscar_number ? oscarStrings(c.oscar_number) : undefined,
-      level_of_risk: c.risk_level==='no_action' ? 'no action' : c.risk_level,
+      level_of_risk: c.risk_level === 'no_action' ? 'no action' : c.risk_level,
       mosvy_number: oscarStrings(c.mosvy_number),
       given_name: oscarStrings(c.name_first),
       family_name: oscarStrings(c.name_last),
       gender: oscarStrings(c.sex),
       date_of_birth: oscarStrings(c.date_of_birth && c.date_of_birth.replace(/\//g, '-')),
       location_current_village_code: checkValue(c.location_current),
-      address_current_village_code: checkValue(c.location_current), //oscarStrings(c.address_current),
+      address_current_village_code: checkValue(c.location_current),
       reason_for_referral: oscarStrings(referralReason),
       external_case_worker_name: oscarStrings(c.owned_by),
       external_case_worker_id: oscarStrings(c.owned_by_id),
@@ -309,11 +297,10 @@ fn(state => {
       organization_id: 'cif', //TODO: Hardcoded, replace with below
       //organization_name: setOrganization(c), //TODO: Add mappings back before go-live
       //organization_id: oscarStrings(c.owned_by_agency_id),
-      //referral_status: 'Referred', //TODO: TO REMOVE! This overwrites decisions for ALL referrals, but API throws error is not here
       services: c.services_section
         .filter(s => s.service_type)
         .map(s => {
-          // NEW logic to return only 1 serivce subtype if multiple are mistakenly selected by the user
+          // Logic to return only 1 serivce subtype if multiple are mistakenly selected by the user
           const service = {
             uuid: oscarStrings(s.unique_id),
             name:
@@ -321,23 +308,15 @@ fn(state => {
                 ? serviceMap[s.service_subtype[0]] || 'Not Specified'
                 : 'Not Specified',
           };
+          // Logic to send a 'Not Specified' service subtype to OSCaR if left blank in Primero
+          // This is because Service Subtype is required in OSCaR, but not on Primero Services Subform
           return s.service_subtype.length > 0
             ? service
             : { uuid: oscarStrings(s.unique_id), name: 'Not Specified' };
-          // return s.service_subtype.length > 0
-          //   ? s.service_subtype.map(st => {
-
-          //       return {
-          //         uuid: oscarStrings(s.unique_id),
-          //         name: st ? serviceMap[st] || 'Not Specified' : 'Not Specified',
-          //       };
-          //     })
-          //   : { uuid: oscarStrings(s.unique_id), name: 'Not Specified' };
         })
         .flat(),
       transaction_id:
         c.transitions && c.transitions.length > 0 ? c.transitions[0].transition_id : undefined,
-      // transaction_id: oscarStrings(c.transition_id), //TODO: Confirm mapping; not sure this was ever working
       date_of_referral: oscarStrings(
         c.last_updated_at && c.last_updated_at.replace(/\//g, '-')
       ).substring(0, 10),
@@ -432,8 +411,7 @@ fn(state => {
   };
 });
 
-//NOW that data is transforemed, we start to map to Oscar...
-
+//NOW that data is transforemed, we start to sync case referrals to Oscar...
 //User Story 1.8b: Create referrals in Oscar
 each(
   '$.cases.referrals[*]',
@@ -449,13 +427,7 @@ each(
   })
 );
 
-//LOGS FOR TESTING - TO REMOVE
-// fn(state => {
-//   console.log('state', JSON.stringify(state.cases.decisions, null, 2));
-//   return state;
-// });
-
-//== NEW PUT request that sends all decisions in bulk to this new endpoint ==//
+//==For decisions only, we send a PUT request to OSCaR to update the Referral Status for existing cases with decisions from Primero ==//
 fn(state => {
   if (state.cases.decisions.length > 0)
     return put('/api/v1/organizations/referrals/update_statuses/', {

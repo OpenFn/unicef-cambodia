@@ -33,7 +33,7 @@ alterState(state => {
 // GET new OSCaR cases
 // User Story 2: 'View Oscar cases in Primero' AND User Story 4: 'Sending referrals to Primero'
 post(
-  //Oscar authentication  --> To update?
+  //Oscar authentication step
   '/api/v1/admin_auth/sign_in',
   {
     keepCookie: true,
@@ -42,30 +42,30 @@ post(
       password: state.configuration.password,
     },
   },
+  //Here we get ALL cases from OSCaR that have sharing with Primero granted. This includes referrals & cases for duplicate prevention.
   get(
     '/api/v1/organizations/clients',
     {
       keepCookie: true,
       headers: state => ({
-        // Oscar authentication
+        // Passing oscar authentication parameters in headers
         'access-token': state.data.__headers['access-token'],
         'Content-Type': 'application/json',
         client: state.data.__headers.client,
         uid: state.configuration.username,
       }),
       query: {
-        // NOTE: since_date must be rounded to 00:00:00 to work with Oscar API.
+        // NOTE: since_date must be rounded to 00:00:00 to work with Oscar API. API does not support other timestamps.
         since_date: state.lastQueryDate || '2022-10-08 00:00:00',
-        //referred_external: true, //old query parameter - to remove to pull ALL cases, not just referrals
       },
     },
     state => {
       console.log(`Oscar API responded with cases: ${JSON.stringify(state.data.data, null, 2)}`);
-      /*console.log(
-        `Oscar API responded with cases with global_ids: ${JSON.stringify(
-          state.data.data ? state.data.data.map(c => c.global_id) : ''
-        )}`
-      );*/
+      // console.log(
+      //   `Oscar API responded with cases with global_ids: ${JSON.stringify(
+      //     state.data.data ? state.data.data.map(c => c.global_id) : ''
+      //   )}`
+      // );
       state.lastQueryDate = state.thisQueryDate;
       console.log(`Updated state.lastQueryDate to: ${state.lastQueryDate}`);
       return state;

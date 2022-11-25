@@ -1,28 +1,31 @@
-// we log cases before sending to primero
+//We update cases synced for duplicate prevention AND set the status of newly referred Services as 'Pending'
 fn(state => {
-  //console.log('Prepared cases:', JSON.stringify(state.cases, null, 2));
-  const caseIds = state.cases.map(c => ({ case_id: c.case_id,  oscar_number: c.oscar_number, address_current: c.address_current }));
+  const caseIds = state.cases.map(c => ({
+    case_id: c.case_id,
+    oscar_number: c.oscar_number,
+    address_current: c.address_current,
+  }));
   console.log('External Ids for prepared cases:', JSON.stringify(caseIds, null, 2));
   return state;
 });
 
-// we upsert Primero cases based on matching 'oscar_number' OR 'case_id'
+// We upsert Primero cases based on matching 'oscar_number' OR 'case_id'
 each(
   '$.cases[*]', //using each() here returns state.data for each item in the prepared "cases" array
   upsertCase({
-    externalIds: state => (!!state.data.case_id ? ['case_id'] : ['oscar_number']), //changed from state.data.external_id
+    externalIds: state => (!!state.data.case_id ? ['case_id'] : ['oscar_number']),
     data: state => {
       console.log('Syncing prepared case...', state.data);
       return state.data;
     },
   })
 );
-//We then get cases to check which have pending status
+//We then get Primero cases to check which should have 'pending' status
 getCases(
   {
     remote: true,
     //last_updated_at: state => `${state.cursor}..`,
-    last_updated_at: '2022-09-08T00:57:24.777Z..', //TODO: dynamically set cursor
+    last_updated_at: '2022-11-25T00:57:24.777Z..', //TODO: dynamically set cursor
     workflow: 'referral_from_oscar',
   },
   { withReferrals: false },
@@ -56,8 +59,6 @@ getCases(
 
     const casesToUpdate = casesWithPending.filter(checkServices);
 
-    //console.log('casesToUpdate', JSON.stringify(casesToUpdate, null, 2));
-
     modifiedCases = casesToUpdate
       ? casesToUpdate.map(c => {
           return {
@@ -73,8 +74,6 @@ getCases(
           };
         })
       : undefined;
-
-    //console.log('modifiedCases', JSON.stringify(modifiedCases, null, 2));
 
     return { ...state, pendingCases: modifiedCases };
   }
