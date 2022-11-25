@@ -10,17 +10,19 @@ See [this project background](https://docs.google.com/document/d/1zNyWXHhbJ0u_v5
 
 Three interoperability workflows have been implemented to facilitate a bi-directional sync between the Primero and OSCaR systems to share relevant case and referral data between systems. This is to support the following functional requirements.
 
-_**Flow 0: Oscar ids --> Primero**_
-* Syncing Oscar ids to Primero cases
 
-_**Flow 1: Primero cases --> OSCaR**_
+_**Workflow 1: Sending case referrals to NGOs (Primero -> OSCaR)**_
 * Sending MoSVY government referrals to NGO case workers
 * Syncing referral decisions from Oscar to Primero: When NGO case workers accept/reject a referral the decision is sent to the MoSVY case worker.
+![workflow1-diagram](./primero_oscar_workflow1.png)
 
-_**Flow 2: OSCaR cases --> Primero**_
+
+_**Workflow 2: Sending case referrals to MoSVY (OSCaR --> Primero**_
 * Sending NGO referrals to MoSVY case workers
-* Syncing NGO cases to Primero for MoSVY case workers to view (to prevent duplicate work)
 * Syncing referral decisions from Primero to Oscar: When MoSVY case workers accept/reject a referral the decision is sent to the NGO case worker.
+* Syncing _all_ NGO cases to Primero for MoSVY case workers to view (to prevent duplicate work)
+![workflow2-diagram](./oscar_primero_workflow2.png)
+
 
 ### Videos
 [See this video playlist](https://www.youtube.com/playlist?list=PLSnTMDfTYBLj0cLKYgYBAtLU0lyrSG7Zb) for the solution overview & demo of the interoperability workflows. 
@@ -38,11 +40,11 @@ _*Note that these APIs are newly implemented and were developed at the start of 
 * [primero](https://github.com/OpenFn/adaptors/tree/main/packages/primero)
 
 ## (3) Interoperability Workflows
-To achieve a bi-directional systems sync, 7 OpenFn jobs have been implemented to automate the IO workflows
+To achieve a bi-directional systems sync, multiple OpenFn jobs have been implemented to automate the different workflow steps. 
 
 _**Flow 0: Oscar ids --> Primero**_ 
-1. [f0-j1-getOscarCases.js](https://github.com/OpenFn/unicef-cambodia/blob/master/jobs/V2/f0-j1-getOscarCases.js) will fetch new Oscar cases 
-2. [f0-j2-syncsIdsToPrimero.js](https://github.com/OpenFn/unicef-cambodia/blob/master/jobs/V2/f0-j2-syncsIdsToPrimero.js) will update Primero cases with Oscar ids 
+1. [f0-j1-getOscarCases.js](https://github.com/OpenFn/unicef-cambodia/blob/master/jobs/V2/f0-j1-getOscarCases.js) will fetch new Oscar cases to check for newly accepted OSCaR cases where an "oscar_number" has been assigned; we then want to sync this external ID back to Primero
+2. [f0-j2-syncsIdsToPrimero.js](https://github.com/OpenFn/unicef-cambodia/blob/master/jobs/V2/f0-j2-syncsIdsToPrimero.js) will update Primero cases with Oscar External Ids
 
 _**Flow 1: Primero cases --> OSCaR**_ ([Data flow diagram](https://lucid.app/lucidchart/invitations/accept/f6751d0f-2e48-4978-a635-13b8a45d6b3e))
 1. [f1-j1-getPrimeroCases.js](https://github.com/OpenFn/unicef-cambodia/blob/master/jobs/V2/f1-j1-getPrimeroCasesV2.js) will fetch Primero case updates & referrals
@@ -58,7 +60,7 @@ _**Flow 2: OSCaR cases --> Primero**_ ([Data flow diagram](https://lucid.app/luc
 ## (4) Automation Triggers
 ### Trigger Type: Cron Timer
 
-Every hour at `00` minutes (cron: `00 * * * *`) OpenFn will run the 4 jobs to fetch new case information from the Primero and OSCaR systems. The flows may also be executed on-demand at any time by a designated OpenFn admin user by clicking the "Run" button on a job in OpenFn.org. 
+Every hour at `00` minutes (cron: `00 * * * *`) OpenFn will run the workflows to sync case data between the Primero and OSCaR systems. The flows may also be executed on-demand at any time by a designated OpenFn admin user by clicking the "Run" button on a job in OpenFn.org. 
 ![Run Job](./run_job_now.png)
 
 
@@ -70,7 +72,7 @@ _**Flow 0: OSCaR ids --> Primero**_
 
 Example Request:
 ```
- GET /api/v1/organizations/clients?since_date='2020-07-01 01:00:00'&referred_external=true
+ GET /api/v1/organizations/clients?since_date='2020-07-01 01:00:00'
 ```
 
 _**Flow 1: Primero cases --> OSCaR**_
@@ -101,7 +103,7 @@ Example Request:
 ### Data Sharing Agreements
 [See this folder](https://drive.google.com/drive/folders/1Wb_h0Dazt8socWRW7buR2IBNqW4Pft7_?usp=sharing) for copies of the data sharing agreements between the MoSVY and Cambodia (OSCaR user) agencies. 
 
-[See this mapping table](https://docs.google.com/spreadsheets/d/1Zg9KGkHbh0ptjpj4YX9qFkojz9ydJ9aVT_UtkvE7Wu8/edit#gid=744794061) for the data element mappings implemented in the IO solution. This includes detailed integration mappings for **Services** and **Primero Users/Case Owners**. 
+[See this mapping specification](https://docs.google.com/spreadsheets/d/1Zg9KGkHbh0ptjpj4YX9qFkojz9ydJ9aVT_UtkvE7Wu8/edit#gid=744794061) for the data element mappings implemented in the interoperability solution. This includes detailed integration mappings for **Services** and **Primero Users/Case Owners**. 
 
 ### Data Entry Protocols
 In order for data to be successfully exchanged as expected, users should follow the data entry protocols defined in the training sessions. For an overview of the data entry steps in both the OSCaR and Primero systems (see the below videos). If these data entry steps are _not_ followed and consent is _not_ provided in the Primero system, then these cases may not be eligible for case sharing and referrals between systems. **See the videos (above) for guidance**. 
@@ -138,23 +140,21 @@ _Agency/Organization Ids should follow the below naming conventions, otherwise t
     - Primero Agency ID: `'agency-{organization_name}'` (e.g., `agency-cif`)
 
 ## (8) 2022 Primero V2 Upgrade 
-OpenFn updated the IO Solution between the Primero and OSCaR systems to work with Primero V2. New jobs were written for V2 and the changes listed below were added to the solution. The original V1 OpenFn jobs were deprecated with this upgrade. 
+This interoperability solution was originally implemented in 2020 to work with Primero V1. In 2022, it was updated by OpenFn team in partnership with UNICEF Cambodia and OSCaR/Children in Families core team, in order to ensure compatibility with the Primero V2 upgrade and new features available in this version. 
+
+New jobs were written for V2 and the changes listed below were added to the solution. The original V1 OpenFn jobs were deprecated with this upgrade. 
 - **Syncing of 2nd referrals** to enable caseworkers to send multiple referrals over time for 1 child
 - **Syncing referral decisions** to “accept”/”reject” referrals and notify source systems
 - **New field mappings:** `risk level` & `date of referral`
-- Primero Focal Point user for the `Banteay Meanchey` province configured for locations so that Oscar case referrals can be received in Primero  
 - Primero Service `Referral Status` field now has a default `Pending` value when creating services for outbound referrals
 - Implemented change to not group Services in Primero by `service_type` and ensure 1 Primero Service record will exist for every new OSCaR service referred 
-
-
-
 
 See links to the updated documentation below: 
 
 - [V2 mapping specifications](https://docs.google.com/spreadsheets/d/1Zg9KGkHbh0ptjpj4YX9qFkojz9ydJ9aVT_UtkvE7Wu8/edit#gid=744794061)
 - [V2 data flow diagrams](https://drive.google.com/file/d/14_Nk0xML9k_0mmtI__fNGASm-brXfn-7/view?usp=sharing)
 - [V2 testing slides](https://docs.google.com/presentation/d/17X8NSJsPgQ4d6H74v2ecZAe9-23H6FrUyuIEgFyn6so/edit#slide=id.g1510cfdce24_0_0)
-- [V2 training deck](https://docs.google.com/presentation/d/1FSCfgd9RUfjmZO_NZ2bsosbYBTn8--KHoR4cefVsmpw/edit#slide=id.gcde362733a_0_348)
+- [V2 training deck](https://docs.google.com/presentation/d/1FSCfgd9RUfjmZO_NZ2bsosbYBTn8--KHoR4cefVsmpw/edit#slide=id.g8c9d2ded25_0_193)
 
 
 ## (9) Administration
@@ -165,14 +165,13 @@ This integration is hosted on [OpenFn.org](https://openfn.org/projects) with Pri
 Contact **support@openfn.org** with any questions or troubleshooting support. 
 
 **MoSVY Primero system administrators will be the primary contacts** responsible for ongoing integration monitoring and management:   
-srychandina@gmail.com  
+nheldarath8@gmail.com
 sideth@childreninfamilies.org
 
 #### Other Support Contacts
 **UNICEF:**  
 mkeng@unicef.org 		  
 pkhauv@unicef.org   
-
 
 **OSCaR:**  
 sokly@childreninfamilies.org  
@@ -182,6 +181,7 @@ meas.kiry@childreninfamilies.org
 
 ### V2 Training Materials 
 - See the November 2022 [training presentation](https://docs.google.com/presentation/d/1FSCfgd9RUfjmZO_NZ2bsosbYBTn8--KHoR4cefVsmpw/edit#slide=id.g8c9d2ded25_0_193). 
+- See the November 2022 [training video recording](https://drive.google.com/drive/folders/1bgAaSsER69etUdIUiT3aH5LBXWrOcn1d?usp=sharingM). 
 
 ### V1 Training Materials 
 - Administrators: [See the video recording](https://youtu.be/-5-Y9ZrK-aQ) and [presentation](https://docs.google.com/presentation/d/1aUprT1CwnEWtIax_PGxsPspXdR3mPy78rj6qt92dxeI/edit?usp=sharing) from the December 2020 System Administrators training. This includes an overview of integration monitoring, error codes, and troubleshooting. 
