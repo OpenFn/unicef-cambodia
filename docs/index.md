@@ -43,6 +43,7 @@ _*Note that these APIs are newly implemented and were developed at the start of 
 
 **OpenFn Adaptors** (API wrappers) implemented: 
 * [primero](https://github.com/OpenFn/adaptors/tree/main/packages/primero)
+* See OpenFn Adaptor docs here: [docs.openfn.org/adaptors/primero](https://docs.openfn.org/adaptors/primero)
 
 ## (3) Interoperability Workflows
 To achieve a bi-directional systems sync, multiple OpenFn jobs have been implemented to automate the different workflow steps. 
