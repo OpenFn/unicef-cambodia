@@ -43,7 +43,7 @@ _*Note that these APIs are newly implemented and were developed at the start of 
 
 **OpenFn Adaptors** (API wrappers) implemented: 
 * [primero](https://github.com/OpenFn/adaptors/tree/main/packages/primero)
-* See OpenFn Adaptor docs here: [docs.openfn.org/adaptors/primero](https://docs.openfn.org/adaptors/primero)
+* See OpenFn Adaptor docs here for usage: [docs.openfn.org/adaptors/primero](https://docs.openfn.org/adaptors/primero)
 
 ## (3) Interoperability Workflows
 To achieve a bi-directional systems sync, multiple OpenFn jobs have been implemented to automate the different workflow steps. 
@@ -171,13 +171,14 @@ This integration is hosted on [OpenFn.org](https://openfn.org/projects) with Pri
 Contact **support@openfn.org** with any questions or troubleshooting support. 
 
 **MoSVY Primero system administrators will be the primary contacts** responsible for ongoing integration monitoring and management:   
+sovansideth@gmail.com
 nheldarath8@gmail.com
 sideth@childreninfamilies.org
 
 #### Other Support Contacts
 **UNICEF:**  
-mkeng@unicef.org 		  
 pkhauv@unicef.org   
+mkeng@unicef.org 		  
 
 **OSCaR:**  
 sokly@childreninfamilies.org  
