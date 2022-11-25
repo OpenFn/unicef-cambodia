@@ -16,6 +16,8 @@ _**Workflow 1: Sending case referrals to NGOs (Primero -> OSCaR)**_
 * Syncing referral decisions from Oscar to Primero: When NGO case workers accept/reject a referral the decision is sent to the MoSVY case worker.
 ![workflow1-diagram](./primero_oscar_workflow1.png)
 
+_See [workflow 1 diagram source](https://drive.google.com/file/d/12jjOheLLXi07WpG4k2BULDFAPTX1tZvr/view?usp=sharing) here._
+
 
 _**Workflow 2: Sending case referrals to MoSVY (OSCaR --> Primero**_
 * Sending NGO referrals to MoSVY case workers
@@ -23,9 +25,12 @@ _**Workflow 2: Sending case referrals to MoSVY (OSCaR --> Primero**_
 * Syncing _all_ NGO cases to Primero for MoSVY case workers to view (to prevent duplicate work)
 ![workflow2-diagram](./oscar_primero_workflow2.png)
 
+_See [workflow 2 diagram source](https://drive.google.com/file/d/1jsKq9mnO6QECcHpkg2Sf3EDUqtitliBM/view?usp=sharing) here._
 
-### Videos
-[See this video playlist](https://www.youtube.com/playlist?list=PLSnTMDfTYBLj0cLKYgYBAtLU0lyrSG7Zb) for the solution overview & demo of the interoperability workflows. 
+
+
+### Videos (TODO: UPDATE WITH V2 Videos)
+[See this video playlist](https://www.youtube.com/playlist?list=PLSnTMDfTYBLj0cLKYgYBAtLU0lyrSG7Zb) for the solution overview & demo of the interoperability workflows (V1 solution). 
 
 ## (2) Integration with System APIs
 To automate the IO workflows, a bi-directional integration has been configured on the [OpenFn](openfn.org) platform to connect the Primero and OSCaR APIs. 
