@@ -1,4 +1,4 @@
-// we create dataClips and functions for later use
+// Custom transformation logic: we create dataClips and functions for later use
 fn(state => {
   console.log('Preparing cases and decisions for upload to Primero...');
   // Saving original cases, creating Case:Service ID map =======================
@@ -6,7 +6,6 @@ fn(state => {
   state.serviceRecordIds = {};
   // ===========================================================================
 
-  // AK TODO: Discuss with @Aicha, I think format should be YYYY-MM-DD
   const convertToPrimeroDate = dateString => {
     if (!dateString) return null;
     const dateArray = dateString.split('-');
@@ -36,7 +35,7 @@ fn(state => {
 
   function createName(given, local) {
     if (local && given) {
-      return `${local} (${given})`; //Format: khmer name (english name)
+      return `${local} (${given})`; //Output format: khmer name (english name)
     }
     if (given && !local) {
       return given;
@@ -73,7 +72,9 @@ fn(state => {
     const source = location_current_village_code || organization_address_code;
     console.log('Location code sent by Oscar :: ', source);
     if (source) {
-      //const subCode = source.slice(0, 2); //replaced with below to handle scenarios where village not specified
+      //If Village (admin level 4 location) not specified in OSCaR, then we expect a shorter location code and sometimes it has leading 0s (e.g., '0004')
+      //This logic therefore tells us how to extract the province code from the full location code
+      //Depending on the length of the location code and if leading 0s, we may need to look in a different spot for the province code
       const subCode = source.slice(0, 2) === '00' ? source.slice(2, 4) : source.slice(0, 2);
       console.log('Matching province code:: ', subCode);
       user = provinceUserMap[subCode];
@@ -337,7 +338,6 @@ fn(state => {
     },
     'Residential Care Institution': { subtype: 'residential_care_gov_only_other', type: 'other' },
     'Other Service': { subtype: 'other_other_service', type: 'other' },
-    //'Not Specified': { subtype: 'other_other_service', type: 'other' },
   };
 
   const serviceStatusMap = {
@@ -346,7 +346,6 @@ fn(state => {
     Active: 'accepted_340953',
     Rejected: 'rejected_936484',
     Exited: 'rejected_936484',
-    //Referred: 'pending_310366',
   };
 
   const referralStatusMap = {
@@ -382,9 +381,9 @@ fn(state => {
         : null;
 
     const isUpdate = c.external_id;
-    const oscarNumber = c.global_id; 
-    
-    const riskLevel = c.risk_level==='no action' ? 'no_action' : c.risk_level || 'no_action'; 
+    const oscarNumber = c.global_id;
+
+    const riskLevel = c.risk_level === 'no action' ? 'no_action' : c.risk_level || 'no_action';
 
     const referralReason = c.reason_for_referral;
 
@@ -400,7 +399,6 @@ fn(state => {
       sex: isUpdate ? undefined : setGender(c.gender),
       age: isUpdate ? undefined : calcAge(c.date_of_birth),
       date_of_birth: isUpdate ? undefined : c.date_of_birth,
-      //address_current: isUpdate ? undefined : addressCode,
       location_current: isUpdate ? undefined : locationCode,
       oscar_status: c.status,
       protection_status: !isUpdate && c.is_referred == true ? 'oscar_referral' : undefined,
@@ -408,19 +406,15 @@ fn(state => {
         !isUpdate || //if NOT an update to a case already synced...
         c.resource !== 'primero' //or if case didn't originate in Primero...
           ? setUser(c) //set 'owned_by' user
-          : undefined, //otherwise do not overwrite user
-      //owned_by: isUpdate ? undefined : setUser(c),
+          : undefined, //otherwise do not overwrite user that is already set in Primero
       oscar_reason_for_exiting: c.reason_for_exiting,
       consent_for_services: true,
       disclosure_other_orgs: true,
-      risk_level: c.is_referred === true ? riskLevel : undefined, 
+      risk_level: c.is_referred === true ? riskLevel : undefined,
       interview_subject: isUpdate || c.is_referred !== true ? undefined : 'other',
       module_id: 'primeromodule-cp',
-      //referral_notes_oscar: c.reason_for_referral, //moved down to service-level; see referral_notes_from_oscar_2e787b8
       services_section: c.services.map(s => ({
-        //===== TODO - can uuid include the oscar_referral_id to ensure uniqueness? If yes, can we match to services based on this ===//
-        unique_id: s.uuid !== null && s.uuid !== '' ? s.uuid : undefined ,
-        //===========================================================================//
+        unique_id: s.uuid !== null && s.uuid !== '' ? s.uuid : undefined,
         referral_notes_from_oscar_2e787b8: referralReason,
         service_referral_notes: s.reason_for_referral,
         service_type: (serviceMap[s.name] && serviceMap[s.name].type) || 'Other',
@@ -434,12 +428,9 @@ fn(state => {
         oscar_case_worker_name: c.case_worker_name,
         oscar_case_worker_telephone: c.case_worker_mobile,
         oscar_referring_organization: `agency-${c.organization_name}`,
-        service_implementing_agency: `agency-${c.organization_name}`, //TODO: @Aicha should these be the same?
+        service_implementing_agency: `agency-${c.organization_name}`,
         oscar_referral_id_a4ac8a5: s.referral_id ? s.referral_id.toString() : undefined,
-        //===== TODO - To foolproof not overwrite decisions in Primero, we will need to check if this case already exists in Primero...
-        //... and not overwrite any Primero decisions if the Oscar status is still set to 'Referred'
         referral_status_edf41f2: serviceStatusMap[s.referral_status] || undefined,
-        //===================================================================================//
       })),
     };
   }
@@ -465,13 +456,8 @@ fn(state => {
 fn(state => {
   const { originalCases } = state;
 
-  //AUG 19 CHANGED to check for Oscar decisions on service-, not case-level ==============///
-  //const isDecision = c => c.resource == 'primero' && c.status !== 'Referred';
   const isDecision = c =>
-    c.resource == 'primero' &&
-    //Added below to check service-level for decisions
-    c.services.filter(s => s.referral_status !== 'Referred');
-  //======================================================================================//
+    c.resource == 'primero' && c.services.filter(s => s.referral_status !== 'Referred');
 
   const cases = originalCases.filter(c => !isDecision(c));
   const decisions = originalCases.filter(c => isDecision(c));
@@ -490,7 +476,6 @@ fn(state => {
     delete c.__original_oscar_record;
     return c;
   });
-  //console.log('finalized:', JSON.stringify(finalized, null, 2));
 
   const finalizedNoRefsFromPrimero = finalized.map(c => {
     return {
@@ -509,28 +494,6 @@ fn(state => {
   return { ...state, cases: finalizedNoRefsFromPrimero };
 });
 
-//============= Moved to f2-j3 job ======================================//
-// // we log cases before sending to primero
-// fn(state => {
-//   //console.log('Prepared cases:', JSON.stringify(state.cases, null, 2));
-//   const caseIds = state.cases.map(c => ({ case_id: c.case_id }));
-//   console.log('External Ids for prepared cases:', JSON.stringify(caseIds, null, 2));
-//   return state;
-// });
-
-// // we upsert Primero cases based on matching 'oscar_number' OR 'case_id'
-// each(
-//   '$.cases[*]', //using each() here returns state.data for each item in the prepared "cases" array
-//   upsertCase({
-//     externalIds: state => (!!state.data.case_id ? ['case_id'] : ['oscar_number']), //changed from state.data.external_id
-//     data: state => {
-//       //console.log('Syncing prepared case & checking if exists...', state.data);
-//       return state.data;
-//     },
-//   })
-// );
-//=====================================================================//
-
 // we build decisions for primero, add array for referrals to update
 fn(state => {
   const { decisions, buildCaseRecord } = state;
@@ -539,12 +502,6 @@ fn(state => {
 
   return { ...state, decisions: finalized, referrals: [] };
 });
-
-// we log decisions before sending to primero
-// fn(state => {
-//   console.log('Prepared decisions:', JSON.stringify(state.decisions.data, null, 2));
-//   return state;
-// });
 
 // for EACH decision, we get its referrals and then we update a single referral
 each(
@@ -560,7 +517,7 @@ each(
       s => s.enrollment_date === null
     );
 
-    console.log('The "newDecisions" are', newDecisions); // undefined
+    console.log('The "newDecisions" are', newDecisions);
 
     if (!newDecisions) {
       console.log(
@@ -573,21 +530,18 @@ each(
     }
 
     const oscarReferredServices = newDecisions;
+    //== Here we match services based on Oscar referral_id, not service uuid ==//
     const oscarReferredReferralIds = newDecisions.map(d => d.referral_id);
 
     console.log('oscarReferredServices ::', oscarReferredServices);
-    //=====================================================================//
-    //== AUG 22 CHANGE: Match services based on Oscar referral_id, not service uuid ==//
     console.log('oscar referral_ids ::', oscarReferredReferralIds);
     console.log('parentCase in Primero ::', parentCase);
 
     const parentServices = parentCase ? parentCase.services_section : undefined;
-    //console.log('parentServices in Primero::', parentServices);
 
     if (parentServices) {
       const updatedDecisions = decisions.map(d => {
         // find the right case...
-        //console.log('oscar decision payload ::', d);
         if (d.case_id === decision.case_id) {
           return {
             ...d,
@@ -599,28 +553,20 @@ each(
               referralId = s.oscar_referral_id_a4ac8a5;
               matchingService = parentServices.find(
                 s =>
-                  // === TODO - ensure service matching is based on oscar_referral_id for decisions
-                  // Consider checking both BOTH crtieria (changing to AND, instead of OR) ============//
                   s.oscar_referral_id_a4ac8a5 === referralId ||
                   (s.service_subtype[0] === decisionServiceType &&
                     s.referral_status_edf41f2 === 'pending_310366' &&
                     s.service_response_type === 'referral_to_oscar') ||
-                  (s.service_subtype[0] === '' && //for rejected 'Not Specified' referrals
+                  //Criteria for rejected 'Not Specified' referrals where subtype originally not specified
+                  (s.service_subtype[0] === '' &&
                     s.referral_status_edf41f2 === 'pending_310366' &&
                     s.service_response_type === 'referral_to_oscar')
-                // &&
-                // s.referral_status_edf41f2 === 'rejected_936484')
-
-                //|| s.service_subtype[0] === decisionServiceType //Sept 13 removed
-                //== ERROR: TypeError: Cannot read property 'pending_310366' of undefined =========//
-                //looking for Primero services where decision is 'pending' & has not yet been updated...
               );
               console.log('matchingService', matchingService);
               matchingServiceId = matchingService ? matchingService.unique_id : undefined;
               decisionStatus = PrimeroServiceToReferralStatusMap[s.referral_status_edf41f2];
 
               console.log('Oscar decisionServiceSubType to match on::', decisionServiceType);
-              //console.log('matchingService in Primero found ::', matchingService);
               console.log('matchingServiceId in Primero found::', matchingServiceId);
               console.log('decisionStatus for Referral found::', decisionStatus);
 
@@ -634,7 +580,6 @@ each(
         }
         return d;
       });
-      // console.log('updatedDecisions:', JSON.stringify(updatedDecisions, null, 2));
       //Now let's find the service's parent referral to update
       const referralServiceUuids = updatedDecisions
         .map(d => {
@@ -645,30 +590,25 @@ each(
         .flat();
 
       console.log('referralServiceUuids:', referralServiceUuids);
-      // console.log('Searching referrals:', parentCase.referrals);
       const matchingReferrals = parentCase.referrals.filter(
         r =>
-          // where status is in_progress...
+          // Update referral with matching service where status is in_progress...
           r.status === 'in_progress' && referralServiceUuids.includes(r.service_record_id)
-        //r.status === 'in_progress' && r.service_record_id === matchingServiceId
       );
 
       if (matchingReferrals) console.log('Matching referrals found...');
-      //if (matchingReferrals) console.log('Matching referrals found:', matchingReferrals);
 
       const mappedReferrals = matchingReferrals.map(r => {
         const serviceId = r.service_record_id;
         const matchingCase = updatedDecisions.filter(d => d.case_id === decision.case_id);
-        //console.log('Matching case found:', matchingCase);
 
         const matchingService = matchingCase
           ? matchingCase[0].services_section.find(s => s.unique_id === serviceId)
           : undefined;
 
-        //console.log('Matching referred service found:', matchingService);
         return {
           ...r,
-          status: PrimeroServiceToReferralStatusMap[matchingService.referral_status_edf41f2], //WILL THIS ASSIGN
+          status: PrimeroServiceToReferralStatusMap[matchingService.referral_status_edf41f2],
           case_id: decision.case_id,
         };
       });
@@ -690,7 +630,6 @@ each(
 
 // log matching referrals
 fn(state => {
-  //console.log('mappedReferrals state ::', JSON.stringify(state, null, 2));
   state.referrals = state.referrals.flat();
 
   console.log('Preparing referrals to sync...');
@@ -698,7 +637,7 @@ fn(state => {
   return state;
 });
 
-// for each referral, we update its service status
+// Now that we've found the matching referral, we update its status
 each(
   '$.referrals[*]',
   updateReferral({
@@ -715,7 +654,7 @@ each(
   })
 );
 
-// Now let's clean decision payload & only sync cases with decisions for services...
+// After we've updated the Referrals, let's go update the "Referral Status" on the related Service record
 fn(state => {
   console.log('Preparing decisions to sync...');
   const cleanedDecisions = state.decisions
@@ -728,11 +667,10 @@ fn(state => {
       return { ...d, services_section: filteredServices };
     })
     .filter(d => d.services_section.length > 0);
-  //console.log('cleanedDecisions to sync to Primero:', JSON.stringify(cleanedDecisions, null, 2));
   return { ...state, decisions: cleanedDecisions };
 });
 
-// for EACH decision, we upsert the primero case record
+// for EACH decision from OSCaR, we update the matching Primero case to update the Services Subform with the decision
 each(
   '$.decisions[*]',
   upsertCase({
