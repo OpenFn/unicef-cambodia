@@ -3,7 +3,7 @@ fn(state => {
   const caseIds = state.cases.map(c => ({
     case_id: c.case_id,
     oscar_number: c.oscar_number,
-    address_current: c.address_current,
+    // address_current: c.address_current,
   }));
   console.log('External Ids for prepared cases:', JSON.stringify(caseIds, null, 2));
   return state;
@@ -15,15 +15,15 @@ each(
   upsertCase({
     externalIds: state => (!!state.data.case_id ? ['case_id'] : ['oscar_number']),
     data: state => {
-      console.log('Syncing prepared case...', state.data);
+      console.log('Syncing prepared case...', state.data ? state.data.map(x => x.case_id) : '');
       return state.data;
     },
   })
 );
 
 fn(state => {
-  console.log('f2j2 cursor:', state.cursor);
-  console.log('lastQueryDate:', state.lastQueryDate);
+  console.log('Dynamic cursor to use in GET request to Primero::', state.cursor);
+  //console.log('lastQueryDate:', state.lastQueryDate);
   return state;
 });
 
@@ -38,8 +38,8 @@ getCases(
   { withReferrals: false },
   state => {
     const cases = state.data;
-    console.log('preparedCases ::', JSON.stringify(state.cases, null, 2));
-    console.log('referrals fromOscar', JSON.stringify(cases, null, 2));
+    // console.log('preparedCases ::', JSON.stringify(state.cases, null, 2));
+    // console.log('referrals fromOscar', JSON.stringify(cases, null, 2));
 
     function checkPending(s) {
       return (
@@ -56,7 +56,10 @@ getCases(
       };
     });
 
-    console.log('casesWithPending', JSON.stringify(casesWithPending, null, 2));
+    console.log(
+      'Cases with empty referral status to update as Pending ::',
+      JSON.stringify(casesWithPending ? casesWithPending.map(x => x.case_id) : '', null, 2)
+    );
 
     ///return only cases with services
     function checkServices(c) {
@@ -91,7 +94,8 @@ each(
   upsertCase({
     externalIds: ['id'],
     data: state => {
-      console.log('Updating pending status for new referrals...', state.data);
+      console.log('Updating pending status for new referrals...');
+      //console.log('Updating pending status for new referrals...', state.data);
       return state.data;
     },
   })

@@ -70,15 +70,15 @@ fn(state => {
   function setProvinceUser(c) {
     const { location_current_village_code, organization_address_code } = c;
     const source = location_current_village_code || organization_address_code;
-    console.log('Location code sent by Oscar :: ', source);
+    //console.log('Location code sent by Oscar :: ', source);
     if (source) {
       //If Village (admin level 4 location) not specified in OSCaR, then we expect a shorter location code and sometimes it has leading 0s (e.g., '0004')
       //This logic therefore tells us how to extract the province code from the full location code
       //Depending on the length of the location code and if leading 0s, we may need to look in a different spot for the province code
       const subCode = source.slice(0, 2) === '00' ? source.slice(2, 4) : source.slice(0, 2);
-      console.log('Matching province code:: ', subCode);
+      //console.log('Matching province code:: ', subCode);
       user = provinceUserMap[subCode];
-      console.log('Province username located:: ', user);
+      //console.log('Province username located:: ', user);
       if (user) {
         return user;
       } else {
@@ -462,8 +462,8 @@ fn(state => {
   const cases = originalCases.filter(c => !isDecision(c));
   const decisions = originalCases.filter(c => isDecision(c));
 
-  console.log('Standard Cases:', cases.length);
-  console.log('Cases with Decisions:', decisions.length);
+  console.log('# standard Cases:', cases.length);
+  console.log('# cases with Decisions:', decisions.length);
 
   return { ...state, cases, decisions };
 });
@@ -488,7 +488,11 @@ fn(state => {
 
   console.log(
     'Prepared cases to sync back to Primero:',
-    JSON.stringify(finalizedNoRefsFromPrimero, null, 2)
+    JSON.stringify(
+      finalizedNoRefsFromPrimero ? finalizedNoRefsFromPrimero.map(x => x.case_id) : '',
+      null,
+      2
+    )
   );
 
   return { ...state, cases: finalizedNoRefsFromPrimero };
@@ -517,7 +521,7 @@ each(
       s => s.enrollment_date === null
     );
 
-    console.log('The "newDecisions" are', newDecisions);
+    //console.log('The "newDecisions" are', newDecisions);
 
     if (!newDecisions) {
       console.log(
@@ -533,9 +537,9 @@ each(
     //== Here we match services based on Oscar referral_id, not service uuid ==//
     const oscarReferredReferralIds = newDecisions.map(d => d.referral_id);
 
-    console.log('oscarReferredServices ::', oscarReferredServices);
+    //console.log('oscarReferredServices ::', oscarReferredServices);
     console.log('oscar referral_ids ::', oscarReferredReferralIds);
-    console.log('parentCase in Primero ::', parentCase);
+    //console.log('parentCase in Primero ::', parentCase);
 
     const parentServices = parentCase ? parentCase.services_section : undefined;
 
@@ -546,7 +550,7 @@ each(
           return {
             ...d,
             services_section: d.services_section.map(s => {
-              console.log('Oscar decision to map to Primero service ::', s);
+              console.log('Oscar decision to map to Primero service ::', s.unique_id);
 
               // and find the right service, matching by subtype..
               decisionServiceType = s.service_subtype[0];
@@ -562,13 +566,13 @@ each(
                     s.referral_status_edf41f2 === 'pending_310366' &&
                     s.service_response_type === 'referral_to_oscar')
               );
-              console.log('matchingService', matchingService);
+              console.log('matchingService', matchingService ? matchingService.unique_id : '');
               matchingServiceId = matchingService ? matchingService.unique_id : undefined;
               decisionStatus = PrimeroServiceToReferralStatusMap[s.referral_status_edf41f2];
 
-              console.log('Oscar decisionServiceSubType to match on::', decisionServiceType);
-              console.log('matchingServiceId in Primero found::', matchingServiceId);
-              console.log('decisionStatus for Referral found::', decisionStatus);
+              // console.log('Oscar decisionServiceSubType to match on::', decisionServiceType);
+              // console.log('matchingServiceId in Primero found::', matchingServiceId);
+              // console.log('decisionStatus for Referral found::', decisionStatus);
 
               return {
                 ...s,
@@ -589,7 +593,7 @@ each(
         })
         .flat();
 
-      console.log('referralServiceUuids:', referralServiceUuids);
+      //console.log('referralServiceUuids:', referralServiceUuids);
       const matchingReferrals = parentCase.referrals.filter(
         r =>
           // Update referral with matching service where status is in_progress...
@@ -615,14 +619,14 @@ each(
 
       console.log('Building referrals array...');
       console.log('# of mappedReferrals ::', mappedReferrals.length);
-      console.log('mappedReferrals ::', mappedReferrals);
+      //console.log('mappedReferrals ::', mappedReferrals);
 
       if (mappedReferrals) nextState.referrals.push(mappedReferrals.flat());
-      console.log('mappedReferrals array ::', nextState.referrals);
+      //console.log('mappedReferrals array ::', nextState.referrals);
 
       return { ...nextState, decisions: updatedDecisions };
     }
-    console.log('referrals array 2', nextState.referrals);
+    //console.log('referrals array 2', nextState.referrals);
 
     return { ...nextState };
   })
@@ -633,7 +637,10 @@ fn(state => {
   state.referrals = state.referrals.flat();
 
   console.log('Preparing referrals to sync...');
-  console.log('mappedReferrals to update:', JSON.stringify(state.referrals, null, 2));
+  console.log(
+    'mappedReferrals to update for these cases ::',
+    JSON.stringify(state.referrals ? state.referrals.map(x => x.case_id) : '', null, 2)
+  );
   return state;
 });
 
@@ -678,7 +685,7 @@ each(
 
     data: state => {
       const decision = state.data;
-      console.log('Syncing decision... ::', decision);
+      console.log('Syncing decision... ::', decision ? decision.map(x => x.case_id) : '');
       return decision;
     },
   })
