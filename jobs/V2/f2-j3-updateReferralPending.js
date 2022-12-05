@@ -6,6 +6,8 @@ fn(state => {
     address_current: c.address_current,
   }));
   console.log('External Ids for prepared cases:', JSON.stringify(caseIds, null, 2));
+  console.log('f2j2 cursor:', state.cursor);
+  console.log('lastQueryDate:', state.lastQueryDate);
   return state;
 });
 
