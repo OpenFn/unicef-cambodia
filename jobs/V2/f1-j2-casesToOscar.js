@@ -8,10 +8,26 @@ fn(state => {
     nonReferrals: oscarCases,
   };
 
-  console.log(`Cases with DECISIONS for Oscar: ${JSON.stringify(cases.decisions, null, 2)}`);
-  console.log(`Cases with REFERRALS for Oscar: ${JSON.stringify(cases.referrals, null, 2)}`);
   console.log(
-    `NONreferrals to sync external_id only: ${JSON.stringify(cases.nonReferrals, null, 2)}`
+    `Cases with DECISIONS for Oscar: ${JSON.stringify(
+      cases.decisions ? cases.decisions.map(x => x.case_id) : '',
+      null,
+      2
+    )}`
+  );
+  console.log(
+    `Cases with REFERRALS for Oscar: ${JSON.stringify(
+      cases.referrals ? cases.referrals.map(x => x.case_id) : '',
+      null,
+      2
+    )}`
+  );
+  console.log(
+    `NONreferrals to sync external_id only: ${JSON.stringify(
+      cases.nonReferrals ? cases.nonReferrals.map(x => x.case_id) : '',
+      null,
+      2
+    )}`
   );
 
   const oscarStrings = value => {
@@ -46,11 +62,12 @@ fn(state => {
       );
       return toOrg.service_implementing_agency.substring(7);
     } else {
-      console.log(
-        'Referral to or from oscar not detected, the "owned_by_agency" is',
-        c.owned_by_agency
-      );
-      console.log('line 72', state.cases.referrals);
+      console.log('Referral to or from oscar not detected.');
+      // console.log(
+      //   'Referral to or from oscar not detected, the "owned_by_agency" is',
+      //   c.owned_by_agency
+      // );
+      //console.log('line 72', state.cases.referrals);
       return c.owned_by_agency.substring(7);
     }
   };
@@ -209,7 +226,7 @@ fn(state => {
 
   console.log(
     'confirmedDecisions - list of oscar_referrals with decisions to sync',
-    JSON.stringify(confirmedDecisions, null, 2)
+    JSON.stringify(confirmedDecisions ? confirmedDecisions.map(x => x.external_id) : '', null, 2)
   );
   //=================================================================================//
 
@@ -384,10 +401,11 @@ fn(state => {
     return { organization: oscar };
   });
 
-  console.log(
-    'list of mapped referrals to send to Oscar',
-    JSON.stringify(mappedReferrals, null, 2)
-  );
+  // console.log(
+  //   'list of mapped referrals to send to Oscar',
+  //   JSON.stringify(mappedReferrals, null, 2)
+  // );
+  console.log('If Oscar referrals have 2+ services, mapping to multiple Primero services...');
 
   // NOTE: If Oscar referrals have 2+ services, here we split into separate JSON objects so that each
   // request sent to Oscar only contains 1 service each (e.g., { c1, services: [s1, s2]} -->
@@ -403,8 +421,7 @@ fn(state => {
     });
   });
 
-  console.log('Transformed Oscar referrals to sync...', JSON.stringify(transformedCases, null, 2));
-
+  //console.log('Transformed Oscar referrals to sync...', JSON.stringify(transformedCases, null, 2));
   return {
     ...state,
     cases: { ...cases, referrals: transformedCases, decisions: confirmedDecisions },
@@ -478,7 +495,7 @@ fn(state => {
               is_referred: false,
             })),
           };
-          console.log(state.cases.nonReferrals);
+          //console.log(state.cases.nonReferrals);
           console.log(`'Update links' with non-referrals: ${JSON.stringify(payload, null, 4)}`);
           return payload;
         },

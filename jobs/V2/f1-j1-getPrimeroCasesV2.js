@@ -61,9 +61,9 @@ getCases(
       c => c.services_section && c.services_section.length > 0
     );
 
-    console.log(
-      `New 'Pending' referrals to send to Oscar: ${JSON.stringify(pendingRefsToSend, null, 2)}`
-    );
+    // console.log(
+    //   `New 'Pending' referrals to send to Oscar: ${JSON.stringify(pendingRefsToSend, null, 2)}`
+    // );
 
     return { ...state, oscarRefs: pendingRefsToSend, referralIds, data: {}, references: [] };
   }
@@ -88,7 +88,13 @@ getCases(
       })
     );
 
-    console.log(`Decisions to send to Oscar: ${JSON.stringify(refsFromOscar, null, 2)}`);
+    console.log(
+      `Decisions to send to Oscar: ${JSON.stringify(
+        refsFromOscar ? refsFromOscar.map(c => c.case_id) : '',
+        null,
+        2
+      )}`
+    );
 
     return { ...state, oscarDecisions, data: {}, references: [] };
   }
@@ -124,7 +130,7 @@ getCases(
 
     console.log(
       `OSCaR cases that have been registered in Primero & assigned a Case Id: ${JSON.stringify(
-        oscarCases.map(x => x.case_id_display)
+        oscarCases ? oscarCases.map(x => x.case_id_display) : ''
       )}`
     );
 
