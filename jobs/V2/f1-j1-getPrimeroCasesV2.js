@@ -1,7 +1,7 @@
 // Either use a manual cursor, or take the cursor from the last run.
 fn(state => {
   console.log('Last sync end date:', state.lastRunDateTime || 'undefined; using manual cursor...');
-  const manualCursor = '2022-12-05T11:00:11.129Z'; //'2022-09-07T08:57:24.777Z';
+  const manualCursor = '2022-12-05T12:00:00.000Z';
   const currentAttempt = new Date().toISOString();
   console.log('Current attempt time:', currentAttempt);
 
@@ -60,10 +60,6 @@ getCases(
     const pendingRefsToSend = sentOscarRefs.filter(
       c => c.services_section && c.services_section.length > 0
     );
-
-    // console.log(
-    //   `New 'Pending' referrals to send to Oscar: ${JSON.stringify(pendingRefsToSend, null, 2)}`
-    // );
 
     return { ...state, oscarRefs: pendingRefsToSend, referralIds, data: {}, references: [] };
   }
@@ -124,7 +120,6 @@ getCases(
         return true;
       })
       .map(x => {
-        // console.log('after 🚨', x.oscar_number, x.services_section);
         return x;
       });
 

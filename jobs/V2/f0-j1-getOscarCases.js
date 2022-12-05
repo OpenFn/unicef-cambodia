@@ -3,7 +3,7 @@
 alterState(state => {
   if (state.data && state.data.initialState) {
     const lastQueryDate = state.cursor || state.data.initialState.lastQueryDate;
-    console.log('Setting cursor...', lastQueryDate);
+    console.log('Setting cursor ::', lastQueryDate);
     return { ...state, lastQueryDate };
   }
   state.lastQueryDate = state.cursor;
@@ -58,7 +58,6 @@ post(
       },
     },
     state => {
-      //console.log(`Oscar API responded with cases: ${JSON.stringify(state.data.data, null, 2)}`);
       console.log(
         `Oscar API responded with cases with global_ids: ${JSON.stringify(
           state.data.data ? state.data.data.map(c => c.global_id) : ''

@@ -23,7 +23,6 @@ each(
 
 fn(state => {
   console.log('Dynamic cursor to use in GET request to Primero::', state.cursor);
-  //console.log('lastQueryDate:', state.lastQueryDate);
   return state;
 });
 
@@ -31,15 +30,12 @@ fn(state => {
 getCases(
   {
     remote: true,
-    last_updated_at: state => `${state.cursor}..`,
-    //last_updated_at: '2022-11-25T00:57:24.777Z..', //TODO: dynamically set cursor
+    last_updated_at: state => `${state.cursor}..`, //e.g., '2022-11-25T00:57:24.777Z..'
     workflow: 'referral_from_oscar',
   },
   { withReferrals: false },
   state => {
     const cases = state.data;
-    // console.log('preparedCases ::', JSON.stringify(state.cases, null, 2));
-    // console.log('referrals fromOscar', JSON.stringify(cases, null, 2));
 
     function checkPending(s) {
       return (
@@ -95,7 +91,6 @@ each(
     externalIds: ['id'],
     data: state => {
       console.log('Updating pending status for new referrals ::', state.data.id);
-      //console.log('Updating pending status for new referrals...', state.data);
       return state.data;
     },
   })

@@ -63,11 +63,6 @@ fn(state => {
       return toOrg.service_implementing_agency.substring(7);
     } else {
       console.log('Referral to or from oscar not detected.');
-      // console.log(
-      //   'Referral to or from oscar not detected, the "owned_by_agency" is',
-      //   c.owned_by_agency
-      // );
-      //console.log('line 72', state.cases.referrals);
       return c.owned_by_agency.substring(7);
     }
   };
@@ -183,7 +178,6 @@ fn(state => {
 
   //======================================================================================//
   //=== NOTE: This is the new mapping for Oscar decisions - added July 2022 ==============//
-  //console.log('decisions', JSON.stringify(cases.decisions, null, 2));
   const mappedDecisions = cases.decisions
     .map(c => {
       const external_id = oscarStrings(c.case_id);
@@ -205,11 +199,6 @@ fn(state => {
       return referralMap;
     })
     .flat(); //Here we de-nest array - e.g, convert [[data]] --> [data]
-
-  // console.log(
-  //   'mappedDecisions - list of oscar_referrals that MIGHT have decisions',
-  //   JSON.stringify(mappedDecisions, null, 2)
-  // );
 
   //Check if decision is accepted/rejected before sending...
   function checkDecision(d) {
@@ -238,40 +227,6 @@ fn(state => {
 
     const referralReason = c.referrals.length > 0 ? c.referrals[0].notes : lastTransitionNote;
 
-    // NOTE: This can be added back for more verbose logging.
-    // console.log(
-    //   `Data provided by Primero: ${JSON.stringify(
-    //     {
-    //       _id: c._id,
-    //       case_id: c.case_id,
-    //       case_id_display: c.case_id_display,
-    //       created_at: c.created_at,
-    //       location_current: c.location_current,
-    //       module_id: c.module_id,
-    //       owned_by: c.owned_by,
-    //       owned_by_agency: c.owned_by_agency,
-    //       owned_by_phone: c.owned_by_phone,
-    //       services_section: c.services_section.map(s => ({
-    //         oscar_referring_organization: s.oscar_referring_organization,
-    //         service_implementing_agency: s.service_implementing_agency,
-    //         service_status_referred: s.service_status_referred,
-    //         unique_id: s.unique_id,
-    //       })),
-    //       transitions: c.services_section.map(t => ({
-    //         created_at: t.created_at,
-    //         id: t.id,
-    //         service_section_unique_id: t.service_section_unique_id,
-    //         transitioned_by: t.transitioned_by,
-    //         type_of_export: t.type_of_export,
-    //         unique_id: t.unique_id,
-    //       })),
-    //     },
-    //     null,
-    //     2
-    //   )}`
-    // );
-    // console.log(`Data provided by Primero:${JSON.stringify(c, null, 4)}`);
-
     //Historically assumed would only send 1 service per case, but this is no longer true bc we want to sync decisions
     //This will return ALL Primero services marked as 'referrals'
     const primeroService = c.services_section.filter(
@@ -283,7 +238,6 @@ fn(state => {
     //Here we want to find only the MOST RECENT service, taking the last item in the service_section array
     const primeroLastService = primeroService.length > 1 ? primeroService.length - 1 : 0;
 
-    //TODO: @Aleksa - Remove if we have a default mapping for referral_status?
     //Here we only map the referral status of the Most Recent service from Primero
     const referral_status = primeroService
       ? statusMap[oscarStrings(primeroService[primeroLastService].referral_status_edf41f2)] ||
@@ -310,14 +264,14 @@ fn(state => {
       external_case_worker_mobile: c.owned_by_phone || '000000000',
       resource: c.workflow === 'referral_to_oscar' ? 'Primero' : undefined,
       is_referred: true,
-      organization_name: 'cif', //TODO: Hardcoded for staging testing only; replaces lines below.
-      organization_id: 'cif', //TODO: Hardcoded, replace with below
-      //organization_name: setOrganization(c), //TODO: Add mappings back before go-live
-      //organization_id: oscarStrings(c.owned_by_agency_id),
+      // organization_name: 'cif', //FOR TESTING: Use for testing with staging environments
+      // organization_id: 'cif', //FOR TESTING: Use for testing with staging environments
+      organization_name: setOrganization(c),
+      organization_id: oscarStrings(c.owned_by_agency_id),
       services: c.services_section
         .filter(s => s.service_type)
         .map(s => {
-          // Logic to return only 1 serivce subtype if multiple are mistakenly selected by the user
+          // Logic to return only 1 serivce subtype if multiple are mistakenly selected by the Primero user
           const service = {
             uuid: oscarStrings(s.unique_id),
             name:
@@ -339,74 +293,10 @@ fn(state => {
       ).substring(0, 10),
     };
 
-    // NOTE: Logs for enhanced audit trail.
-    // console.log(
-    //   'Case data to be posted to Oscar: ',
-    //   JSON.stringify(
-    //     {
-    //       organization: {
-    //         external_id: oscar.external_id,
-    //         external_id_display: oscar.external_id_display,
-    //         oscar_id: oscar.oscar_short_id,
-    //         global_id: oscar.global_id,
-    //         mosvy_number: oscar.mosvy_number,
-    //         location_current_village_code: oscar.location_current_village_code,
-    //         address_current_village_code: oscar.address_current_village_code,
-    //         external_case_worker_id: oscar.external_case_worker_id,
-    //         external_case_worker_mobile: oscar.external_case_worker_mobile,
-    //         organization_name:'cif',
-    //         organization_id: 'cif',
-    //         is_referred: oscar.is_referred,
-    //         services: oscar.services && oscar.services.map(s => ({ uuid: s.uuid })),
-    //       },
-    //     },
-    //     null,
-    //     2
-    //   )
-    // );
-    // console.log(
-    //   'Case data to be posted to Oscar: ',
-    //   JSON.stringify(
-    //     {
-    //       organization: {
-    //         external_id: oscar.external_id,
-    //         external_id_display: oscar.external_id_display,
-    //         global_id: oscar.global_id,
-    //         level_of_risk: c.risk_level,
-    //         oscar_id: oscar.oscar_short_id,
-    //         mosvy_number: oscar.mosvy_number,
-    //         given_name: oscar.given_name,
-    //         family_name: oscar.family_name,
-    //         gender: oscar.gender,
-    //         date_of_birth: oscar.date_of_birth,
-    //         location_current_village_code: oscar.location_current_village_code,
-    //         address_current_village_code: oscar.address_current_village_code,
-    //         reason_for_referral: oscar.reason_for_referral,
-    //         external_case_worker_name: oscar.external_case_worker_name,
-    //         external_case_worker_id: oscar.external_case_worker_id,
-    //         external_case_worker_mobile: oscar.external_case_worker_mobile,
-    //         organization_name: 'cif',
-    //         organization_id: 'cif',
-    //         is_referred: oscar.is_referred,
-    //         services: oscar.services && oscar.services.map(s => ({ uuid: s.uuid })),
-    //         transaction_id: oscar.transaction_id,
-    //       },
-    //     },
-    //     null,
-    //     2
-    //   )
-    // );
-    // console.log('Case data to be posted to Oscar: ', JSON.stringify(oscar, null, 4));
-
     return { organization: oscar };
   });
 
-  // console.log(
-  //   'list of mapped referrals to send to Oscar',
-  //   JSON.stringify(mappedReferrals, null, 2)
-  // );
   console.log('If Oscar referrals have 2+ services, mapping to multiple Primero services...');
-
   // NOTE: If Oscar referrals have 2+ services, here we split into separate JSON objects so that each
   // request sent to Oscar only contains 1 service each (e.g., { c1, services: [s1, s2]} -->
   // becomes 2 requests: {c1, services: [s1]} AND {c1, services: [s2]}
@@ -421,7 +311,6 @@ fn(state => {
     });
   });
 
-  //console.log('Transformed Oscar referrals to sync...', JSON.stringify(transformedCases, null, 2));
   return {
     ...state,
     cases: { ...cases, referrals: transformedCases, decisions: confirmedDecisions },
@@ -495,7 +384,6 @@ fn(state => {
               is_referred: false,
             })),
           };
-          //console.log(state.cases.nonReferrals);
           console.log(`'Update links' with non-referrals: ${JSON.stringify(payload, null, 4)}`);
           return payload;
         },

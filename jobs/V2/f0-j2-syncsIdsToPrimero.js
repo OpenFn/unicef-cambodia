@@ -32,8 +32,6 @@ fn(state => {
   });
   console.log('Preparing OSCaR external IDs to sync back to Primero...');
 
-  //console.log('Prepared cases to sync back to Primero:', JSON.stringify(finalized, null, 2));
-
   return { ...state, cases: finalized };
 });
 // for EACH Oscar case, we upsert the primero case record to sync the IDs back to Primero
@@ -43,7 +41,10 @@ each(
     externalIds: ['case_id'],
     data: state => {
       const individualCase = state.data;
-      console.log('Syncing Oscar external IDs to Primero case with case_id ::', individualCase.case_id);
+      console.log(
+        'Syncing Oscar external IDs to Primero case with case_id ::',
+        individualCase.case_id
+      );
       console.log('oscar_number ::', individualCase.oscar_number);
       console.log('oscar_short_id ::', individualCase.oscar_short_id);
       return individualCase;

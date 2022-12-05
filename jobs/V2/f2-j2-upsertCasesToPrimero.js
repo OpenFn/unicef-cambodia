@@ -521,8 +521,6 @@ each(
       s => s.enrollment_date === null
     );
 
-    //console.log('The "newDecisions" are', newDecisions);
-
     if (!newDecisions) {
       console.log(
         'Skipping dropping this decision from the array; no services with enrollment_date === null'
@@ -537,9 +535,7 @@ each(
     //== Here we match services based on Oscar referral_id, not service uuid ==//
     const oscarReferredReferralIds = newDecisions.map(d => d.referral_id);
 
-    //console.log('oscarReferredServices ::', oscarReferredServices);
     console.log('oscar referral_ids ::', oscarReferredReferralIds);
-    //console.log('parentCase in Primero ::', parentCase);
 
     const parentServices = parentCase ? parentCase.services_section : undefined;
 
@@ -593,7 +589,6 @@ each(
         })
         .flat();
 
-      //console.log('referralServiceUuids:', referralServiceUuids);
       const matchingReferrals = parentCase.referrals.filter(
         r =>
           // Update referral with matching service where status is in_progress...
@@ -619,14 +614,11 @@ each(
 
       console.log('Building referrals array...');
       console.log('# of mappedReferrals ::', mappedReferrals.length);
-      //console.log('mappedReferrals ::', mappedReferrals);
 
       if (mappedReferrals) nextState.referrals.push(mappedReferrals.flat());
-      //console.log('mappedReferrals array ::', nextState.referrals);
 
       return { ...nextState, decisions: updatedDecisions };
     }
-    //console.log('referrals array 2', nextState.referrals);
 
     return { ...nextState };
   })
@@ -682,12 +674,10 @@ each(
   '$.decisions[*]',
   upsertCase({
     externalIds: ['case_id'],
-
     data: state => {
       const decision = state.data;
       const decisionCaseId = state.data.case_id;
       console.log('Syncing decision ::', decisionCaseId);
-      //console.log('Syncing decision... ::', decision);
       return decision;
     },
   })

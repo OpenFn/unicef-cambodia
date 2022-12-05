@@ -48,7 +48,6 @@ post(
     {
       keepCookie: true,
       headers: state => ({
-        // Passing oscar authentication parameters in headers
         'access-token': state.data.__headers['access-token'],
         'Content-Type': 'application/json',
         client: state.data.__headers.client,
@@ -60,7 +59,6 @@ post(
       },
     },
     state => {
-      //console.log(`Oscar API responded with cases: ${JSON.stringify(state.data.data, null, 2)}`);
       console.log(
         `Oscar API responded with cases with global_ids: ${JSON.stringify(
           state.data.data ? state.data.data.map(c => c.global_id) : ''
