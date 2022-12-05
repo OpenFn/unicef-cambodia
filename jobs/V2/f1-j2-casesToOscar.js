@@ -183,7 +183,7 @@ fn(state => {
 
   //======================================================================================//
   //=== NOTE: This is the new mapping for Oscar decisions - added July 2022 ==============//
-  console.log('decisions', JSON.stringify(cases.decisions, null, 2));
+  //console.log('decisions', JSON.stringify(cases.decisions, null, 2));
   const mappedDecisions = cases.decisions
     .map(c => {
       const external_id = oscarStrings(c.case_id);
@@ -206,10 +206,10 @@ fn(state => {
     })
     .flat(); //Here we de-nest array - e.g, convert [[data]] --> [data]
 
-  console.log(
-    'mappedDecisions - list of oscar_referrals that MIGHT have decisions',
-    JSON.stringify(mappedDecisions, null, 2)
-  );
+  // console.log(
+  //   'mappedDecisions - list of oscar_referrals that MIGHT have decisions',
+  //   JSON.stringify(mappedDecisions, null, 2)
+  // );
 
   //Check if decision is accepted/rejected before sending...
   function checkDecision(d) {
