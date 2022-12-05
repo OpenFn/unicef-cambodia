@@ -43,8 +43,9 @@ each(
     externalIds: ['case_id'],
     data: state => {
       const individualCase = state.data;
-      console.log('Syncing Oscar external IDs to Primero case ::', individualCase.case_id);
+      console.log('Syncing Oscar external IDs to Primero case with case_id ::', individualCase.case_id);
       console.log('oscar_number ::', individualCase.oscar_number);
+      console.log('oscar_short_id ::', individualCase.oscar_short_id);
       return individualCase;
     },
   })
