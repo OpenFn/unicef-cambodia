@@ -15,7 +15,7 @@ each(
   upsertCase({
     externalIds: state => (!!state.data.case_id ? ['case_id'] : ['oscar_number']),
     data: state => {
-      console.log('Syncing prepared case...', state.data ? state.data.map(x => x.case_id) : '');
+      console.log('Syncing prepared case ::', state.data.case_id);
       return state.data;
     },
   })
@@ -94,7 +94,7 @@ each(
   upsertCase({
     externalIds: ['id'],
     data: state => {
-      console.log('Updating pending status for new referrals...');
+      console.log('Updating pending status for new referrals ::', state.data.id);
       //console.log('Updating pending status for new referrals...', state.data);
       return state.data;
     },
