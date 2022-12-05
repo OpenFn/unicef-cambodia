@@ -264,10 +264,10 @@ fn(state => {
       external_case_worker_mobile: c.owned_by_phone || '000000000',
       resource: c.workflow === 'referral_to_oscar' ? 'Primero' : undefined,
       is_referred: true,
-      // organization_name: 'cif', //FOR TESTING: Use for testing with staging environments
-      // organization_id: 'cif', //FOR TESTING: Use for testing with staging environments
-      organization_name: setOrganization(c),
-      organization_id: oscarStrings(c.owned_by_agency_id),
+      organization_name: 'cif', //FOR TESTING: Use for testing with staging environments
+      organization_id: 'cif', //FOR TESTING: Use for testing with staging environments
+      // organization_name: setOrganization(c), //TODO: Use this for prod; replace with above lines
+      // organization_id: oscarStrings(c.owned_by_agency_id), //TODO: Use this for prod; replace with above lines
       services: c.services_section
         .filter(s => s.service_type)
         .map(s => {
