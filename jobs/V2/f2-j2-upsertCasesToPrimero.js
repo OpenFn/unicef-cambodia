@@ -685,7 +685,9 @@ each(
 
     data: state => {
       const decision = state.data;
-      console.log('Syncing decision... ::', decision ? decision.map(x => x.case_id) : '');
+      const decisionCaseId = state.data.case_id;
+      console.log('Syncing decision ::', decisionCaseId);
+      //console.log('Syncing decision... ::', decision);
       return decision;
     },
   })
