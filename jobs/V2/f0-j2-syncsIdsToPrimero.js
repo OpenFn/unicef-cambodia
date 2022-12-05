@@ -30,8 +30,9 @@ fn(state => {
   const finalized = originalCases.map(buildCaseRecord).map(c => {
     return c;
   });
+  console.log('Preparing OSCaR external IDs to sync back to Primero...');
 
-  console.log('Prepared cases to sync back to Primero:', JSON.stringify(finalized, null, 2));
+  //console.log('Prepared cases to sync back to Primero:', JSON.stringify(finalized, null, 2));
 
   return { ...state, cases: finalized };
 });
@@ -42,7 +43,7 @@ each(
     externalIds: ['case_id'],
     data: state => {
       const individualCase = state.data;
-      console.log('Syncing Oscar external IDs to Primero case ::', individualCase);
+      console.log('Syncing Oscar external IDs to Primero case ::', individualCase.case_id);
       return individualCase;
     },
   })
