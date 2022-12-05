@@ -6,8 +6,6 @@ fn(state => {
     address_current: c.address_current,
   }));
   console.log('External Ids for prepared cases:', JSON.stringify(caseIds, null, 2));
-  console.log('f2j2 cursor:', state.cursor);
-  console.log('lastQueryDate:', state.lastQueryDate);
   return state;
 });
 
@@ -22,12 +20,19 @@ each(
     },
   })
 );
+
+fn(state => {
+  console.log('f2j2 cursor:', state.cursor);
+  console.log('lastQueryDate:', state.lastQueryDate);
+  return state;
+});
+
 //We then get Primero cases to check which should have 'pending' status
 getCases(
   {
     remote: true,
-    //last_updated_at: state => `${state.cursor}..`,
-    last_updated_at: '2022-11-25T00:57:24.777Z..', //TODO: dynamically set cursor
+    last_updated_at: state => `${state.cursor}..`,
+    //last_updated_at: '2022-11-25T00:57:24.777Z..', //TODO: dynamically set cursor
     workflow: 'referral_from_oscar',
   },
   { withReferrals: false },
