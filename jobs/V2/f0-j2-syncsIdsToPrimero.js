@@ -38,7 +38,7 @@ fn(state => {
 each(
   '$.cases[*]',
   upsertCase({
-    externalIds: ['case_id'],
+    externalIds: state => (!!state.data.case_id ? ['case_id'] : ['oscar_number']),
     data: state => {
       const individualCase = state.data;
       console.log(
