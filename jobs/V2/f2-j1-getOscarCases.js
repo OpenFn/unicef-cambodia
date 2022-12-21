@@ -42,31 +42,36 @@ post(
       password: state.configuration.password,
     },
   },
-  //Here we get ALL cases from OSCaR that have sharing with Primero granted. This includes referrals & cases for duplicate prevention.
-  get(
-    '/api/v1/organizations/clients',
-    {
-      keepCookie: true,
-      headers: state => ({
-        'access-token': state.data.__headers['access-token'],
-        'Content-Type': 'application/json',
-        client: state.data.__headers.client,
-        uid: state.configuration.username,
-      }),
-      query: {
-        // NOTE: since_date must be rounded to 00:00:00 to work with Oscar API. API does not support other timestamps.
-        since_date: state.lastQueryDate || '2022-12-06 00:00:00',
-      },
+  state => {
+    delete state.configuration.password;
+    return state;
+  }
+);
+
+//Here we get ALL cases from OSCaR that have sharing with Primero granted. This includes referrals & cases for duplicate prevention.
+get(
+  '/api/v1/organizations/clients',
+  {
+    keepCookie: true,
+    headers: state => ({
+      'access-token': state.data.__headers['access-token'],
+      'Content-Type': 'application/json',
+      client: state.data.__headers.client,
+      uid: state.configuration.username,
+    }),
+    query: {
+      // NOTE: since_date must be rounded to 00:00:00 to work with Oscar API. API does not support other timestamps.
+      since_date: state.lastQueryDate || '2022-12-06 00:00:00',
     },
-    state => {
-      console.log(
-        `Oscar API responded with cases with global_ids: ${JSON.stringify(
-          state.data.data ? state.data.data.map(c => c.global_id) : ''
-        )}`
-      );
-      state.lastQueryDate = state.thisQueryDate;
-      console.log(`Updated state.lastQueryDate to: ${state.lastQueryDate}`);
-      return state;
-    }
-  )
+  },
+  state => {
+    console.log(
+      `Oscar API responded with cases with global_ids: ${JSON.stringify(
+        state.data.data ? state.data.data.map(c => c.global_id) : ''
+      )}`
+    );
+    state.lastQueryDate = state.thisQueryDate;
+    console.log(`Updated state.lastQueryDate to: ${state.lastQueryDate}`);
+    return state;
+  }
 );
