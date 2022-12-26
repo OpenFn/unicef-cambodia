@@ -9,7 +9,6 @@ fn(state => {
     const isUpdate = c.external_id;
 
     return {
-      oscar_number: c.global_id,
       case_id: c.external_id === '' ? undefined : c.external_id,
       case_id_display: c.external_id_display === '' ? undefined : c.external_id_display,
       oscar_number: c.global_id,
