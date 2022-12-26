@@ -12,6 +12,7 @@ fn(state => {
       oscar_number: c.global_id,
       case_id: c.external_id === '' ? undefined : c.external_id,
       case_id_display: c.external_id_display === '' ? undefined : c.external_id_display,
+      oscar_number: c.global_id,
       oscar_short_id: c.slug,
       mosvy_number: c.mosvy_number,
     };
