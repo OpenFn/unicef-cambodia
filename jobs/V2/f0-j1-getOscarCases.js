@@ -54,7 +54,7 @@ post(
       }),
       query: {
         // NOTE: since_date must be rounded to 00:00:00 to work with Oscar API.
-        since_date: state.lastQueryDate || '2022-12-05 00:00:00',
+        since_date: state.lastQueryDate || '2022-12-19 00:00:00',
       },
     },
     state => {
