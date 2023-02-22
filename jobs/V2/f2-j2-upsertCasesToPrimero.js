@@ -364,6 +364,10 @@ fn(state => {
 
     const referralReason = c.reason_for_referral;
 
+    //cleaning rule for date_of_birth when Oscar sometimes sends bad date value e.g., 22012-01-01
+    const dob = c.date_of_birth;
+    const cleanedDob = dob && dob.length === 11 ? dob.substring(1, 11) : dob;
+
     return {
       __original_oscar_record: c,
       oscar_number: c.global_id,
@@ -374,8 +378,8 @@ fn(state => {
       name_first: isUpdate ? undefined : createName(c.given_name, c.local_given_name),
       name_last: isUpdate ? undefined : createName(c.family_name, c.local_family_name),
       sex: isUpdate ? undefined : setGender(c.gender),
-      age: isUpdate ? undefined : calcAge(c.date_of_birth),
-      date_of_birth: isUpdate ? undefined : c.date_of_birth,
+      age: isUpdate ? undefined : calcAge(cleanedDob),
+      date_of_birth: isUpdate ? undefined : cleanedDob,
       location_current: isUpdate ? undefined : locationCode,
       oscar_status: c.status,
       protection_status: !isUpdate && c.is_referred == true ? 'oscar_referral' : undefined,
