@@ -77,7 +77,7 @@ fn(state => {
       //Depending on the length of the location code and if leading 0s, we may need to look in a different spot for the province code
       const subCode = source.slice(0, 2) === '00' ? source.slice(2, 4) : source.slice(0, 2);
       //console.log('Matching province code:: ', subCode);
-      user = provinceUserMap[subCode];
+      const user = provinceUserMap[subCode];
       //console.log('Province username located:: ', user);
       if (user) {
         return user;
