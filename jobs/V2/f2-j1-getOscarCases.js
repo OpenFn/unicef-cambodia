@@ -66,7 +66,12 @@ get(
   },
   state => {
     console.log(
-      `Oscar API responded with cases with global_ids: ${JSON.stringify(
+      `# cases in Oscar API response :: ${JSON.stringify(
+        state.data.data ? state.data.data.length : ''
+      )}`
+    );
+    console.log(
+      `Oscar global_ids in reponse :: ${JSON.stringify(
         state.data.data ? state.data.data.map(c => c.global_id) : ''
       )}`
     );

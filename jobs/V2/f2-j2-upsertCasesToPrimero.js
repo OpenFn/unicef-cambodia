@@ -435,6 +435,7 @@ fn(state => {
 
 // we separate cases from decisions
 fn(state => {
+  console.log('Finding cases with decisions...');
   const { originalCases } = state;
 
   const isDecision = c =>
@@ -443,8 +444,8 @@ fn(state => {
   const cases = originalCases.filter(c => !isDecision(c));
   const decisions = originalCases.filter(c => isDecision(c));
 
-  console.log('# standard Cases:', cases.length);
-  console.log('# cases with Decisions:', decisions.length);
+  // console.log('# standard Cases:', cases.length);
+  // console.log('# cases with Decisions:', decisions.length);
 
   return { ...state, cases, decisions };
 });
