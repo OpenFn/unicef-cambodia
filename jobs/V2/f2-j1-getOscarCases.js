@@ -61,7 +61,7 @@ get(
     }),
     query: {
       // NOTE: since_date must be rounded to 00:00:00 to work with Oscar API. API does not support other timestamps.
-      since_date: '2023-03-07 00:00:00',
+      since_date: '2023-03-01 00:00:00',
       //since_date: state.lastQueryDate || '2023-03-07 00:00:00',
     },
   },
