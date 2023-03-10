@@ -664,3 +664,6 @@ each(
     },
   })
 );
+
+// Remove everything but `cases` and `cursor` from state.
+fn(state => ({ cases: state.cases, cursor: state.cursor }));
