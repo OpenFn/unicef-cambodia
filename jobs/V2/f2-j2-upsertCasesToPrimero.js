@@ -139,52 +139,29 @@ fn(state => {
   };
 
   const agencyUserMap = {
-    'agency-agh': 'agency-agh-user',
-    'agency-ahc': 'agency-ahc-user',
-    'agency-ajl': 'agency-ajl-user',
-    'agency-auscam': 'agency-auscam-user',
-    'agency-brc': 'agency-brc-user',
-    'agency-cccu': 'agency-cccu-user',
+    'agency-gpc': 'agency-gpc-user',
+    'agency-tpo': 'agency-tpo-user',
+    'agency-eao': 'agency-eao-user',
+    'agency-goh': 'agency-goh-user',
+    'agency-sk': 'agency-sk-user',
+    'agency-colt': 'agency-colt-user',
+    'agency-kt': 'agency-kt-user',
+    'agency-ea': 'agency-ea-user',
+    'agency-fsi': 'agency-fsi-user',
+    'agency-oec': 'agency-oec-user',
     'agency-cct': 'agency-cct-user',
     'agency-cfi': 'agency-cfi-user',
     'agency-cif': 'agency-cif-user',
     'agency-css': 'agency-css-user',
-    'agency-cvcd': 'agency-cvcd-user',
     'agency-cwd': 'agency-cwd-user',
-    'agency-demo': 'agency-demo-user',
-    'agency-fco': 'agency-fco-user',
-    'agency-fit': 'agency-fit-user',
-    'agency-fsc': 'agency-fsc-user',
-    'agency-fsi': 'agency-fsi-user',
-    'agency-fts': 'agency-fts-user',
-    'agency-gca': 'agency-gca-user',
-    'agency-gct': 'agency-gct-user',
-    'agency-hfj': 'agency-hfj-user',
-    'agency-hol': 'agency-hol-user',
     'agency-holt': 'agency-holt-user',
-    'agency-icf': 'agency-icf-user',
     'agency-isf': 'agency-isf-user',
-    'agency-kmo': 'agency-kmo-user',
     'agency-kmr': 'agency-kmr-user',
-    'agency-lwb': 'agency-lwb-user',
-    'agency-mande': 'agency-mande-user',
     'agency-mho': 'agency-mho-user',
-    'agency-mrs': 'agency-mrs-user',
     'agency-msl': 'agency-msl-user',
     'agency-mtp': 'agency-mtp-user',
-    'agency-my': 'agency-my-user',
-    'agency-myan': 'agency-myan-user',
-    'agency-newsmile': 'agency-newsmile-user',
-    'agency-pepy': 'agency-pepy-user',
-    'agency-rok': 'agency-rok-user',
-    'agency-scc': 'agency-scc-user',
-    'agency-shk': 'agency-shk-user',
-    'agency-spo': 'agency-spo-user',
-    'agency-ssc': 'agency-ssc-user',
     'agency-tlc': 'agency-tlc-user',
     'agency-tmw': 'agency-tmw-user',
-    'agency-tutorials': 'agency-tutorials-user',
-    'agency-voice': 'agency-voice-user',
     'agency-wmo': 'agency-wmo-user',
   };
 
@@ -387,6 +364,10 @@ fn(state => {
 
     const referralReason = c.reason_for_referral;
 
+    //cleaning rule for date_of_birth when Oscar sometimes sends bad date value e.g., 22012-01-01
+    const dob = c.date_of_birth;
+    const cleanedDob = dob && dob.length === 11 ? dob.substring(1, 11) : dob;
+
     return {
       __original_oscar_record: c,
       oscar_number: c.global_id,
@@ -397,8 +378,8 @@ fn(state => {
       name_first: isUpdate ? undefined : createName(c.given_name, c.local_given_name),
       name_last: isUpdate ? undefined : createName(c.family_name, c.local_family_name),
       sex: isUpdate ? undefined : setGender(c.gender),
-      age: isUpdate ? undefined : calcAge(c.date_of_birth),
-      date_of_birth: isUpdate ? undefined : c.date_of_birth,
+      age: isUpdate ? undefined : calcAge(cleanedDob),
+      date_of_birth: isUpdate ? undefined : cleanedDob,
       location_current: isUpdate ? undefined : locationCode,
       oscar_status: c.status,
       protection_status: !isUpdate && c.is_referred == true ? 'oscar_referral' : undefined,
@@ -682,3 +663,6 @@ each(
     },
   })
 );
+
+// Remove everything but `cases` and `cursor` from state.
+fn(state => ({ cases: state.cases, cursor: state.cursor }));
