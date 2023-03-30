@@ -375,10 +375,14 @@ fn(state => {
       case_id_display: c.external_id_display === '' ? undefined : c.external_id_display,
       oscar_short_id: c.slug,
       mosvy_number: c.mosvy_number,
-      name_first: isUpdate ? undefined : createName(c.given_name, c.local_given_name),
-      name_last: isUpdate ? undefined : createName(c.family_name, c.local_family_name),
-      sex: isUpdate ? undefined : setGender(c.gender),
-      age: isUpdate ? undefined : calcAge(cleanedDob),
+      name_first: createName(c.given_name, c.local_given_name), //don't check if exists first
+      name_last: createName(c.family_name, c.local_family_name), //don't check if exists first
+      sex: setGender(c.gender), //don't check if exists first
+      age: calcAge(cleanedDob), //don't check if exists first
+      // name_first: isUpdate ? undefined : createName(c.given_name, c.local_given_name),
+      // name_last: isUpdate ? undefined : createName(c.family_name, c.local_family_name),
+      // sex: isUpdate ? undefined : setGender(c.gender),
+      // age: isUpdate ? undefined : calcAge(cleanedDob),
       date_of_birth: isUpdate ? undefined : cleanedDob,
       location_current: isUpdate ? undefined : locationCode,
       oscar_status: c.status,
