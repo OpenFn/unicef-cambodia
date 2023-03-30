@@ -27,9 +27,12 @@ fn(state => {
 fn(state => {
   const { originalCases, buildCaseRecord } = state;
 
-  const finalized = originalCases.map(buildCaseRecord).map(c => {
-    return c;
-  });
+  const finalized = originalCases
+    .map(buildCaseRecord)
+    .filter(c => c.external_id !== undefined) //only sync global ids for existing Primero cases
+    .map(c => {
+      return c;
+    });
   console.log('Preparing OSCaR external IDs to sync back to Primero...');
 
   return { ...state, cases: finalized };
