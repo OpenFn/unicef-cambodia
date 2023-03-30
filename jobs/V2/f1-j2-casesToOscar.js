@@ -310,6 +310,8 @@ fn(state => {
       });
     });
   });
+  
+  console.log('Transformed referrals to send to Oscar :: ', JSON.stringify(transformedCases, null, 2)); 
 
   return {
     ...state,
