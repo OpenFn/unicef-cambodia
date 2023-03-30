@@ -27,10 +27,11 @@ fn(state => {
 fn(state => {
   const { originalCases, buildCaseRecord } = state;
 
-  const finalized = originalCases.map(buildCaseRecord).map(c => {
+  const finalized = originalCases.map(buildCaseRecord).filter(c => c.external_id!==undefined).map(c => {
     return c;
   });
   console.log('Preparing OSCaR external IDs to sync back to Primero...');
+  console.log('Primero case updates :: ', JSON.stringify(finalized, null, 2));
 
   return { ...state, cases: finalized };
 });
