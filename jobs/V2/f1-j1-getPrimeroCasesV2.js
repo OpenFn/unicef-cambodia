@@ -20,6 +20,8 @@ getCases(
   {
     remote: true,
     last_updated_at: state => `${state.cursor}..`,
+    page: 1,
+    per: 10000,
     // These cases have been recently updated and MIGHT have a new referral to send to Oscar; we check & filter below
     // workflow: 'referral_to_oscar', //REMOVED July '23 bc we should rely on services, not case-level statuses
   },
@@ -70,6 +72,8 @@ getCases(
   {
     remote: true,
     last_updated_at: state => `${state.cursor}..`,
+    page: 1,
+    per: 10000,
     //workflow: 'referral_from_oscar', //REMOVED July '23 bc we should rely on services, not case-level statuses
     // These cases have a service that might have a decision to send back to Oscar
   },
@@ -106,6 +110,8 @@ getCases(
   {
     remote: true,
     last_updated_at: state => `${state.cursor}..`,
+    page: 1,
+    per: 10000,
   },
   { withReferrals: true },
   state => {
