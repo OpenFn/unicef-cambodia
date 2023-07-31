@@ -20,9 +20,8 @@ getCases(
   {
     remote: true,
     last_updated_at: state => `${state.cursor}..`,
-    // These cases have a service that might be sent to Oscar, but haven't
-    // necessarily ALREADY BEEN sent to Oscar:
-    workflow: 'referral_to_oscar',
+    // These cases have been recently updated and MIGHT have a new referral to send to Oscar; we check & filter below
+    // workflow: 'referral_to_oscar', //REMOVED July '23 bc we should rely on services, not case-level statuses
   },
   { withReferrals: true },
   state => {
@@ -49,10 +48,12 @@ getCases(
         ...c,
         services_section: c.services_section.filter(service => {
           if (referralIds.includes(service.unique_id)) {
-            console.log('Detected service to refer to oscar', service.unique_id);
+            console.log('Detected service to refer to oscar :', service.unique_id);
+            console.log('Service response type :', service.service_response_type);
             return true;
           }
-          console.log('N/A, service not recently referred to oscar', service.unique_id);
+          console.log('N/A, service not recently referred to Oscar :', service.unique_id);
+          console.log('Service response type :', service.service_response_type);
           return false;
         }),
       }));
@@ -69,7 +70,7 @@ getCases(
   {
     remote: true,
     last_updated_at: state => `${state.cursor}..`,
-    workflow: 'referral_from_oscar',
+    //workflow: 'referral_from_oscar', //REMOVED July '23 bc we should rely on services, not case-level statuses
     // These cases have a service that might have a decision to send back to Oscar
   },
   { withReferrals: true },
@@ -79,8 +80,10 @@ getCases(
     // if service is accepted/rejected, then we know there is a decision made in Primero that should be sent to Oscar
     const oscarDecisions = refsFromOscar.filter(c =>
       c.services_section.filter(service => {
-        service.referral_status_edf41f2 === 'accepted_340953' ||
-          service.referral_status_edf41f2 === 'rejected_936484';
+        (service.service_response_type === 'referral_from_oscar' &&
+          service.referral_status_edf41f2 === 'accepted_340953') ||
+          (service.service_response_type === 'referral_from_oscar' &&
+            service.referral_status_edf41f2 === 'rejected_936484');
       })
     );
 
