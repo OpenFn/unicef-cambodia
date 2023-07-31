@@ -1,7 +1,7 @@
 // Either use a manual cursor, or take the cursor from the last run.
 fn(state => {
   console.log('Last sync end date:', state.lastRunDateTime || 'undefined; using manual cursor...');
-  const manualCursor = '2023-03-30T07:19:24.929Z';
+  const manualCursor = '2023-06-29T00:40:00.862Z';
   const currentAttempt = new Date().toISOString();
   console.log('Current attempt time:', currentAttempt);
 
@@ -20,13 +20,16 @@ getCases(
   {
     remote: true,
     last_updated_at: state => `${state.cursor}..`,
-    // These cases have a service that might be sent to Oscar, but haven't
-    // necessarily ALREADY BEEN sent to Oscar:
-    workflow: 'referral_to_oscar',
+    page: 1,
+    per: 10000,
+    // These cases have been recently updated and MIGHT have a new referral to send to Oscar; we check & filter below
+    // workflow: 'referral_to_oscar', //REMOVED July '23 bc we should rely on services, not case-level statuses
   },
   { withReferrals: true },
   state => {
     const oscarRefs = state.data;
+    const caseIds = oscarRefs.map(x => x.case_id_display);
+    console.log('Primero cases returned (before filtering) ::', caseIds);
     const referralIds = oscarRefs
       .map(c =>
         c.referrals
@@ -49,10 +52,12 @@ getCases(
         ...c,
         services_section: c.services_section.filter(service => {
           if (referralIds.includes(service.unique_id)) {
-            console.log('Detected service to refer to oscar', service.unique_id);
+            console.log('Detected service to refer to oscar :', service.unique_id);
+            console.log('Service response type :', service.service_response_type);
             return true;
           }
-          console.log('N/A, service not recently referred to oscar', service.unique_id);
+          console.log('N/A, service not recently referred to Oscar :', service.unique_id);
+          console.log('Service response type :', service.service_response_type);
           return false;
         }),
       }));
@@ -60,6 +65,9 @@ getCases(
     const pendingRefsToSend = sentOscarRefs.filter(
       c => c.services_section && c.services_section.length > 0
     );
+
+    const filteredRefIds = pendingRefsToSend.map(x => x.case_id_display);
+    console.log('Primero cases returned (AFTER filtering) ::', filteredRefIds);
 
     return { ...state, oscarRefs: pendingRefsToSend, referralIds, data: {}, references: [] };
   }
@@ -69,7 +77,9 @@ getCases(
   {
     remote: true,
     last_updated_at: state => `${state.cursor}..`,
-    workflow: 'referral_from_oscar',
+    page: 1,
+    per: 10000,
+    //workflow: 'referral_from_oscar', //REMOVED July '23 bc we should rely on services, not case-level statuses
     // These cases have a service that might have a decision to send back to Oscar
   },
   { withReferrals: true },
@@ -79,8 +89,10 @@ getCases(
     // if service is accepted/rejected, then we know there is a decision made in Primero that should be sent to Oscar
     const oscarDecisions = refsFromOscar.filter(c =>
       c.services_section.filter(service => {
-        service.referral_status_edf41f2 === 'accepted_340953' ||
-          service.referral_status_edf41f2 === 'rejected_936484';
+        (service.service_response_type === 'referral_from_oscar' &&
+          service.referral_status_edf41f2 === 'accepted_340953') ||
+          (service.service_response_type === 'referral_from_oscar' &&
+            service.referral_status_edf41f2 === 'rejected_936484');
       })
     );
 
@@ -103,6 +115,8 @@ getCases(
   {
     remote: true,
     last_updated_at: state => `${state.cursor}..`,
+    page: 1,
+    per: 10000,
   },
   { withReferrals: true },
   state => {
