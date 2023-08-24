@@ -1,7 +1,7 @@
 // Either use a manual cursor, or take the cursor from the last run.
 fn(state => {
   console.log('Last sync end date:', state.lastRunDateTime || 'undefined; using manual cursor...');
-  const manualCursor = '2023-08-24T09:20:28.203Z'; //referral: '2023-08-13T06:00:00.862Z';
+  const manualCursor = '2023-08-13T06:00:00.862Z'; //'2023-08-24T09:20:28.203Z'; 
   const currentAttempt = new Date().toISOString();
   console.log('Current attempt time:', currentAttempt);
 
@@ -20,7 +20,7 @@ getCases(
   {
     remote: true,
     last_updated_at: state => `${state.cursor}..`,
-    //last_updated_at: '2023-08-24T00:00:00.862Z..', //for troubleshooting
+    last_updated_at: '2023-08-24T00:00:00.862Z..', //for troubleshooting
     //last_updated_at: state => `${state.cursor}..2023-08-14T15:00:00.862Z`,  //for troubleshooting
     page: 1,
     per: 10000,
@@ -78,8 +78,8 @@ getCases(
 getCases(
   {
     remote: true,
-    last_updated_at: state => `${state.cursor}..`,
-    //last_updated_at: state => `${state.cursor}..2023-08-13T06:02:00.862Z`, //for troubleshooting
+    //last_updated_at: state => `${state.cursor}..`,
+    last_updated_at: state => `${state.cursor}..2023-08-13T06:02:00.862Z`, //for troubleshooting
     page: 1,
     per: 10000,
     //workflow: 'referral_from_oscar', //REMOVED July '23 bc we should rely on services, not case-level statuses
@@ -119,8 +119,8 @@ getCases(
 getCases(
   {
     remote: true,
-    last_updated_at: state => `${state.cursor}..`,
-    // last_updated_at: state => `${state.cursor}..2023-08-13T06:02:00.862Z`, //for troubleshooting
+    // last_updated_at: state => `${state.cursor}..`,
+    last_updated_at: state => `${state.cursor}..2023-08-13T06:02:00.862Z`, //for troubleshooting
     page: 1,
     per: 10000,
   },
