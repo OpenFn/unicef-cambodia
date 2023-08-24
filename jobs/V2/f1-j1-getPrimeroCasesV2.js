@@ -19,9 +19,9 @@ fn(state => ({ ...state, data: {}, references: [], referralIds: [] }));
 getCases(
   {
     remote: true,
-    last_updated_at: '2023-08-24T00:00:00.862Z..',
-    //last_updated_at: state => `${state.cursor}.
-    //last_updated_at: state => `${state.cursor}..2023-08-14T15:00:00.862Z`,
+    last_updated_at: state => `${state.cursor}..`,
+    //last_updated_at: '2023-08-24T00:00:00.862Z..', //for troubleshooting
+    //last_updated_at: state => `${state.cursor}..2023-08-14T15:00:00.862Z`,  //for troubleshooting
     page: 1,
     per: 10000,
     // These cases have been recently updated and MIGHT have a new referral to send to Oscar; we check & filter below
@@ -78,7 +78,8 @@ getCases(
 getCases(
   {
     remote: true,
-    last_updated_at: state => `${state.cursor}..2023-08-13T06:02:00.862Z`,
+    last_updated_at: state => `${state.cursor}..`,
+    //last_updated_at: state => `${state.cursor}..2023-08-13T06:02:00.862Z`, //for troubleshooting
     page: 1,
     per: 10000,
     //workflow: 'referral_from_oscar', //REMOVED July '23 bc we should rely on services, not case-level statuses
@@ -118,7 +119,8 @@ getCases(
 getCases(
   {
     remote: true,
-    last_updated_at: state => `${state.cursor}..2023-08-13T06:02:00.862Z`,
+    last_updated_at: state => `${state.cursor}..`,
+    // last_updated_at: state => `${state.cursor}..2023-08-13T06:02:00.862Z`, //for troubleshooting
     page: 1,
     per: 10000,
   },
