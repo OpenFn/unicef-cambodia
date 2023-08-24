@@ -68,21 +68,23 @@ fn(state => {
   }
 
   function setProvinceUser(c) {
-    const { location_current_village_code, organization_address_code } = c;
+    const { location_current_village_code, organization_address_code, external_id, global_id } = c;
     const source = location_current_village_code || organization_address_code;
-    //console.log('Location code sent by Oscar :: ', source);
+    console.log('Finding province user for this case from Oscar... id: ', global_id);
+    console.log('Primero case id (if case already synced) :: ', external_id);
+    console.log('Location code sent by Oscar :: ', source);
     if (source) {
       //If Village (admin level 4 location) not specified in OSCaR, then we expect a shorter location code and sometimes it has leading 0s (e.g., '0004')
       //This logic therefore tells us how to extract the province code from the full location code
       //Depending on the length of the location code and if leading 0s, we may need to look in a different spot for the province code
       const subCode = source.slice(0, 2) === '00' ? source.slice(2, 4) : source.slice(0, 2);
-      //console.log('Matching province code:: ', subCode);
-      user = provinceUserMap[subCode];
-      //console.log('Province username located:: ', user);
+      console.log('Matching Primero province code:: ', subCode);
+      const user = provinceUserMap[subCode];
+      console.log('Primero province username located:: ', user);
       if (user) {
         return user;
       } else {
-        throw 'Province user not found for this case. Check the case location and list of available province users.';
+        throw `Province user not found for this case ${global_id} with Oscar location code ${source}. Verify the case location and mapping to Primero province users.`;
       }
     } else {
       return null;
