@@ -50,18 +50,23 @@ getCases(
         ...c,
         services_section: c.services_section.filter(service => {
           if (referralIds.includes(service.unique_id)) {
-            console.log('Detected service to refer to oscar :', service.unique_id);
-            console.log('Service response type :', service.service_response_type);
+            // console.log('Detected service to refer to oscar :', service.unique_id);
+            // console.log('Service response type :', service.service_response_type);
             return true;
           }
-          console.log('N/A, service not recently referred to Oscar :', service.unique_id);
-          console.log('Service response type :', service.service_response_type);
+          // console.log('N/A, service not recently referred to Oscar :', service.unique_id);
+          // console.log('Service response type :', service.service_response_type);
           return false;
         }),
       }));
 
     const pendingRefsToSend = sentOscarRefs.filter(
       c => c.services_section && c.services_section.length > 0
+    );
+
+    console.log(
+      'Case IDs of pending referrals to send to Oscar ::',
+      pendingRefsToSend ? pendingRefsToSend.map(c => c.case_id) : null
     );
 
     return { ...state, oscarRefs: pendingRefsToSend, referralIds, data: {}, references: [] };
@@ -83,17 +88,19 @@ getCases(
     // Here we filter the services_section in each refsFromOscar to return only the services that have decisions
     // if service is accepted/rejected, then we know there is a decision made in Primero that should be sent to Oscar
     const oscarDecisions = refsFromOscar.filter(c =>
-      c.services_section.filter(service => {
-        (service.service_response_type === 'referral_from_oscar' &&
-          service.referral_status_edf41f2 === 'accepted_340953') ||
-          (service.service_response_type === 'referral_from_oscar' &&
-            service.referral_status_edf41f2 === 'rejected_936484');
-      })
+      c.services_section
+        ? c.services_section.filter(service => {
+            (service.service_response_type === 'referral_from_oscar' &&
+              service.referral_status_edf41f2 === 'accepted_340953') ||
+              (service.service_response_type === 'referral_from_oscar' &&
+                service.referral_status_edf41f2 === 'rejected_936484');
+          })
+        : null
     );
 
     console.log(
-      `Decisions to send to Oscar: ${JSON.stringify(
-        refsFromOscar ? refsFromOscar.map(c => c.case_id) : '',
+      `Case IDs of referral decisions to send to Oscar :: ${JSON.stringify(
+        oscarDecisions ? oscarDecisions.map(c => c.case_id) : '',
         null,
         2
       )}`
@@ -133,7 +140,7 @@ getCases(
       });
 
     console.log(
-      `OSCaR cases that have been registered in Primero & assigned a Case Id: ${JSON.stringify(
+      `OSCaR cases that have been registered in Primero & assigned a Case ID: ${JSON.stringify(
         oscarCases ? oscarCases.map(x => x.case_id_display) : ''
       )}`
     );
