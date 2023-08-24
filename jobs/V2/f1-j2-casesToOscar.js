@@ -327,6 +327,15 @@ each(
     transformResponse: [
       data => {
         console.log('Uploading referrals... Oscar says', JSON.stringify(data, null, 2));
+
+        try {
+          JSON.parse(responseData);
+        } catch (e) {
+          throw new Error(
+            'See above: the response from OSCAR was not valid JSON. Concealing HTTP error to protect child privacy.'
+          );
+        }
+
         return data;
       },
     ],
@@ -346,6 +355,15 @@ fn(state => {
       transformResponse: [
         data => {
           console.log('Uploading decisions...Oscar says', JSON.stringify(data, null, 2));
+
+          try {
+            JSON.parse(responseData);
+          } catch (e) {
+            throw new Error(
+              'See above: the response from OSCAR was not valid JSON. Concealing HTTP error to protect child privacy.'
+            );
+          }
+
           return data;
         },
       ],
@@ -387,6 +405,21 @@ fn(state => {
           console.log(`'Update links' with non-referrals: ${JSON.stringify(payload, null, 4)}`);
           return payload;
         },
+        transformResponse: [
+          data => {
+            console.log('Updating links...Oscar says', JSON.stringify(data, null, 2));
+
+            try {
+              JSON.parse(responseData);
+            } catch (e) {
+              throw new Error(
+                'See above: the response from OSCAR was not valid JSON. Concealing HTTP error to protect child privacy.'
+              );
+            }
+
+            return data;
+          },
+        ],
       })
     )(state);
 
