@@ -471,9 +471,9 @@ fn(state => {
   });
 
   console.log(
-    'Prepared cases to sync back to Primero:',
+    'Prepared cases with Oscar services to sync back to Primero ::',
     JSON.stringify(
-      finalizedNoRefsFromPrimero ? finalizedNoRefsFromPrimero.map(x => x.case_id) : '',
+      finalizedNoRefsFromPrimero ? finalizedNoRefsFromPrimero.length : '',
       null,
       2
     )
