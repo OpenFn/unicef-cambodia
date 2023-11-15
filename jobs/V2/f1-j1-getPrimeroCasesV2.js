@@ -1,7 +1,7 @@
 // Either use a manual cursor, or take the cursor from the last run.
 fn(state => {
   console.log('Last sync end date:', state.lastRunDateTime || 'undefined; using manual cursor...');
-  const manualCursor = '2023-09-16T05:00:05.908Z'; //for missing referral: '2023-08-13T06:00:00.862Z'; 
+  const manualCursor = '2023-11-15T02:00:04.102Z'; //for missing referral: '2023-08-13T06:00:00.862Z'; 
   const currentAttempt = new Date().toISOString();
   console.log('Current attempt time:', currentAttempt);
 
