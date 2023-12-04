@@ -122,41 +122,41 @@ getCases(
 // GET new Primero cases with oscar_number
 // User Story 2: View all Oscar cases in Primero
 // #2 - Request all oscar cases ================================================
-getCases(
-  {
-    remote: true,
-    last_updated_at: state => `${state.cursor}..`,
-    page: 1,
-    per: 10000,
-  },
-  { withReferrals: true },
-  state => {
-    // Do not include any cases that have a 'referral_to_oscar' service, bc we handle those in the steps above
-    // console.log(
-    //   `Referrals before filter: ${JSON.stringify(state.data.map(x => x.case_id_display))}`
-    // );
-    const oscarCases = state.data
-      .filter(c => c.oscar_number) //Only return Oscar cases
-      .filter(c => {
-        if (c.services_section) {
-          // if it has a services section, ensure no services include "referral_to_oscar"
-          return !c.services_section.some(s => s.service_response_type === 'referral_to_oscar');
-        }
-        return true;
-      })
-      .map(x => {
-        return x;
-      });
+// getCases(
+//   {
+//     remote: true,
+//     last_updated_at: state => `${state.cursor}..`,
+//     page: 1,
+//     per: 10000,
+//   },
+//   { withReferrals: true },
+//   state => {
+//     // Do not include any cases that have a 'referral_to_oscar' service, bc we handle those in the steps above
+//     // console.log(
+//     //   `Referrals before filter: ${JSON.stringify(state.data.map(x => x.case_id_display))}`
+//     // );
+//     const oscarCases = state.data
+//       .filter(c => c.oscar_number) //Only return Oscar cases
+//       .filter(c => {
+//         if (c.services_section) {
+//           // if it has a services section, ensure no services include "referral_to_oscar"
+//           return !c.services_section.some(s => s.service_response_type === 'referral_to_oscar');
+//         }
+//         return true;
+//       })
+//       .map(x => {
+//         return x;
+//       });
 
-    console.log(
-      `OSCaR cases that have been registered in Primero & assigned a Case Id: ${JSON.stringify(
-        oscarCases ? oscarCases.map(x => x.case_id_display) : ''
-      )}`
-    );
+//     console.log(
+//       `OSCaR cases that have been registered in Primero & assigned a Case Id: ${JSON.stringify(
+//         oscarCases ? oscarCases.map(x => x.case_id_display) : ''
+//       )}`
+//     );
 
-    return { ...state, oscarCases, data: {}, references: [] };
-  }
-);
+//     return { ...state, oscarCases, data: {}, references: [] };
+//   }
+// );
 
 // After job completes successfully, update cursor
 fn(state => {
