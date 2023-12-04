@@ -89,7 +89,7 @@ getCases(
     // if service is accepted/rejected, then we know there is a decision made in Primero that should be sent to Oscar
     
     const oscarDecisions = refsFromOscar.filter(c =>
-      c.services_section.filter(service => {
+        c.services_section && c.services_section.filter(service => {
         // (service.service_response_type === 'referral_from_oscar' &&
         //   service.referral_status_edf41f2 === 'accepted_340953') ||
         //   (service.service_response_type === 'referral_from_oscar' &&
