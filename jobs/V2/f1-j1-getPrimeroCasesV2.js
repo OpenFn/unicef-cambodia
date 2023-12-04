@@ -85,6 +85,7 @@ getCases(
   { withReferrals: true },
   state => {
     const refsFromOscar = state.data;
+    console.log(refsFromOscar);
     // Here we filter the services_section in each refsFromOscar to return only the services that have decisions
     // if service is accepted/rejected, then we know there is a decision made in Primero that should be sent to Oscar
     const oscarDecisions = refsFromOscar.filter(c =>
