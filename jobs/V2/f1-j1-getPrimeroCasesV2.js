@@ -85,15 +85,25 @@ getCases(
   { withReferrals: true },
   state => {
     const refsFromOscar = state.data;
-    console.log(refsFromOscar);
     // Here we filter the services_section in each refsFromOscar to return only the services that have decisions
     // if service is accepted/rejected, then we know there is a decision made in Primero that should be sent to Oscar
+    
     const oscarDecisions = refsFromOscar.filter(c =>
       c.services_section.filter(service => {
-        (service.service_response_type === 'referral_from_oscar' &&
-          service.referral_status_edf41f2 === 'accepted_340953') ||
-          (service.service_response_type === 'referral_from_oscar' &&
-            service.referral_status_edf41f2 === 'rejected_936484');
+        // (service.service_response_type === 'referral_from_oscar' &&
+        //   service.referral_status_edf41f2 === 'accepted_340953') ||
+        //   (service.service_response_type === 'referral_from_oscar' &&
+        //     service.referral_status_edf41f2 === 'rejected_936484');
+        if (service.service_response_type && service.referral_status_edf41f2) {
+          return (
+            (service.service_response_type === 'referral_from_oscar' &&
+              service.referral_status_edf41f2 === 'accepted_340953') ||
+            (service.service_response_type === 'referral_from_oscar' &&
+              service.referral_status_edf41f2 === 'rejected_936484')
+          );
+        } else {
+          return false;
+        }
       })
     );
 
