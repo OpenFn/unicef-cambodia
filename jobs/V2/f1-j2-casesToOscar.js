@@ -72,9 +72,9 @@ fn(state => {
 // =========================================== //
 
 fn(state => {
-  console.log('nonReferrals length:', state.cases.nonReferrals.length);
-  console.log('referrals length:', state.cases.referrals.length);
-  console.log('decisions length:', state.cases.decisions.length);
+  // console.log('nonReferrals length:', state.cases.nonReferrals.length);
+  // console.log('referrals length:', state.cases.referrals.length);
+  // console.log('decisions length:', state.cases.decisions.length);
   return state;
 });
 
