@@ -17,12 +17,13 @@ fn(state => ({ ...state, data: {}, references: [], referralIds: [] }));
 // User Story 1: Generating government referrals
 // #1 - Request oscar referrals only ===========================================
 fn(async state => {
-  const perPage = 20;
+  const perPage = 100;
   let currentPage = 1;
   let totalItems = 0;
   let allCases = [];
 
   do {
+    console.log('Fetching cases and their referralls...');
     const cases = await getCases(
       {
         remote: true,
@@ -37,6 +38,7 @@ fn(async state => {
       { withReferrals: true }
     )(state);
 
+    console.log(`Fetched ${cases.length} cases`);
     const {
       metadata: { total },
       data,
