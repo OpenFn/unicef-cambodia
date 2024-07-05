@@ -23,7 +23,7 @@ fn(async state => {
   let allCases = [];
 
   do {
-    console.log('Fetching cases and their referralls...');
+    console.log('Fetching cases and their referrals...');
     const cases = await getCases(
       {
         remote: true,
