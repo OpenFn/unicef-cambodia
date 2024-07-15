@@ -1,7 +1,7 @@
 // Either use a manual cursor, or take the cursor from the last run.
 fn(state => {
   console.log('Last sync end date:', state.lastRunDateTime || 'undefined; using manual cursor...');
-  const manualCursor = '2024-04-09T00:00:00.000Z'; //for missing referral: '2023-08-13T06:00:00.862Z'; 
+  const manualCursor = '2024-04-09T00:00:00.000Z'; //for missing referral: '2023-08-13T06:00:00.862Z';
   const currentAttempt = new Date().toISOString();
   console.log('Current attempt time:', currentAttempt);
 
@@ -16,64 +16,87 @@ fn(state => ({ ...state, data: {}, references: [], referralIds: [] }));
 // GET Primero cases with oscar referrals
 // User Story 1: Generating government referrals
 // #1 - Request oscar referrals only ===========================================
-getCases(
-  {
-    remote: true,
-    last_updated_at: state => `${state.cursor}..`,
-    //last_updated_at: '2023-08-24T00:00:00.862Z..', //for troubleshooting
-    //last_updated_at: state => `${state.cursor}..2023-08-14T15:00:00.862Z`,  //for troubleshooting
-    page: 1,
-    per: 10000,
-    // These cases have been recently updated and MIGHT have a new referral to send to Oscar; we check & filter below
-    // workflow: 'referral_to_oscar', //REMOVED July '23 bc we should rely on services, not case-level statuses
-  },
-  { withReferrals: true },
-  state => {
-    const oscarRefs = state.data;
-    const referralIds = oscarRefs
-      .map(c =>
-        c.referrals
-          .map(x => {
-            console.log('referral:', 'id:', x.id, x.status, x.created_at, x.service_record_id);
-            return x;
-          })
-          .filter(r => new Date(r.created_at) >= new Date(state.cursor)) //Only send referrals created after the last sync
-          .filter(r => r.status === 'in_progress') // And only send referrals where status 'in progress'
-          .map(r => r.service_record_id)
-      )
-      .flat();
+fn(async state => {
+  const perPage = 100;
+  let currentPage = 1;
+  let totalItems = 0;
+  let allCases = [];
 
-    console.log('Detected referral Ids:', referralIds);
+  do {
+    console.log(`Fetching page ${currentPage} of cases and their referrals...`);
+    const cases = await getCases(
+      {
+        remote: true,
+        last_updated_at: state => `${state.cursor}..`,
+        //last_updated_at: '2023-08-24T00:00:00.862Z..', //for troubleshooting
+        //last_updated_at: state => `${state.cursor}..2023-08-14T15:00:00.862Z`,  //for troubleshooting
+        page: currentPage,
+        per: perPage,
+        // These cases have been recently updated and MIGHT have a new referral to send to Oscar; we check & filter below
+        // workflow: 'referral_to_oscar', //REMOVED July '23 bc we should rely on services, not case-level statuses
+      },
+      { withReferrals: true }
+    )(state);
 
-    // we filter the services_section in each oscarRef to return only the services that have/have not been sent to Oscar
-    const sentOscarRefs = oscarRefs
-      .filter(c => c.services_section)
-      .map(c => ({
-        ...c,
-        services_section: c.services_section.filter(service => {
-          if (referralIds.includes(service.unique_id)) {
-            // console.log('Detected service to refer to oscar :', service.unique_id);
-            // console.log('Service response type :', service.service_response_type);
-            return true;
-          }
-          // console.log('N/A, service not recently referred to Oscar :', service.unique_id);
+    console.log(`Fetched ${cases.length} cases`);
+    const {
+      metadata: { total },
+      data,
+    } = cases;
+
+    totalItems = total;
+    allCases = allCases.concat(data);
+    currentPage++;
+  } while ((currentPage - 1) * perPage < totalItems);
+
+  return { ...state, data: allCases };
+});
+
+fn(state => {
+  const oscarRefs = state.data;
+  const referralIds = oscarRefs
+    .map(c =>
+      c.referrals
+        .map(x => {
+          console.log('referral:', 'id:', x.id, x.status, x.created_at, x.service_record_id);
+          return x;
+        })
+        .filter(r => new Date(r.created_at) >= new Date(state.cursor)) //Only send referrals created after the last sync
+        .filter(r => r.status === 'in_progress') // And only send referrals where status 'in progress'
+        .map(r => r.service_record_id)
+    )
+    .flat();
+
+  console.log('Detected referral Ids:', referralIds);
+
+  // we filter the services_section in each oscarRef to return only the services that have/have not been sent to Oscar
+  const sentOscarRefs = oscarRefs
+    .filter(c => c.services_section)
+    .map(c => ({
+      ...c,
+      services_section: c.services_section.filter(service => {
+        if (referralIds.includes(service.unique_id)) {
+          // console.log('Detected service to refer to oscar :', service.unique_id);
           // console.log('Service response type :', service.service_response_type);
-          return false;
-        }),
-      }));
+          return true;
+        }
+        // console.log('N/A, service not recently referred to Oscar :', service.unique_id);
+        // console.log('Service response type :', service.service_response_type);
+        return false;
+      }),
+    }));
 
-    const pendingRefsToSend = sentOscarRefs.filter(
-      c => c.services_section && c.services_section.length > 0
-    );
+  const pendingRefsToSend = sentOscarRefs.filter(
+    c => c.services_section && c.services_section.length > 0
+  );
 
-    console.log(
-      'Case IDs of pending referrals to send to Oscar ::',
-      pendingRefsToSend ? pendingRefsToSend.map(c => c.case_id) : null
-    );
+  console.log(
+    'Case IDs of pending referrals to send to Oscar ::',
+    pendingRefsToSend ? pendingRefsToSend.map(c => c.case_id) : null
+  );
 
-    return { ...state, oscarRefs: pendingRefsToSend, referralIds, data: {}, references: [] };
-  }
-);
+  return { ...state, oscarRefs: pendingRefsToSend, referralIds, data: {}, references: [] };
+});
 // NEW: Get decisions to send back to OSCAR ================================================//
 getCases(
   {
