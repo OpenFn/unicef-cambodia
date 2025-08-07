@@ -62,7 +62,7 @@ get(
     query: {
       // NOTE: since_date must be rounded to 00:00:00 to work with Oscar API. API does not support other timestamps.
       //since_date: '2023-08-24 00:00:00', //for troubleshooting
-      since_date:  state.lastQueryDate || '2024-04-09 00:00:00',
+      since_date:  state.lastQueryDate || state.cursor || '2025-08-06 00:00:00',
     },
   },
   state => {
