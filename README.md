@@ -12,6 +12,10 @@ Contact support@openfn.org or the MoSVY Primero administrators:
 - srychandina@gmail.com
 - sovansideth@gmail.com 
 
+Oscar administrators
+- Sam Ol Um, BEB Asia Regional Director – sam@bebglobal.org
+- Chantrea Brak, BEB Cambodia Country Manager – chantrea@bebglobal.org
+- Kiry Meas, Techical Lead – kiry@bebglobal.org
 
 
  
