@@ -1,0 +1,1527 @@
+# =============================================================================
+# PROPOSED v2 (Lightning/worker) workflow — 4 steps, mapped 1:1 to the 4 V1 jobs.
+#
+#   Step 1  Get Referrals from Primero    <- jobs/V2/f1-j1-getPrimeroCasesV2.js   (primero)
+#   Step 2  Upsert Cases in Oscar         <- jobs/V2/f1-j2-casesToOscar.js        (http)
+#   Step 3  Get Referrals from OSCaR      <- jobs/V2/f2-j1-getOscarCases.js       (http)
+#   Step 4  Upsert Cases in Primero       <- jobs/V2/f2-j2-upsertCasesToPrimero.js
+#                                            + jobs/V2/f2-j3-updateReferralPending.js (primero)
+#
+# GOAL: keep the external HTTP calls (to Primero and OSCaR) byte-identical to V1,
+# while making the minimum changes required to run on:
+#   @openfn/language-primero@4.1.1   (was 2.7.0)
+#   @openfn/language-http@7.3.1      (was 4.2.8)
+#
+# WHAT CHANGED, AND WHY (everything else is verbatim from the V1 jobs):
+#   * Primero steps (1 & 4): NO logic changes — primero v4 is API-compatible with the
+#     patterns used (getCases/upsertCase/updateReferral/dataValue/each/references, and
+#     trailing callbacks are still honored). Step 4 simply concatenates the old 4th and
+#     5th jobs so the workflow is 4 steps. The only edit is preserving `configuration`
+#     across the mid-step state trim (see the marked line in step 4).
+#   * HTTP steps (2 & 3): rewritten for the http v6/v7 rewrite (axios -> undici):
+#       - post/put signature is now (path, data, options) — body moved to the 2nd arg.
+#       - trailing callbacks were removed — replaced by a following fn() or `op(state).then()`.
+#       - response headers moved from state.data.__headers to state.response.headers.
+#       - `keepCookie` was removed (no-op); OSCaR auth is carried by the explicit
+#         access-token/client/uid headers exactly as before, so the requests are unchanged.
+#       - `transformResponse` was removed; the "conceal HTTP error to protect child
+#         privacy" JSON guard is reproduced with `parseAs: 'text'` + `errors: false`
+#         (errors:false stops the adaptor from throwing the raw OSCaR body) plus the same
+#         JSON.parse check in a .then(). See REVIEW NOTE in each guard.
+#   * Adaptors are pinned (were "@latest").
+# =============================================================================
+name: primero-oscar-referrals-sync
+jobs:
+  Get-Referrals-from-Primero:
+    name: Get Referrals from Primero
+    adaptor: "@openfn/language-primero@4.1.1"
+    body: |
+      // Either use a manual cursor, or take the cursor from the last run.
+      fn(state => {
+        console.log('Last sync end date:', state.lastRunDateTime || 'undefined; using manual cursor...');
+        const manualCursor = '2025-08-02T00:00:04.400Z'; //for missing referral: '2023-08-13T06:00:00.862Z';
+        const currentAttempt = new Date().toISOString();
+        console.log('Current attempt time:', currentAttempt);
+
+        const cursor = state.lastRunDateTime || manualCursor;
+        console.log('Cursor:', cursor);
+        return { ...state, cursor, currentAttempt };
+      });
+
+      // Clear data from previous runs and add a referralIds array.
+      fn(state => ({ ...state, data: {}, references: [], referralIds: [] }));
+
+      // GET Primero cases with oscar referrals
+      // User Story 1: Generating government referrals
+      // #1 - Request oscar referrals only ===========================================
+      getCases(
+        {
+          remote: true,
+          last_updated_at: state => `${state.cursor}..`,
+          //last_updated_at: '2023-08-24T00:00:00.862Z..', //for troubleshooting
+          //last_updated_at: state => `${state.cursor}..2023-08-14T15:00:00.862Z`,  //for troubleshooting
+          page: 1,
+          per: 10000,
+          // These cases have been recently updated and MIGHT have a new referral to send to Oscar; we check & filter below
+          // workflow: 'referral_to_oscar', //REMOVED July '23 bc we should rely on services, not case-level statuses
+        },
+        { withReferrals: true },
+        state => {
+          const oscarRefs = state.data;
+          const referralIds = oscarRefs
+            .map(c =>
+              c.referrals
+                .map(x => {
+                  console.log('referral:', 'id:', x.id, x.status, x.created_at, x.service_record_id);
+                  return x;
+                })
+                .filter(r => new Date(r.created_at) >= new Date(state.cursor)) //Only send referrals created after the last sync
+                .filter(r => r.status === 'in_progress') // And only send referrals where status 'in progress'
+                .map(r => r.service_record_id)
+            )
+            .flat();
+
+          console.log('Detected referral Ids:', referralIds);
+
+          // we filter the services_section in each oscarRef to return only the services that have/have not been sent to Oscar
+          const sentOscarRefs = oscarRefs
+            .filter(c => c.services_section)
+            .map(c => ({
+              ...c,
+              services_section: c.services_section.filter(service => {
+                if (referralIds.includes(service.unique_id)) {
+                  // console.log('Detected service to refer to oscar :', service.unique_id);
+                  // console.log('Service response type :', service.service_response_type);
+                  return true;
+                }
+                // console.log('N/A, service not recently referred to Oscar :', service.unique_id);
+                // console.log('Service response type :', service.service_response_type);
+                return false;
+              }),
+            }));
+
+          const pendingRefsToSend = sentOscarRefs.filter(
+            c => c.services_section && c.services_section.length > 0
+          );
+
+          console.log(
+            'Case IDs of pending referrals to send to Oscar ::',
+            pendingRefsToSend ? pendingRefsToSend.map(c => c.case_id) : null
+          );
+
+          return { ...state, oscarRefs: pendingRefsToSend, referralIds, data: {}, references: [] };
+        }
+      );
+      // NEW: Get decisions to send back to OSCAR ================================================//
+      getCases(
+        {
+          remote: true,
+          last_updated_at: state => `${state.cursor}..`,
+          //last_updated_at: state => `${state.cursor}..2023-08-13T06:02:00.862Z`, //for troubleshooting
+          page: 1,
+          per: 10000,
+          //workflow: 'referral_from_oscar', //REMOVED July '23 bc we should rely on services, not case-level statuses
+          // These cases have a service that might have a decision to send back to Oscar
+        },
+        { withReferrals: true },
+        state => {
+          const refsFromOscar = state.data;
+          // Here we filter the services_section in each refsFromOscar to return only the services that have decisions
+          // if service is accepted/rejected, then we know there is a decision made in Primero that should be sent to Oscar
+          const oscarDecisions = refsFromOscar.filter(c =>
+            c.services_section
+              ? c.services_section.filter(service => {
+                  (service.service_response_type === 'referral_from_oscar' &&
+                    service.referral_status_edf41f2 === 'accepted_340953') ||
+                    (service.service_response_type === 'referral_from_oscar' &&
+                      service.referral_status_edf41f2 === 'rejected_936484');
+                })
+              : null
+          );
+
+          console.log(
+            `Case IDs of referral decisions to send to Oscar :: ${JSON.stringify(
+              oscarDecisions ? oscarDecisions.map(c => c.case_id) : '',
+              null,
+              2
+            )}`
+          );
+
+          return { ...state, oscarDecisions, data: {}, references: [] };
+        }
+      );
+
+      // GET new Primero cases with oscar_number
+      // User Story 2: View all Oscar cases in Primero
+      // #2 - Request all oscar cases ================================================
+      getCases(
+        {
+          remote: true,
+          last_updated_at: state => `${state.cursor}..`,
+          //last_updated_at: state => `${state.cursor}..2023-08-13T06:02:00.862Z`, //for troubleshooting
+          page: 1,
+          per: 10000,
+        },
+        { withReferrals: true },
+        state => {
+          // Do not include any cases that have a 'referral_to_oscar' service, bc we handle those in the steps above
+          // console.log(
+          //   `Referrals before filter: ${JSON.stringify(state.data.map(x => x.case_id_display))}`
+          // );
+          const oscarCases = state.data
+            .filter(c => c.oscar_number) //Only return Oscar cases
+            .filter(c => {
+              if (c.services_section) {
+                // if it has a services section, ensure no services include "referral_to_oscar"
+                return !c.services_section.some(s => s.service_response_type === 'referral_to_oscar');
+              }
+              return true;
+            })
+            .map(x => {
+              return x;
+            });
+
+          console.log(
+            `OSCaR cases that have been registered in Primero & assigned a Case ID: ${JSON.stringify(
+              oscarCases ? oscarCases.map(x => x.case_id_display) : ''
+            )}`
+          );
+
+          return { ...state, oscarCases, data: {}, references: [] };
+        }
+      );
+
+      // After job completes successfully, update cursor
+      fn(state => {
+        const { lastRunDateTime, currentAttempt, cursor } = state;
+        console.log('cursor', cursor);
+        console.log('Current attempt time:', currentAttempt);
+        console.log(`Updating lastRunDateTime from ${lastRunDateTime} to ${currentAttempt}.`);
+        return { ...state, lastRunDateTime: currentAttempt };
+      });
+  Upsert-Cases-in-Oscar:
+    name: Upsert Cases in Oscar
+    adaptor: "@openfn/language-http@7.3.1"
+    body: |
+      // Primero cases --> OSCaR
+      // User Story 1: Generating government referrals, creating referrals in Oscar
+      fn(state => {
+        const { oscarDecisions, oscarRefs, oscarCases } = state;
+        const cases = {
+          decisions: oscarDecisions,
+          referrals: oscarRefs,
+          nonReferrals: oscarCases,
+        };
+
+        console.log(
+          `Cases with DECISIONS for Oscar: ${JSON.stringify(
+            cases.decisions ? cases.decisions.map(x => x.case_id) : '',
+            null,
+            2
+          )}`
+        );
+        console.log(
+          `Cases with REFERRALS for Oscar: ${JSON.stringify(
+            cases.referrals ? cases.referrals.map(x => x.case_id) : '',
+            null,
+            2
+          )}`
+        );
+        console.log(
+          `NONreferrals to sync external_id only: ${JSON.stringify(
+            cases.nonReferrals ? cases.nonReferrals.map(x => x.case_id) : '',
+            null,
+            2
+          )}`
+        );
+
+        const oscarStrings = value => {
+          // NOTE: OSCaR API has unique behavior that requires us to send empty strings for null values.
+          if (value) {
+            return value;
+          } else {
+            console.log('Converting key to an empty string for OSCAR.');
+            return '';
+          }
+        };
+
+        //NOTE FOR AK: To test? And update considering multiple agencies now sending referrals?
+        const setOrganization = c => {
+          // NOTE: This assumes the first referral will tell us which is the referring organization.
+          // The client stipulates that all "oscar_referring_organization"
+          // values will be the SAME for an array including any "referral_from_oscar"
+          // items, and requires that we merely select the first item that matches.
+          const fromOrg = c.services_section.find(s => s.service_response_type === 'referral_from_oscar');
+          const toOrg = c.services_section.find(s => s.service_response_type === 'referral_to_oscar');
+
+          if (fromOrg) {
+            console.log(
+              'Response type "referral_from_oscar" detected, The "oscar_referring_organization" values for these services are',
+              c.services_section.map(s => s.oscar_referring_organization)
+            );
+            return fromOrg.oscar_referring_organization.substring(7);
+          } else if (toOrg) {
+            console.log(
+              'Response type "referral_to_oscar" detected, The "service_implementing_agency" values for these services are',
+              c.services_section.map(s => s.service_implementing_agency)
+            );
+            return toOrg.service_implementing_agency.substring(7);
+          } else {
+            console.log('Referral to or from oscar not detected.');
+            return c.owned_by_agency.substring(7);
+          }
+        };
+
+        return { ...state, cases, oscarStrings, setOrganization };
+      });
+      // =========================================== //
+
+      fn(state => {
+        console.log('nonReferrals length:', state.cases.nonReferrals.length);
+        console.log('referrals length:', state.cases.referrals.length);
+        console.log('decisions length:', state.cases.decisions.length);
+        return state;
+      });
+
+      // Oscar authentication step, one request per job run.
+      // v7: body is the 2nd positional arg; `keepCookie` removed (auth is carried by the
+      // explicit token headers built below); response headers are now on state.response.
+      post('/api/v1/admin_auth/sign_in', state => ({
+        email: state.configuration.username,
+        password: state.configuration.password,
+      }));
+
+      fn(state => {
+        console.log('Authenticated with OSCaR...');
+        return {
+          ...state,
+          oscarHeaders: {
+            'Content-Type': 'application/json',
+            uid: state.configuration.username,
+            client: state.response.headers.client,
+            'access-token': state.response.headers['access-token'],
+          },
+        };
+      });
+
+      fn(state => {
+        const { oscarStrings, setOrganization, cases } = state;
+
+        const statusMap = {
+          accepted_340953: 'Accepted',
+          rejected_936484: 'Exited',
+          pending_310366: 'Referred',
+        };
+
+        function checkValue(data) {
+          if (data !== 'NaN' && data) {
+            return data.length === 1 || data.length === 7 || data.length === 3 || data.length === 5
+              ? '0' + data
+              : data; //if 1, 3, 5, or 7 char, add leading 0s to convert location code to Oscar format
+          } else {
+            console.log('Converting location null values to OSCAR empty string.');
+            return '';
+          }
+        }
+
+        const serviceMap = {
+          social_work_case_work_generalist: 'Generalist social work / case work',
+          social_work_case_work_community: 'Community social work',
+          family_based_care_emergency_foster: 'Emergency foster care',
+          family_based_care_longterm_foster: 'Long term foster care',
+          family_based_care_kinship: 'Kinship care',
+          family_based_care_domestic_adoption: 'Domestic adoption support',
+          family_based_care_family_preservation: 'Family preservation',
+          family_based_care_family_reunification: 'Family reunification',
+          family_based_care_independent_living: 'Independent Living',
+          drug_alcohol_counselling: 'Drug and Alcohol Counselling',
+          drug_alcohol_detox_rehabilitation: 'Detox / rehabilitation services',
+          drug_alcohol_detox_support: 'Detox support',
+          counselling_generalist: 'Generalist counselling',
+          counselling_abuse_survivors: 'Counselling for abuse survivors',
+          counselling_trauma: 'Trauma counselling',
+          counselling_family: 'Family counselling / mediation',
+          financial_development_material_assistance: 'Direct material assistance',
+          financial_development_financial_assistance: 'Direct financial assistance',
+          financial_development_income_generation: 'Income generation services',
+          financial_development_day_care: 'Day care services',
+          disability_support_therapeutic_interventions: 'Therapeutic interventions',
+          'disability_support_respite-care': 'Disability respite care',
+          disability_support_therapeutic_training: 'Therapeutic training',
+          disability_support_aid_provision: 'Disability-aid provision',
+          disability_support_peripheral: 'Peripheral supports',
+          disability_support_groups: 'Support groups',
+          medical_support_access_care: 'Support to access care',
+          medical_support_provision_medical_case: 'Provision of medical care',
+          medical_support_medical_training: 'Medical training services',
+          medical_support_healt_education: 'Health education',
+          legal_support_access_legal_services: 'Support to access legal services',
+          legal_support_advocacy_services: 'Legal advocacy services',
+          legal_support_representation: 'Legal representation',
+          legal_support_prision_visitation: 'Prison visitation support',
+          mental_health_support_therapeutic_interventions: 'Therapeutic interventions',
+          mental_health_support_therapeutic_training: 'Therapeutic training',
+          mental_health_support_direct_medical_support: 'Direct medical support',
+          training_education_school_support: 'School support',
+          training_education_supplementary: 'Supplementary school education',
+          training_education_vocational: 'Vocational education and training',
+          training_education_material_support: 'Material support for education (uniforms, etc)',
+          training_education_scholarships: 'Scholarships or financial support',
+          training_education_life_skills: 'Life skills',
+          family_support_family_support: 'Family support',
+          anti_trafficking_rescue: 'Rescue Services',
+          anti_trafficking_transitional_accomodation: 'Transitional Accommodation',
+          anti_trafficking_post_trafficking: 'Post-Trafficking Counseling',
+          anti_trafficking_community_reintegration: 'Community Reintegration Support',
+          residential_care_gov_only_other: 'Residential Care Institution',
+          other_other_service: 'Other Service',
+          other: 'Other Service',
+        };
+
+        //======================================================================================//
+        //=== NOTE: This is the new mapping for Oscar decisions - added July 2022 ==============//
+        const mappedDecisions = cases.decisions
+          .map(c => {
+            const external_id = oscarStrings(c.case_id);
+            const external_id_display = oscarStrings(c.case_id_display);
+            const client_global_id = oscarStrings(c.oscar_number);
+
+            const referralMap = c.services_section
+              .filter(s => s.service_response_type === 'referral_from_oscar')
+              .map(s => {
+                return {
+                  external_id,
+                  external_id_display,
+                  client_global_id,
+                  referral_status: statusMap[s.referral_status_edf41f2] || 'Referred',
+                  referral_id: parseInt(s.oscar_referral_id_a4ac8a5),
+                };
+              });
+
+            return referralMap;
+          })
+          .flat(); //Here we de-nest array - e.g, convert [[data]] --> [data]
+
+        //Check if decision is accepted/rejected before sending...
+        function checkDecision(d) {
+          return d.referral_status !== 'Referred';
+        }
+
+        function checkNull(d) {
+          return d.referral_id && d.referral_id !== null && d.referral_id !== undefined;
+        }
+
+        const confirmedDecisions = mappedDecisions.filter(checkDecision).filter(checkNull);
+
+        console.log('Finding oscar_referrals with confirmed decisions...');
+
+        console.log(
+          'confirmedDecisions - list of oscar_referrals with decisions to sync',
+          JSON.stringify(confirmedDecisions ? confirmedDecisions.map(x => x.external_id) : '', null, 2)
+        );
+        //=================================================================================//
+
+        const mappedReferrals = cases.referrals.map(c => {
+          const lastTransitionNote =
+            c.transitions &&
+            c.transitions.length > 0 &&
+            c.transitions.sort((a, b) => (a.created_at < b.created_at ? 1 : -1))[0].notes;
+
+          const referralReason = c.referrals.length > 0 ? c.referrals[0].notes : lastTransitionNote;
+
+          //Historically assumed would only send 1 service per case, but this is no longer true bc we want to sync decisions
+          //This will return ALL Primero services marked as 'referrals'
+          const primeroService = c.services_section.filter(
+            s =>
+              s.service_response_type === 'referral_to_oscar' ||
+              s.service_response_type === 'referral_from_oscar' //TODO: @Aleksa - remove now that we have decisions above?
+          );
+
+          //Here we want to find only the MOST RECENT service, taking the last item in the service_section array
+          const primeroLastService = primeroService.length > 1 ? primeroService.length - 1 : 0;
+
+          //Here we only map the referral status of the Most Recent service from Primero
+          const referral_status = primeroService
+            ? statusMap[oscarStrings(primeroService[primeroLastService].referral_status_edf41f2)] ||
+              'Referred'
+            : 'Referred';
+
+          // Mappings for posting cases to Oscar
+          const oscar = {
+            // oscar_field, primero_field,
+            external_id: oscarStrings(c.case_id),
+            external_id_display: oscarStrings(c.case_id_display),
+            global_id: c.oscar_number ? oscarStrings(c.oscar_number) : undefined,
+            level_of_risk: c.risk_level === 'no_action' ? 'no action' : c.risk_level,
+            mosvy_number: oscarStrings(c.mosvy_number),
+            given_name: oscarStrings(c.name_first),
+            family_name: oscarStrings(c.name_last),
+            gender: oscarStrings(c.sex),
+            date_of_birth: oscarStrings(c.date_of_birth && c.date_of_birth.replace(/\//g, '-')),
+            location_current_village_code: checkValue(c.location_current),
+            address_current_village_code: checkValue(c.location_current),
+            reason_for_referral: oscarStrings(referralReason),
+            external_case_worker_name: oscarStrings(c.owned_by),
+            external_case_worker_id: oscarStrings(c.owned_by_id),
+            external_case_worker_mobile: c.owned_by_phone || '000000000',
+            resource: c.workflow === 'referral_to_oscar' ? 'Primero' : undefined,
+            is_referred: true,
+            // organization_name: 'cif', //FOR TESTING: Use for testing with staging environments
+            // organization_id: 'cif', //FOR TESTING: Use for testing with staging environments
+            organization_name: setOrganization(c),
+            organization_id: oscarStrings(c.owned_by_agency_id),
+            services: c.services_section
+              .filter(s => s.service_type)
+              .map(s => {
+                // Logic to return only 1 serivce subtype if multiple are mistakenly selected by the Primero user
+                const service = {
+                  uuid: oscarStrings(s.unique_id),
+                  name:
+                    s.service_subtype.length > 0
+                      ? serviceMap[s.service_subtype[0]] || 'Not Specified'
+                      : 'Not Specified',
+                };
+                // Logic to send a 'Not Specified' service subtype to OSCaR if left blank in Primero
+                // This is because Service Subtype is required in OSCaR, but not on Primero Services Subform
+                return s.service_subtype.length > 0
+                  ? service
+                  : { uuid: oscarStrings(s.unique_id), name: 'Not Specified' };
+              })
+              .flat(),
+            transaction_id:
+              c.transitions && c.transitions.length > 0 ? c.transitions[0].transition_id : undefined,
+            date_of_referral: oscarStrings(
+              c.last_updated_at && c.last_updated_at.replace(/\//g, '-')
+            ).substring(0, 10),
+          };
+
+          return { organization: oscar };
+        });
+
+        console.log('If Oscar referrals have 2+ services, mapping to multiple Primero services...');
+        // NOTE: If Oscar referrals have 2+ services, here we split into separate JSON objects so that each
+        // request sent to Oscar only contains 1 service each (e.g., { c1, services: [s1, s2]} -->
+        // becomes 2 requests: {c1, services: [s1]} AND {c1, services: [s2]}
+        const transformedCases = [];
+
+        mappedReferrals.map(wrapper => {
+          wrapper.organization.services.map(s => {
+            transformedCases.push({
+              ...wrapper,
+              organization: { ...wrapper.organization, services: [s] },
+            });
+          });
+        });
+
+        return {
+          ...state,
+          cases: { ...cases, referrals: transformedCases, decisions: confirmedDecisions },
+        };
+      });
+
+      //NOW that data is transforemed, we start to sync case referrals to Oscar...
+      //User Story 1.8b: Create referrals in Oscar
+      // v7 rewrite: body is the 2nd positional arg; `transformResponse` is gone, so the
+      // privacy guard runs in a .then() on the invoked operation.
+      // REVIEW NOTE: `errors: false` prevents the adaptor from throwing the raw OSCaR
+      // response on a non-2xx (which could leak child data); `parseAs: 'text'` gives us
+      // the raw body so the SAME JSON.parse guard below behaves exactly as the old
+      // transformResponse did. The HTTP request itself is unchanged.
+      each(
+        '$.cases.referrals[*]',
+        state =>
+          post('/api/v1/organizations/clients/upsert/', state.data, {
+            headers: state.oscarHeaders,
+            parseAs: 'text',
+            errors: false,
+          })(state).then(state => {
+            const data = state.data;
+            console.log('Uploading referrals... Oscar says', JSON.stringify(data, null, 2));
+
+            try {
+              JSON.parse(data);
+            } catch (e) {
+              throw new Error(
+                'See above: the response from OSCAR was not valid JSON. Concealing HTTP error to protect child privacy.'
+              );
+            }
+
+            return state;
+          })
+      );
+
+      //==For decisions only, we send a PUT request to OSCaR to update the Referral Status for existing cases with decisions from Primero ==//
+      fn(state => {
+        if (state.cases.decisions.length > 0) {
+          const body = { data: state.cases.decisions };
+          console.log('Decisions sent in final PUT request', JSON.stringify(body, null, 2));
+          return put('/api/v1/organizations/referrals/update_statuses/', body, {
+            headers: state.oscarHeaders,
+            parseAs: 'text',
+            errors: false,
+          })(state).then(state => {
+            const data = state.data;
+            console.log('Uploading decisions...Oscar says', JSON.stringify(data, null, 2));
+
+            try {
+              JSON.parse(data);
+            } catch (e) {
+              throw new Error(
+                'See above: the response from OSCAR was not valid JSON. Concealing HTTP error to protect child privacy.'
+              );
+            }
+
+            return state;
+          });
+        }
+        console.log('No decisions to sync to Oscar.');
+        return state;
+      });
+
+      fn(state => {
+        // Here we update links in OSCaR for non-referrals
+        // NOTE: We also sync these cases back to OSCaR to log the Primero external_id assigned
+        // v7 rewrite: the old nested post(..., put(...)) callback form is gone, so we
+        // re-authenticate, then read state.response.headers, then PUT — sequentially.
+        if (state.cases.nonReferrals.length > 0) {
+          return post('/api/v1/admin_auth/sign_in', {
+            email: state.configuration.username,
+            password: state.configuration.password,
+          })(state).then(state => {
+            const headers = {
+              'Content-Type': 'application/json',
+              uid: state.configuration.username,
+              client: state.response.headers.client,
+              'access-token': state.response.headers['access-token'],
+            };
+            const payload = {
+              data: state.cases.nonReferrals.map(c => ({
+                external_id: state.oscarStrings(c.case_id),
+                external_id_display: state.oscarStrings(c.case_id_display),
+                global_id: state.oscarStrings(c.oscar_number),
+                is_referred: false,
+              })),
+            };
+            console.log(`'Update links' with non-referrals: ${JSON.stringify(payload, null, 4)}`);
+            return put('/api/v1/organizations/clients/update_links/', payload, {
+              headers,
+              parseAs: 'text',
+              errors: false,
+            })(state).then(state => {
+              const data = state.data;
+              console.log('Updating links...Oscar says', JSON.stringify(data, null, 2));
+
+              try {
+                JSON.parse(data);
+              } catch (e) {
+                throw new Error(
+                  'See above: the response from OSCAR was not valid JSON. Concealing HTTP error to protect child privacy.'
+                );
+              }
+
+              return state;
+            });
+          });
+        }
+
+        console.log('No non-referral cases to update.');
+        console.log('cursor', state.cursor);
+        return state;
+      });
+  Get-Referrals-from-OSCaR:
+    name: Get Referrals from OSCaR
+    adaptor: "@openfn/language-http@7.3.1"
+    body: |
+      // If the job was executed from a message in the inbox with a specific cursor,
+      // use that. If not, use the cursor from the previous final state.
+      // NOTE: the v1 "inbox" path no longer exists in v2; state.data.initialState will
+      // not be set by a cron run, so the else-branch is taken (lastQueryDate = cursor).
+      alterState(state => {
+        if (state.data && state.data.initialState) {
+          const lastQueryDate = state.cursor || state.data.initialState.lastQueryDate;
+          console.log('Setting cursor...');
+          return { ...state, lastQueryDate };
+        }
+        state.lastQueryDate = state.cursor;
+        return state;
+      });
+
+      // Clear data from previous runs.
+      alterState(state => {
+        const { lastQueryDate, thisQueryDate } = state;
+        state.data = {};
+        state.references = [];
+        console.log(`lastQueryDate (from the previous run): ${lastQueryDate}`);
+
+        const now = new Date().toISOString().replace('T', ' ').slice(0, 10);
+
+        state.thisQueryDate = `${now} 00:00:00`;
+
+        console.log(
+          `Current datetime, rounded to 00:00:00, to be used to update lastQueryDate after this query: ${state.thisQueryDate}`
+        );
+
+        const initialState = { lastQueryDate, thisQueryDate };
+
+        return { ...state, initialState };
+      });
+
+      // GET new OSCaR cases
+      // User Story 2: 'View Oscar cases in Primero' AND User Story 4: 'Sending referrals to Primero'
+      // Oscar authentication step.
+      // v7: body is the 2nd positional arg; `keepCookie` removed; no callback (the old
+      // callback only deleted the password, which the worker now scrubs automatically).
+      post('/api/v1/admin_auth/sign_in', state => ({
+        email: state.configuration.username,
+        password: state.configuration.password,
+      }));
+
+      //Here we get ALL cases from OSCaR that have sharing with Primero granted. This includes referrals & cases for duplicate prevention.
+      // v7: response headers are now on state.response (was state.data.__headers). The
+      // headers builder runs while state.response still holds the sign_in response (the
+      // GET has not yet replaced it). The old trailing callback is now a following fn().
+      get('/api/v1/organizations/clients', {
+        headers: state => ({
+          'access-token': state.response.headers['access-token'],
+          'Content-Type': 'application/json',
+          client: state.response.headers.client,
+          uid: state.configuration.username,
+        }),
+        query: {
+          // NOTE: since_date must be rounded to 00:00:00 to work with Oscar API. API does not support other timestamps.
+          //since_date: '2023-08-24 00:00:00', //for troubleshooting
+          since_date: state => state.lastQueryDate || state.cursor || '2025-08-02 00:00:00',
+        },
+      });
+
+      fn(state => {
+        console.log(
+          `# cases in Oscar API response :: ${JSON.stringify(
+            state.data.data ? state.data.data.length : ''
+          )}`
+        );
+        console.log(
+          `Oscar global_ids in reponse :: ${JSON.stringify(
+            state.data.data ? state.data.data.map(c => c.global_id) : ''
+          )}`
+        );
+        state.lastQueryDate = state.thisQueryDate;
+        console.log(`Updated state.lastQueryDate to: ${state.lastQueryDate}`);
+        return state;
+      });
+  Upsert-Cases-in-Primero:
+    name: Upsert Cases in Primero
+    adaptor: "@openfn/language-primero@4.1.1"
+    body: |
+      // ====================================================================
+      // PART A — from jobs/V2/f2-j2-upsertCasesToPrimero.js (verbatim).
+      // ====================================================================
+
+      // Custom transformation logic: we create dataClips and functions for later use
+      fn(state => {
+        console.log('Preparing cases and decisions for upload to Primero...');
+        // Saving original cases, creating Case:Service ID map =======================
+        state.originalCases = state.data.data;
+        state.serviceRecordIds = {};
+        // ===========================================================================
+
+        const convertToPrimeroDate = dateString => {
+          if (!dateString) return null;
+          const dateArray = dateString.split('-');
+          return `${dateArray[0]}/${dateArray[1]}/${dateArray[2]}`;
+        };
+
+        const calculateAge = dateOfBirth => {
+          if (!dateOfBirth) return null;
+          const currentYear = new Date().toISOString().split('T')[0].split('-')[0];
+          const yearOfBirth = dateOfBirth.split('-')[0];
+          return +currentYear - +yearOfBirth;
+        };
+
+        const setGender = gender => {
+          gender = gender && gender.toLowerCase();
+          const genderMap = {
+            male: 'male',
+            female: 'female',
+          };
+          return genderMap[gender] || 'other';
+        };
+
+        const setLocationCode = location => {
+          if (!location) return;
+          return parseInt(location).toString();
+        };
+
+        function createName(given, local) {
+          if (local && given) {
+            return `${local} (${given})`; //Output format: khmer name (english name)
+          }
+          if (given && !local) {
+            return given;
+          }
+          if (!given && local) {
+            return local;
+          } else {
+            return null;
+          }
+        }
+
+        function calcAge(str) {
+          if (!str) return 0;
+          var today = new Date();
+          var birthDate = new Date(str);
+          var age = today.getFullYear() - birthDate.getFullYear();
+
+          if (age > 30 || age < 1) return 0;
+
+          var m = today.getMonth() - birthDate.getMonth();
+          if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+          }
+          return age;
+        }
+
+        function setUser(c) {
+          if (c.is_referred) return setProvinceUser(c);
+          return setAgencyUser(c);
+        }
+
+        function setProvinceUser(c) {
+          const { location_current_village_code, organization_address_code, external_id, global_id } = c;
+          const source = location_current_village_code || organization_address_code;
+          console.log('Finding province user for this case from Oscar... id: ', global_id);
+          console.log('Primero case id (if case already synced) :: ', external_id);
+          console.log('Location code sent by Oscar :: ', source);
+          if (source) {
+            //If Village (admin level 4 location) not specified in OSCaR, then we expect a shorter location code and sometimes it has leading 0s (e.g., '0004')
+            //This logic therefore tells us how to extract the province code from the full location code
+            //Depending on the length of the location code and if leading 0s, we may need to look in a different spot for the province code
+            const subCode = source.slice(0, 2) === '00' ? source.slice(2, 4) : source.slice(0, 2);
+            console.log('Matching Primero province code:: ', subCode);
+            const user = provinceUserMap[subCode];
+            console.log('Primero province username located:: ', user);
+            if (user) {
+              return user;
+            } else {
+              throw `Province user not found for this case ${global_id} with Oscar location code ${source}. Verify the case location and mapping to Primero province users.`;
+            }
+          } else {
+            return null;
+          }
+        }
+
+        function setAgencyUser(c) {
+          if (c.organization_name) {
+            return agencyUserMap[`agency-${c.organization_name}`];
+          } else {
+            throw (
+              `No agency user found for the organization ${c.organization_name}. ` +
+              'Please create an agency user for this organization and update the job accordingly.'
+            );
+          }
+        }
+
+        function setServiceResponseType(c, s) {
+          if (s.enrollment_date) return 'service_being_provided_by_oscar_partner_47618';
+
+          if (s.enrollment_date === null && c.resource === 'primero') {
+            return 'referral_to_oscar';
+          }
+
+          return 'referral_from_oscar';
+        }
+
+        const provinceUserMap = {
+          12: 'mgrpnh',
+          '08': 'mgrkdl',
+          17: 'mgrsrp',
+          '02': 'mgrbtb',
+          18: 'mgrshv',
+          22: 'mgrstg',
+          16: 'mgrrtk',
+          11: 'mgrmdk',
+          10: 'mgrkrt',
+          25: 'mgrtkm',
+          '03': 'mgrkcm',
+          22: 'mgromc',
+          13: 'mgrpvh',
+          '06': 'mgrktm',
+          '01': 'mgrbmc',
+          24: 'mgrpln',
+          15: 'mgrpst',
+          23: 'mgrkep',
+          21: 'mgrtakeo',
+          '09': 'mgrkkg',
+          '07': 'mgrkpt',
+          '05': 'mgrksp',
+          20: 'mgrsvg',
+          14: 'mgrpvg',
+          '04': 'mgrkch',
+        };
+
+        const agencyUserMap = {
+          'agency-gpc': 'agency-gpc-user',
+          'agency-tpo': 'agency-tpo-user',
+          'agency-eao': 'agency-eao-user',
+          'agency-goh': 'agency-goh-user',
+          'agency-sk': 'agency-sk-user',
+          'agency-colt': 'agency-colt-user',
+          'agency-kt': 'agency-kt-user',
+          'agency-ea': 'agency-ea-user',
+          'agency-fsi': 'agency-fsi-user',
+          'agency-oec': 'agency-oec-user',
+          'agency-cct': 'agency-cct-user',
+          'agency-cfi': 'agency-cfi-user',
+          'agency-cif': 'agency-cif-user',
+          'agency-css': 'agency-css-user',
+          'agency-cwd': 'agency-cwd-user',
+          'agency-holt': 'agency-holt-user',
+          'agency-isf': 'agency-isf-user',
+          'agency-kmr': 'agency-kmr-user',
+          'agency-mho': 'agency-mho-user',
+          'agency-msl': 'agency-msl-user',
+          'agency-mtp': 'agency-mtp-user',
+          'agency-tlc': 'agency-tlc-user',
+          'agency-tmw': 'agency-tmw-user',
+          'agency-wmo': 'agency-wmo-user',
+        };
+
+        const serviceMap = {
+          'Generalist social work / case work': {
+            subtype: 'social_work_case_work_generalist',
+            type: 'social_work_case_work',
+          },
+          'Community social work': {
+            subtype: 'social_work_case_work_community',
+            type: 'social_work_case_work',
+          },
+          'Emergency foster care': {
+            subtype: 'family_based_care_emergency_foster',
+            type: 'family_based_care',
+          },
+          'Long term foster care': {
+            subtype: 'family_based_care_longterm_foster',
+            type: 'family_based_care',
+          },
+          'Kinship care': { subtype: 'family_based_care_kinship', type: 'family_based_care' },
+          'Domestic adoption support': {
+            subtype: 'family_based_care_domestic_adoption',
+            type: 'family_based_care',
+          },
+          'Family preservation': {
+            subtype: 'family_based_care_family_preservation',
+            type: 'family_based_care',
+          },
+          'Family reunification': {
+            subtype: 'family_based_care_family_reunification',
+            type: 'family_based_care',
+          },
+          'Independent Living': {
+            subtype: 'family_based_care_independent_living',
+            type: 'family_based_care',
+          },
+          'Drug and Alcohol Counselling': { subtype: 'drug_alcohol_counselling', type: 'drug_alcohol' },
+          'Detox / rehabilitation services': {
+            subtype: 'drug_alcohol_detox_rehabilitation',
+            type: 'drug_alcohol',
+          },
+          'Detox support': { subtype: 'drug_alcohol_detox_support', type: 'drug_alcohol' },
+          'Generalist counselling': { subtype: 'counselling_generalist', type: 'counselling' },
+          'Counselling for abuse survivors': {
+            subtype: 'counselling_abuse_survivors',
+            type: 'counselling',
+          },
+          'Trauma counselling': { subtype: 'counselling_trauma', type: 'counselling' },
+          'Family counselling / mediation': { subtype: 'counselling_family', type: 'counselling' },
+          'Direct material assistance': {
+            subtype: 'financial_development_material_assistance',
+            type: 'financial_development',
+          },
+          'Direct financial assistance': {
+            subtype: 'financial_development_financial_assistance',
+            type: 'financial_development',
+          },
+          'Income generation services': {
+            subtype: 'financial_development_income_generation',
+            type: 'financial_development',
+          },
+          'Day care services': {
+            subtype: 'financial_development_day_care',
+            type: 'financial_development',
+          },
+          'Therapeutic interventions': {
+            subtype: 'disability_support_therapeutic_interventions',
+            type: 'disability_support',
+          },
+          'Disability respite care': {
+            subtype: 'disability_support_respite-care',
+            type: 'disability_support',
+          },
+          'Therapeutic training': {
+            subtype: 'disability_support_therapeutic_training',
+            type: 'disability_support',
+          },
+          'Disability-aid provision': {
+            subtype: 'disability_support_aid_provision',
+            type: 'disability_support',
+          },
+          'Peripheral supports': { subtype: 'disability_support_peripheral', type: 'disability_support' },
+          'Support groups': { subtype: 'disability_support_groups', type: 'disability_support' },
+          'Support to access care': { subtype: 'medical_support_access_care', type: 'medical_support' },
+          'Provision of medical care': {
+            subtype: 'medical_support_provision_medical_case',
+            type: 'medical_support',
+          },
+          'Medical training services': {
+            subtype: 'medical_support_medical_training',
+            type: 'medical_support',
+          },
+          'Health education': { subtype: 'medical_support_healt_education', type: 'medical_support' },
+          'Support to access legal services': {
+            subtype: 'legal_support_access_legal_services',
+            type: 'legal_support',
+          },
+          'Legal advocacy services': {
+            subtype: 'legal_support_advocacy_services',
+            type: 'legal_support',
+          },
+          'Legal representation': { subtype: 'legal_support_representation', type: 'legal_support' },
+          'Prison visitation support': {
+            subtype: 'legal_support_prision_visitation',
+            type: 'legal_support',
+          },
+          'Therapeutic interventions': {
+            subtype: 'mental_health_support_therapeutic_interventions',
+            type: 'mental_health_support',
+          },
+          'Therapeutic training': {
+            subtype: 'mental_health_support_therapeutic_training',
+            type: 'mental_health_support',
+          },
+          'Direct medical support': {
+            subtype: 'mental_health_support_direct_medical_support',
+            type: 'mental_health_support',
+          },
+          'School support': { subtype: 'training_education_school_support', type: 'training_education' },
+          'Supplementary school education': {
+            subtype: 'training_education_supplementary',
+            type: 'training_education',
+          },
+          'Vocational education and training': {
+            subtype: 'training_education_vocational',
+            type: 'training_education',
+          },
+          'Material support for education (uniforms, etc)': {
+            subtype: 'training_education_material_support',
+            type: 'training_education',
+          },
+          'Scholarships or financial support': {
+            subtype: 'training_education_scholarships',
+            type: 'training_education',
+          },
+          'Life skills': { subtype: 'training_education_life_skills', type: 'training_education' },
+          'Family support': { subtype: 'family_support_family_support', type: 'family_support' },
+          'Rescue Services': { subtype: 'anti_trafficking_rescue', type: 'anti_trafficking' },
+          'Transitional Accommodation': {
+            subtype: 'anti_trafficking_transitional_accomodation',
+            type: 'anti_trafficking',
+          },
+          'Post-Trafficking Counseling': {
+            subtype: 'anti_trafficking_post_trafficking',
+            type: 'anti_trafficking',
+          },
+          'Community Reintegration Support': {
+            subtype: 'anti_trafficking_community_reintegration',
+            type: 'anti_trafficking',
+          },
+          'Residential Care Institution': { subtype: 'residential_care_gov_only_other', type: 'other' },
+          'Other Service': { subtype: 'other_other_service', type: 'other' },
+        };
+
+        const serviceStatusMap = {
+          Accepted: 'accepted_340953',
+          Accetped: 'accepted_340953',
+          Active: 'accepted_340953',
+          Rejected: 'rejected_936484',
+          Exited: 'rejected_936484',
+        };
+
+        const referralStatusMap = {
+          Accepted: 'accepted',
+          Accetped: 'accepted',
+          Active: 'accepted',
+          Exited: 'rejected',
+        };
+
+        const PrimeroServiceToReferralStatusMap = {
+          accepted_340953: 'accepted',
+          rejected_936484: 'rejected',
+          pending_310366: 'in_progress',
+        };
+
+        function buildCaseRecord(c) {
+          const currentLocation = setLocationCode(
+            c.location_current_village_code || c.address_current_village_code
+          );
+
+          const currentAddress = setLocationCode(
+            c.address_current_village_code || c.location_current_village_code
+          );
+
+          const locationCode =
+            c.location_current_village_code || c.address_current_village_code
+              ? parseInt(currentLocation, 10).toString()
+              : null;
+
+          const addressCode =
+            c.location_current_village_code || c.address_current_village_code
+              ? parseInt(currentAddress, 10).toString()
+              : null;
+
+          const isUpdate = c.external_id;
+          const oscarNumber = c.global_id;
+
+          const riskLevel = c.risk_level === 'no action' ? 'no_action' : c.risk_level || 'no_action';
+
+          const referralReason = c.reason_for_referral;
+
+          //cleaning rule for date_of_birth when Oscar sometimes sends bad date value e.g., 22012-01-01
+          const dob = c.date_of_birth;
+          const cleanedDob = dob && dob.length === 11 ? dob.substring(1, 11) : dob;
+
+          return {
+            __original_oscar_record: c,
+            oscar_number: c.global_id,
+            case_id: c.external_id === '' ? undefined : c.external_id,
+            case_id_display: c.external_id_display === '' ? undefined : c.external_id_display,
+            oscar_short_id: c.slug,
+            mosvy_number: c.mosvy_number,
+            name_first: isUpdate ? undefined : createName(c.given_name, c.local_given_name),
+            name_last: isUpdate ? undefined : createName(c.family_name, c.local_family_name),
+            sex: isUpdate ? undefined : setGender(c.gender),
+            age: isUpdate ? undefined : calcAge(cleanedDob),
+            date_of_birth: isUpdate ? undefined : cleanedDob,
+            location_current: isUpdate ? undefined : locationCode,
+            oscar_status: c.status,
+            protection_status: !isUpdate && c.is_referred == true ? 'oscar_referral' : undefined,
+            owned_by:
+              !isUpdate || //if NOT an update to a case already synced...
+              c.resource !== 'primero' //or if case didn't originate in Primero...
+                ? setUser(c) //set 'owned_by' user
+                : undefined, //otherwise do not overwrite user that is already set in Primero
+            oscar_reason_for_exiting: c.reason_for_exiting,
+            consent_for_services: true,
+            disclosure_other_orgs: true,
+            risk_level: c.is_referred === true ? riskLevel : undefined,
+            interview_subject: isUpdate || c.is_referred !== true ? undefined : 'other',
+            module_id: 'primeromodule-cp',
+            services_section: c.services.map(s => ({
+              unique_id: s.uuid !== null && s.uuid !== '' ? s.uuid : undefined,
+              referral_notes_from_oscar_2e787b8: referralReason,
+              service_referral_notes: s.reason_for_referral,
+              service_type: (serviceMap[s.name] && serviceMap[s.name].type) || 'Other',
+              service_subtype: [serviceMap[s.name] && serviceMap[s.name].subtype],
+              service_type_text: serviceMap[s.name] && serviceMap[s.name].type,
+              service_type_details_text: serviceMap[s.name] ? 'n/a' : s.name,
+              service_response_day_time: s.enrollment_date
+                ? `${s.enrollment_date}T00:00:00.000Z`
+                : undefined,
+              service_response_type: setServiceResponseType(c, s),
+              oscar_case_worker_name: c.case_worker_name,
+              oscar_case_worker_telephone: c.case_worker_mobile,
+              oscar_referring_organization: `agency-${c.organization_name}`,
+              service_implementing_agency: `agency-${c.organization_name}`,
+              oscar_referral_id_a4ac8a5: s.referral_id ? s.referral_id.toString() : undefined,
+              referral_status_edf41f2: serviceStatusMap[s.referral_status] || undefined,
+            })),
+          };
+        }
+
+        return {
+          ...state,
+          serviceStatusMap,
+          referralStatusMap,
+          convertToPrimeroDate,
+          calculateAge,
+          setGender,
+          setLocationCode,
+          createName,
+          setUser,
+          serviceMap,
+          setServiceResponseType,
+          buildCaseRecord,
+          PrimeroServiceToReferralStatusMap,
+        };
+      });
+
+      // we separate cases from decisions
+      fn(state => {
+        console.log('Finding cases with decisions...');
+        const { originalCases } = state;
+
+        const isDecision = c =>
+          c.resource == 'primero' && c.services.filter(s => s.referral_status !== 'Referred');
+
+        const cases = originalCases.filter(c => !isDecision(c));
+        const decisions = originalCases.filter(c => isDecision(c));
+
+        // console.log('# standard Cases:', cases.length);
+        // console.log('# cases with Decisions:', decisions.length);
+
+        return { ...state, cases, decisions };
+      });
+
+      // we build cases for primero
+      fn(state => {
+        const { cases, buildCaseRecord } = state;
+
+        const finalized = cases.map(buildCaseRecord).map(c => {
+          delete c.__original_oscar_record;
+          return c;
+        });
+
+        const finalizedNoRefsFromPrimero = finalized.map(c => {
+          return {
+            ...c,
+            services_section: c.services_section
+              ? c.services_section.filter(s => s.service_response_type !== 'referral_to_oscar')
+              : undefined,
+          };
+        });
+
+        console.log(
+          'Prepared cases with Oscar services to sync back to Primero ::',
+          JSON.stringify(
+            finalizedNoRefsFromPrimero ? finalizedNoRefsFromPrimero.length : '',
+            null,
+            2
+          )
+        );
+
+        return { ...state, cases: finalizedNoRefsFromPrimero };
+      });
+
+      // we build decisions for primero, add array for referrals to update
+      fn(state => {
+        const { decisions, buildCaseRecord } = state;
+
+        const finalized = decisions.map(buildCaseRecord);
+
+        return { ...state, decisions: finalized, referrals: [] };
+      });
+
+      // for EACH decision, we get its referrals and then we update a single referral
+      each(
+        '$.decisions[*]',
+        getCases({ case_id: dataValue('case_id') }, { withReferrals: true }, nextState => {
+          const { decisions, references, data, PrimeroServiceToReferralStatusMap } = nextState;
+          const decision = references[references.length - 1];
+
+          if (data.length > 1) throw new Error('Duplicate case_id on Primero');
+          const parentCase = data[0];
+
+          const newDecisions = decision.__original_oscar_record.services.filter(
+            s => s.enrollment_date === null
+          );
+
+          if (!newDecisions) {
+            console.log(
+              'Skipping dropping this decision from the array; no services with enrollment_date === null'
+            );
+            return {
+              ...nextState,
+              decisions: decisions.filter(d => d.case_id !== decision.case_id),
+            };
+          }
+
+          const oscarReferredServices = newDecisions;
+          //== Here we match services based on Oscar referral_id, not service uuid ==//
+          const oscarReferredReferralIds = newDecisions.map(d => d.referral_id);
+
+          console.log('oscar referral_ids ::', oscarReferredReferralIds);
+
+          const parentServices = parentCase ? parentCase.services_section : undefined;
+
+          if (parentServices) {
+            const updatedDecisions = decisions.map(d => {
+              // find the right case...
+              if (d.case_id === decision.case_id) {
+                return {
+                  ...d,
+                  services_section: d.services_section.map(s => {
+                    console.log('Oscar decision to map to Primero service ::', s.unique_id);
+
+                    // and find the right service, matching by subtype..
+                    decisionServiceType = s.service_subtype[0];
+                    referralId = s.oscar_referral_id_a4ac8a5;
+                    matchingService = parentServices.find(
+                      s =>
+                        s.oscar_referral_id_a4ac8a5 === referralId ||
+                        (s.service_subtype[0] === decisionServiceType &&
+                          s.referral_status_edf41f2 === 'pending_310366' &&
+                          s.service_response_type === 'referral_to_oscar') ||
+                        //Criteria for rejected 'Not Specified' referrals where subtype originally not specified
+                        (s.service_subtype[0] === '' &&
+                          s.referral_status_edf41f2 === 'pending_310366' &&
+                          s.service_response_type === 'referral_to_oscar')
+                    );
+                    console.log('matchingService', matchingService ? matchingService.unique_id : '');
+                    matchingServiceId = matchingService ? matchingService.unique_id : undefined;
+                    decisionStatus = PrimeroServiceToReferralStatusMap[s.referral_status_edf41f2];
+
+                    // console.log('Oscar decisionServiceSubType to match on::', decisionServiceType);
+                    // console.log('matchingServiceId in Primero found::', matchingServiceId);
+                    // console.log('decisionStatus for Referral found::', decisionStatus);
+
+                    return {
+                      ...s,
+                      // Update the unique_id when we've got our needle in the haystack
+                      unique_id: matchingServiceId,
+                    };
+                  }),
+                };
+              }
+              return d;
+            });
+            //Now let's find the service's parent referral to update
+            const referralServiceUuids = updatedDecisions
+              .map(d => {
+                return d.services_section.map(s => {
+                  return s.unique_id;
+                });
+              })
+              .flat();
+
+            const matchingReferrals = parentCase.referrals.filter(
+              r =>
+                // Update referral with matching service where status is in_progress...
+                r.status === 'in_progress' && referralServiceUuids.includes(r.service_record_id)
+            );
+
+            if (matchingReferrals) console.log('Matching referrals found...');
+
+            const mappedReferrals = matchingReferrals.map(r => {
+              const serviceId = r.service_record_id;
+              const matchingCase = updatedDecisions.filter(d => d.case_id === decision.case_id);
+
+              const matchingService = matchingCase
+                ? matchingCase[0].services_section.find(s => s.unique_id === serviceId)
+                : undefined;
+
+              return {
+                ...r,
+                status: PrimeroServiceToReferralStatusMap[matchingService.referral_status_edf41f2],
+                case_id: decision.case_id,
+              };
+            });
+
+            console.log('Building referrals array...');
+            console.log('# of mappedReferrals ::', mappedReferrals.length);
+
+            if (mappedReferrals) nextState.referrals.push(mappedReferrals.flat());
+
+            return { ...nextState, decisions: updatedDecisions };
+          }
+
+          return { ...nextState };
+        })
+      );
+
+      // log matching referrals
+      fn(state => {
+        state.referrals = state.referrals.flat();
+
+        console.log('Preparing referrals to sync...');
+        console.log(
+          'mappedReferrals to update for these cases ::',
+          JSON.stringify(state.referrals ? state.referrals.map(x => x.case_id) : '', null, 2)
+        );
+        return state;
+      });
+
+      // Now that we've found the matching referral, we update its status
+      each(
+        '$.referrals[*]',
+        updateReferral({
+          caseExternalId: 'record_id',
+          caseId: dataValue('record_id'),
+          id: dataValue('id'),
+          data: {
+            status: dataValue('status'),
+            id: dataValue('id'),
+            type: 'Referral',
+            record_id: dataValue('record_id'),
+            record_type: dataValue('case'),
+          },
+        })
+      );
+
+      // After we've updated the Referrals, let's go update the "Referral Status" on the related Service record
+      fn(state => {
+        console.log('Preparing decisions to sync...');
+        const cleanedDecisions = state.decisions
+          .map(d => {
+            delete d.__original_oscar_record;
+            //only sync decisions with a matching Primero service_id and a decision update
+            const filteredServices = d.services_section.filter(
+              s => s.unique_id && s.referral_status_edf41f2
+            );
+            return { ...d, services_section: filteredServices };
+          })
+          .filter(d => d.services_section.length > 0);
+        return { ...state, decisions: cleanedDecisions };
+      });
+
+      // for EACH decision from OSCaR, we update the matching Primero case to update the Services Subform with the decision
+      each(
+        '$.decisions[*]',
+        upsertCase({
+          externalIds: ['case_id'],
+          data: state => {
+            const decision = state.data;
+            const decisionCaseId = state.data.case_id;
+            console.log('Syncing decision ::', decisionCaseId);
+            return decision;
+          },
+        })
+      );
+
+      // Remove everything but `cases` and `cursor` from state.
+      // CHANGE FOR MERGE: also keep `configuration` so PART B (below) still has the
+      // Primero credential for its getCases/upsertCase calls. In the old 5-job workflow
+      // this trim ran at a job boundary and the worker re-injected configuration for the
+      // next job; here PART B runs in the SAME step, so we must carry it across.
+      fn(state => ({ cases: state.cases, cursor: state.cursor, configuration: state.configuration }));
+
+      // ====================================================================
+      // PART B — from jobs/V2/f2-j3-updateReferralPending.js (verbatim).
+      // (Was the separate "Set Pending Status for New Referrals" job in the
+      //  5-step export; merged here so the workflow is 4 steps == 4 V1 jobs.)
+      // ====================================================================
+
+      //We update cases synced for duplicate prevention AND set the status of newly referred Services as 'Pending'
+      fn(state => {
+        const caseIds = state.cases.map(c => ({
+          case_id: c.case_id,
+          oscar_number: c.oscar_number,
+          // address_current: c.address_current,
+        }));
+        console.log('External Ids for prepared cases:', JSON.stringify(caseIds, null, 2));
+        return state;
+      });
+
+      // We upsert Primero cases based on matching 'oscar_number' OR 'case_id'
+      each(
+        '$.cases[*]', //using each() here returns state.data for each item in the prepared "cases" array
+        upsertCase({
+          externalIds: state => (!!state.data.case_id ? ['case_id'] : ['oscar_number']),
+          data: state => {
+            console.log('Syncing prepared case ::', state.data.case_id);
+            return state.data;
+          },
+        })
+      );
+
+      fn(state => {
+        console.log('Dynamic cursor to use in GET request to Primero::', state.cursor);
+        return state;
+      });
+
+      //We then get Primero cases to check which should have 'pending' status
+      getCases(
+        {
+          remote: true,
+          last_updated_at: state => `${state.cursor}..`, //e.g., '2022-11-25T00:57:24.777Z..'
+          workflow: 'referral_from_oscar',
+        },
+        { withReferrals: false },
+        state => {
+          const cases = state.data;
+
+          function checkPending(s) {
+            return (
+              s.referral_status_edf41f2 === 'pending_310366' ||
+              s.referral_status_edf41f2 === undefined ||
+              s.referral_status_edf41f2 === null
+            );
+          }
+
+          const casesWithPending = cases.map(c => {
+            return {
+              ...c,
+              services_section: c.services_section.filter(checkPending),
+            };
+          });
+
+          console.log(
+            'Cases with empty referral status to update as Pending ::',
+            JSON.stringify(casesWithPending ? casesWithPending.map(x => x.case_id) : '', null, 2)
+          );
+
+          ///return only cases with services
+          function checkServices(c) {
+            const length = c.services_section.length;
+            return length > 0 ? true : false;
+          }
+
+          const casesToUpdate = casesWithPending.filter(checkServices);
+
+          modifiedCases = casesToUpdate
+            ? casesToUpdate.map(c => {
+                return {
+                  id: c.id,
+                  case_id: c.case_id,
+                  module_id: 'primeromodule-cp',
+                  services_section: c.services_section.map(s => {
+                    return {
+                      ...s,
+                      referral_status_edf41f2: 'pending_310366',
+                    };
+                  }),
+                };
+              })
+            : undefined;
+
+          return { ...state, pendingCases: modifiedCases };
+        }
+      );
+
+      each(
+        '$.pendingCases[*]', //using each() here returns state.data for each item in the prepared "cases" array
+        upsertCase({
+          externalIds: ['id'],
+          data: state => {
+            console.log('Updating pending status for new referrals ::', state.data.id);
+            return state.data;
+          },
+        })
+      );
+triggers:
+  cron:
+    type: cron
+    enabled: false
+    cron_expression: "*/61 * * * *"
+    # cron_cursor_job seeds the next run from THIS job's last successful output state,
+    # which is where `lastRunDateTime` (the Primero cursor) is written. Kept as-is.
+    cron_cursor_job: Get-Referrals-from-Primero
+edges:
+  cron->Get-Referrals-from-Primero:
+    condition_type: always
+    enabled: true
+    target_job: Get-Referrals-from-Primero
+    source_trigger: cron
+  Get-Referrals-from-Primero->Upsert-Cases-in-Oscar:
+    condition_type: on_job_success
+    enabled: true
+    target_job: Upsert-Cases-in-Oscar
+    source_job: Get-Referrals-from-Primero
+  Upsert-Cases-in-Oscar->Get-Referrals-from-OSCaR:
+    condition_type: on_job_success
+    enabled: true
+    target_job: Get-Referrals-from-OSCaR
+    source_job: Upsert-Cases-in-Oscar
+  Get-Referrals-from-OSCaR->Upsert-Cases-in-Primero:
+    condition_type: on_job_success
+    enabled: true
+    target_job: Upsert-Cases-in-Primero
+    source_job: Get-Referrals-from-OSCaR
